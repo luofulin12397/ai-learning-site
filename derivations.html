@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>公式与概念详解 — AI知识库</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="nav-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<div class="shell">
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h2>AI知识库</h2>
+    <p>公式与概念详解</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">大语言模型</div>
+      <a class="sidebar-link" href="#cross-entropy"><span class="dot" style="background:var(--c-llm)"></span>交叉熵损失推导</a>
+      <a class="sidebar-link" href="#self-attention"><span class="dot" style="background:var(--c-llm)"></span>自注意力机制</a>
+      <a class="sidebar-link" href="#next-token"><span class="dot" style="background:var(--c-llm)"></span>预测下一个Token</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">强化学习</div>
+      <a class="sidebar-link" href="#bellman"><span class="dot" style="background:var(--c-rl)"></span>贝尔曼方程</a>
+      <a class="sidebar-link" href="#policy-gradient-thm"><span class="dot" style="background:var(--c-rl)"></span>策略梯度定理</a>
+      <a class="sidebar-link" href="#gae"><span class="dot" style="background:var(--c-rl)"></span>广义优势估计GAE</a>
+      <a class="sidebar-link" href="#reinforce-derive"><span class="dot" style="background:var(--c-rl)"></span>REINFORCE推导</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">RLHF 核心</div>
+      <a class="sidebar-link" href="#kl-divergence"><span class="dot" style="background:var(--c-rlhf)"></span>KL散度</a>
+      <a class="sidebar-link" href="#importance-sampling"><span class="dot" style="background:var(--c-rlhf)"></span>重要性采样</a>
+      <a class="sidebar-link" href="#ppo-surrogate"><span class="dot" style="background:var(--c-rlhf)"></span>PPO替代目标推导</a>
+      <a class="sidebar-link" href="#grpo-advantage"><span class="dot" style="background:var(--c-rlhf)"></span>GRPO组相对优势</a>
+      <a class="sidebar-link" href="#dpo-derive"><span class="dot" style="background:var(--c-rlhf)"></span>DPO目标函数推导</a>
+      <a class="sidebar-link" href="#reward-rt"><span class="dot" style="background:var(--c-rlhf)"></span>即时奖励Rt计算</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">多模态</div>
+      <a class="sidebar-link" href="#diffusion-forward"><span class="dot" style="background:var(--c-mm)"></span>正向扩散闭式公式</a>
+      <a class="sidebar-link" href="#langevin"><span class="dot" style="background:var(--c-mm)"></span>郎之万动力学</a>
+      <a class="sidebar-link" href="#cond-diffusion-derive"><span class="dot" style="background:var(--c-mm)"></span>条件扩散p(x|y)</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <a href="index.html" style="color:var(--ink-3)">← 返回首页</a>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="breadcrumb">
+    <a href="index.html">首页</a>
+    <span class="breadcrumb-sep">/</span>
+    <span style="color:var(--ink);font-weight:600">公式与概念详解</span>
+  </div>
+
+  <h1>公式与概念详解</h1>
+  <p class="lead">本页汇集全书重要公式与概念的详细推导和解释。点击原页面中的公式或蓝色概念词可跳转到对应章节。</p>
+
+  <!-- ========== LLM ========== -->
+
+  <section class="section" id="cross-entropy">
+    <span class="tag tag-llm">LLM</span>
+    <h2>交叉熵损失函数推导</h2>
+    <p>从极大似然估计出发，推导 LLM 训练使用的交叉熵损失。</p>
+
+    <h3>第 1 步：极大似然估计</h3>
+    <p>假设训练数据为 "abcd"，我们希望模型对每个位置预测正确的下一个 token 的概率越大越好。所有位置的联合概率为：</p>
+    <div class="math-block">Pθ(d|abc) · Pθ(c|ab) · Pθ(b|a)</div>
+
+    <h3>第 2 步：取对数（log 似然）</h3>
+    <p>概率连乘难优化且数值下溢，取 log 转为连加：</p>
+    <div class="math-block">log{ Pθ(d|abc) · Pθ(c|ab) · Pθ(b|a) }<br>= log Pθ(d|abc) + log Pθ(c|ab) + log Pθ(b|a)</div>
+
+    <h3>第 3 步：最大化 ↔ 最小化负对数</h3>
+    <p>最大化 log 似然等价于最小化负 log 似然：</p>
+    <div class="math-block">minimize:  −log Pθ(d|abc) − log Pθ(c|ab) − log Pθ(b|a)</div>
+
+    <h3>第 4 步：识别为交叉熵</h3>
+    <p>这正是<strong>交叉熵损失</strong>。给定输入 "ab"，目标分类是 "c"，模型输出 c 的概率为 p，则损失为 −log p。</p>
+    <p>更一般地，对真实分布 P（one-hot）和预测分布 Q，交叉熵为：</p>
+    <div class="math-block">H(P, Q) = −Σₓ P(x) log Q(x)</div>
+
+    <div class="callout callout-info">
+      <div class="callout-title">直观理解</div>
+      <p>LLM 本质是个<strong>分类模型</strong>：类别 = 词表中的所有 token（可能数万个）。每次预测就是一次"分类"，正确 token 的概率越大，损失越小。</p>
+    </div>
+
+    <p><a href="llm.html#llm-intro" class="concept-link">← 返回 LLM 简介章节</a></p>
+  </section>
+
+  <section class="section" id="self-attention">
+    <span class="tag tag-llm">LLM</span>
+    <h2>自注意力机制（Self-Attention）</h2>
+
+    <h3>核心公式</h3>
+    <div class="math-block">Attention(Q, K, V) = softmax(QKᵀ / √dₖ) · V</div>
+
+    <h3>三个矩阵的来源</h3>
+    <p>输入序列 X（每个 token 的嵌入向量）通过三个不同的线性变换得到 Q、K、V：</p>
+    <div class="code-block"><pre>Q = X · WQ    <span class="comment"># Query：当前 token 想查询什么</span>
+K = X · WK    <span class="comment"># Key：每个 token 提供的"标签"</span>
+V = X · WV    <span class="comment"># Value：每个 token 携带的实际信息</span></pre></div>
+
+    <h3>逐步分解</h3>
+    <p><strong>1. QKᵀ</strong>：计算每个 token 与所有 token 的相似度（点积）。点积越大，两个 token 越相关。</p>
+    <p><strong>2. /√dₖ</strong>：缩放因子，防止点积过大导致 softmax 梯度消失。dₖ 是 Key 的维度。</p>
+    <p><strong>3. softmax</strong>：把相似度归一化为概率分布（权重和为 1）。</p>
+    <p><strong>4. ·V</strong>：用注意力权重对所有 token 的 Value 加权求和，得到当前 token 的新表示。</p>
+
+    <h3>多头注意力</h3>
+    <p>将嵌入空间分成 h 个子空间，每个子空间独立计算注意力，最后拼接。这让模型能同时关注不同类型的关系（语法、语义、共指等）。</p>
+
+    <h3>Decoder-Only 的关键约束</h3>
+    <p>GPT 系列使用<strong>因果掩码</strong>（causal mask）：每个 token 只能"看到"它之前的 token，看不到未来。这保证了自回归生成的正确性。</p>
+
+    <p><a href="llm.html#gpt2" class="concept-link">← 返回 GPT-2 章节</a></p>
+  </section>
+
+  <section class="section" id="next-token">
+    <span class="tag tag-llm">LLM</span>
+    <h2>预测下一个 Token（NTP）</h2>
+
+    <p>大语言模型要解决的核心问题是<strong>预测下一个 token</strong>（Next Token Prediction, NTP）。</p>
+
+    <h3>训练数据的构造</h3>
+    <p>原始文本 "君不见黄河之水天上来" 被程序切分为输入-目标对：</p>
+    <div class="code-block"><pre>输入              预测目标
+君不见黄河        → 之
+君不见黄河之      → 水
+君不见黄河之水    → 天
+君不见黄河之水天  → 上</pre></div>
+
+    <p>预测目标不是人工标注，而是程序通过切分文本自动生成——所以叫<strong>自监督学习</strong>。</p>
+
+    <h3>滑动窗口</h3>
+    <p>为了利用 GPU 并行，训练时使用固定长度的滑动窗口（context length），每个位置同时预测下一个 token。</p>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">为什么这个简单目标如此强大？</div>
+      <p>预测下一个 token 需要理解语法、语义、世界知识、推理能力。一个能完美预测下一个 token 的模型，几乎能完成任何语言任务。</p>
+    </div>
+
+    <p><a href="llm.html#llm-intro" class="concept-link">← 返回 LLM 简介章节</a></p>
+  </section>
+
+  <!-- ========== RL ========== -->
+
+  <section class="section" id="bellman">
+    <span class="tag tag-rl">RL</span>
+    <h2>贝尔曼方程</h2>
+
+    <p>贝尔曼方程是强化学习的核心递推关系，将价值函数分解为"即时奖励 + 下一状态的价值"。</p>
+
+    <h3>状态价值函数的贝尔曼方程</h3>
+    <div class="math-block">V(s) = E[ Rₜ + γ · V(Sₜ₊₁) | Sₜ = s ]</div>
+
+    <h3>推导思路</h3>
+    <p>价值函数 V(s) 定义为从状态 s 出发的期望累积回报：</p>
+    <div class="math-block">V(s) = E[ Gₜ | Sₜ = s ]<br><br>其中 Gₜ = Rₜ + γ·Rₜ₊₁ + γ²·Rₜ₊₂ + ...</div>
+
+    <p>将 Gₜ 拆分为即时奖励 Rₜ 和折扣后的未来回报 γ·Gₜ₊₁：</p>
+    <div class="math-block">Gₜ = Rₜ + γ · Gₜ₊₁</div>
+
+    <p>代入期望：</p>
+    <div class="math-block">V(s) = E[ Rₜ + γ · Gₜ₊₁ | Sₜ = s ]<br>= E[ Rₜ | Sₜ = s ] + γ · E[ Gₜ₊₁ | Sₜ = s ]<br>= E[ Rₜ + γ · V(Sₜ₊₁) | Sₜ = s ]</div>
+
+    <h3>动作价值函数 Q(s, a) 的贝尔曼方程</h3>
+    <div class="math-block">Q(s, a) = E[ Rₜ + γ · E_{a'~π}[ Q(Sₜ₊₁, a') ] | Sₜ = s, Aₜ = a ]</div>
+
+    <div class="callout callout-info">
+      <div class="callout-title">为什么贝尔曼方程重要？</div>
+      <p>它将"长期累积回报"转化为"即时奖励 + 下一状态价值"的递推形式，使我们可以用迭代或动态规划求解价值函数。TD 学习、Q-learning、Actor-Critic 都建立在贝尔曼方程之上。</p>
+    </div>
+
+    <p><a href="rl.html#rl-intro" class="concept-link">← 返回 RL 基础章节</a></p>
+  </section>
+
+  <section class="section" id="policy-gradient-thm">
+    <span class="tag tag-rl">RL</span>
+    <h2>策略梯度定理</h2>
+
+    <h3>目标函数</h3>
+    <p>策略 πθ 的目标：最大化期望回报</p>
+    <div class="math-block">J(θ) = E_{τ~πθ}[ G(τ) ]</div>
+
+    <p>其中轨迹 τ = (S₀, A₀, R₀, S₁, A₁, R₁, ..., S_{T+1})，回报 G(τ) = R₀ + γR₁ + γ²R₂ + ... + γᵀRᵀ。</p>
+
+    <h3>轨迹的概率</h3>
+    <div class="math-block">Pr(τ) = p(S₀) · ∏ₜ πθ(Aₜ|Sₜ) · p(Sₜ₊₁|Sₜ, Aₜ)</div>
+
+    <h3>求梯度</h3>
+    <p>对 J(θ) 求梯度，关键是应用<strong>log-导数技巧</strong>：</p>
+    <div class="math-block">∇θ log Pr(τ) = ∇θ Σₜ log πθ(Aₜ|Sₜ)<br><br>(因为只有 πθ 含 θ，p(S₀) 和 p(Sₜ₊₁|Sₜ,Aₜ) 与 θ 无关)</div>
+
+    <p>由此得到策略梯度定理：</p>
+    <div class="math-block" style="border:2px solid var(--c-rl);background:rgba(5,150,105,0.05)">
+      <strong>∇θ J(θ) = E_{τ~πθ}[ Σₜ G(τ) · ∇θ log πθ(Aₜ|Sₜ) ]</strong>
+    </div>
+
+    <h3>直观解读</h3>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li><strong>G(τ)</strong>：轨迹的回报，作为该轨迹的"权重"</li>
+      <li><strong>∇θ log πθ(Aₜ|Sₜ)</strong>：增大在状态 Sₜ 下采取动作 Aₜ 的对数概率的梯度</li>
+      <li>整体含义：高回报轨迹上的动作被强化，低回报轨迹上的动作被削弱</li>
+    </ul>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">期望无法精确计算</div>
+      <p>真实期望需要对所有轨迹求平均，但轨迹数量是天文数字（如 2²⁰⁰）。实际使用<strong>蒙特卡洛采样</strong>：采 n 条轨迹，用样本平均近似期望。</p>
+    </div>
+
+    <p><a href="rl.html#policy-gradient" class="concept-link">← 返回策略梯度章节</a></p>
+  </section>
+
+  <section class="section" id="gae">
+    <span class="tag tag-rl">RL</span>
+    <h2>广义优势估计（GAE）</h2>
+
+    <h3>问题背景</h3>
+    <p>优势函数 A(s, a) = Q(s, a) − V(s) 衡量动作 a 相对平均水平的优劣。估计 A 有两种极端：</p>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li><strong>1 步 TD</strong>：偏差小，方差大（Aₜ ≈ δₜ = Rₜ + γV(Sₜ₊₁) − V(Sₜ)）</li>
+      <li><strong>蒙特卡洛</strong>：偏差大，方差小（Aₜ ≈ Gₜ − V(Sₜ)）</li>
+    </ul>
+
+    <h3>GAE 公式</h3>
+    <p>GAE 通过多步 TD 误差的指数加权平均，在偏差和方差之间取得平衡：</p>
+    <div class="math-block">Aₜ^GAE(γ, λ) = Σₗ₌₀^∞ (γλ)ˡ · δₜ₊ₗ<br><br>其中 δₜ = Rₜ + γV(Sₜ₊₁) − V(Sₜ) 是 TD 误差</div>
+
+    <h3>参数 λ 的作用</h3>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li><strong>λ = 0</strong>：Aₜ^GAE = δₜ，退化为 1 步 TD（偏差大、方差小）</li>
+      <li><strong>λ = 1</strong>：Aₜ^GAE = Gₜ − V(Sₜ)，退化为蒙特卡洛（偏差小、方差大）</li>
+      <li><strong>0 &lt; λ &lt; 1</strong>：在两者之间权衡（典型值 0.95）</li>
+    </ul>
+
+    <h3>展开形式</h3>
+    <div class="math-block">Aₜ^GAE = δₜ + γλ·δₜ₊₁ + (γλ)²·δₜ₊₂ + ...</div>
+
+    <p>每多加一项，就多考虑一步未来，但权重以 γλ 衰减——既不完全相信远处的价值估计，也不完全忽视。</p>
+
+    <p><a href="rl.html#policy-gradient" class="concept-link">← 返回策略梯度章节</a></p>
+  </section>
+
+  <section class="section" id="reinforce-derive">
+    <span class="tag tag-rl">RL</span>
+    <h2>REINFORCE 推导</h2>
+
+    <h3>原始策略梯度的问题</h3>
+    <p>原始策略梯度中，每个时刻 t 的动作权重都是 G(τ)（整条轨迹的回报）。但时刻 t 之前的奖励与时刻 t 的动作好坏无关——它们是"噪声"。</p>
+
+    <h3>REINFORCE 的改进</h3>
+    <p>用 Gₜ（时刻 t 之后的累积回报）替代 G(τ)：</p>
+    <div class="math-block">Gₜ = Rₜ + γRₜ₊₁ + γ²Rₜ₊₂ + ... + γ^{T−t}R_T</div>
+
+    <p>REINFORCE 版策略梯度定理：</p>
+    <div class="math-block">∇θ J(θ) = E_{τ~πθ}[ Σₜ Gₜ · ∇θ log πθ(Aₜ|Sₜ) ]</div>
+
+    <h3>为什么这样改进？</h3>
+    <p>采取动作 Aₜ 的好坏应该由<strong>动作之后</strong>的回报来评估。之前的奖励已经发生，与当前动作无关。去除这部分噪声能降低梯度估计的方差。</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">REINFORCE 名字的由来</div>
+      <p>REward Increment = Nonnegative Factor × Offset Reinforcement × Characteristic Eligibility（奖励增量 = 非负因子 × 偏移强化 × 特征资格）的首字母缩写。</p>
+    </div>
+
+    <p><a href="rl.html#policy-gradient" class="concept-link">← 返回策略梯度章节</a></p>
+  </section>
+
+  <!-- ========== RLHF ========== -->
+
+  <section class="section" id="kl-divergence">
+    <span class="tag tag-rlhf">RLHF</span>
+    <h2>KL 散度（Kullback-Leibler Divergence）</h2>
+
+    <h3>定义</h3>
+    <p>KL 散度衡量两个概率分布 p 和 q 的差异：</p>
+    <div class="math-block">连续型：D_KL(p‖q) = ∫ p(x) log[ p(x)/q(x) ] dx<br><br>离散型：D_KL(p‖q) = Σₓ p(x) log[ p(x)/q(x) ]</div>
+
+    <h3>三大性质</h3>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li><strong>非负性</strong>：D_KL(p‖q) ≥ 0，当且仅当 p = q 时为 0</li>
+      <li><strong>非对称性</strong>：D_KL(p‖q) ≠ D_KL(q‖p)</li>
+      <li><strong>差异单调性</strong>：两分布差异越大，KL 散度越大</li>
+    </ul>
+
+    <h3>抛硬币示例</h3>
+    <p>真实分布 p：正面 70%，反面 30%。</p>
+
+    <p><strong>估计 1</strong>（50/50）：D_KL = 0.7·log(0.7/0.5) + 0.3·log(0.3/0.5) ≈ 0.082</p>
+    <p><strong>估计 2</strong>（20/80）：D_KL = 0.7·log(0.7/0.2) + 0.3·log(0.3/0.8) ≈ 0.58</p>
+    <p><strong>估计 3</strong>（70/30，正确）：D_KL = 0.7·log(1) + 0.3·log(1) = 0</p>
+
+    <h3>在 RLHF 中的关键作用</h3>
+    <p>KP 散度作为<strong>惩罚项</strong>，防止微调后的 LLM πθ 偏离参考模型 πref 太远：</p>
+    <div class="math-block">β · D_KL[ πθ ‖ πref ]</div>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">为什么必须有 KL 惩罚？</div>
+      <p>没有 KL 约束，RL 模型会<strong>奖励黑客</strong>（Reward Hacking）——利用奖励模型的漏洞，生成人类读不通但 RM 误判高分的文本（如重复乱码）。KL 惩罚拽住模型，让它仍然是"人话"。</p>
+    </div>
+
+    <h3>与信息论的关系</h3>
+    <p>KL 散度 = 交叉熵 − 熵：D_KL(p‖q) = H(p, q) − H(p)</p>
+    <p>当 p 固定时，最小化交叉熵等价于最小化 KL 散度。</p>
+
+    <p><a href="rl.html#ppo-math" class="concept-link">← 返回 PPO 数学章节</a> · <a href="rlhf.html#ppo-llm" class="concept-link">PPO 微调 LLM</a></p>
+  </section>
+
+  <section class="section" id="importance-sampling">
+    <span class="tag tag-rlhf">RLHF</span>
+    <h2>重要性采样（Importance Sampling）</h2>
+
+    <h3>核心问题</h3>
+    <p>想计算 E_{x~p}[f(x)]，但无法从 p 采样，只能从 q 采样。怎么办？</p>
+
+    <h3>解决方法</h3>
+    <div class="math-block">E_{x~p}[f(x)] = E_{x~q}[ (p(x)/q(x)) · f(x) ]</div>
+
+    <p>比值 p(x)/q(x) 称为<strong>重要性权重</strong>。它修正了"用 q 的样本估计 p 的期望"带来的偏差。</p>
+
+    <h3>方差问题</h3>
+    <p>重要性采样的方差为：</p>
+    <div class="math-block">Var(μ̂_q) = (1/N) · [ E_{x~p}[ (p(x)/q(x)) · f(x)² ] − (E_{x~p}[f(x)])² ]</div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">方差的隐患</div>
+      <p>如果 p(x)/q(x) 在某些位置很大，方差会爆炸。所以 p 和 q 必须足够接近，否则估计不可靠。</p>
+    </div>
+
+    <h3>在 PPO 中的应用</h3>
+    <p>PPO 用旧策略 πθ_old 采样的数据更新新策略 πθ，通过重要性权重修正：</p>
+    <div class="math-block">ρ = πθ(a|s) / πθ_old(a|s)</div>
+
+    <p>PPO 用 clip 操作限制 ρ 在 [1−ε, 1+ε] 范围内，避免方差爆炸，这就是<strong>替代目标</strong>的核心。</p>
+
+    <p><a href="rl.html#ppo-math" class="concept-link">← 返回 PPO 数学章节</a></p>
+  </section>
+
+  <section class="section" id="ppo-surrogate">
+    <span class="tag tag-rlhf">RLHF</span>
+    <h2>PPO 替代目标推导</h2>
+
+    <h3>起点：策略改进目标</h3>
+    <p>希望保证新策略不比旧策略差：J(θ) − J(θ_old) ≥ 0</p>
+
+    <h3>第 1 步：差值展开</h3>
+    <p>经过推导（利用 A^{πθ_old} 的定义和价值函数性质）：</p>
+    <div class="math-block">J(θ) − J(θ_old) = E_{τ~πθ}[ Σₜ γᵗ · A^{πθ_old}_t ]</div>
+
+    <h3>第 2 步：用重要性采样改写</h3>
+    <p>问题：上式期望需要用新策略 πθ 采样，但更新前新策略还不存在。用重要性采样转为用旧策略 πθ_old 采样的数据：</p>
+    <div class="math-block">J(θ) − J(θ_old) ≈ E_{τ~πθ_old}[ Σₜ (πθ(Aₜ|Sₜ)/πθ_old(Aₜ|Sₜ)) · A^{πθ_old}_t ]<br>= J^CPI(θ)</div>
+
+    <p>这就是 CPI（Conservative Policy Iteration）目标。</p>
+
+    <h3>第 3 步：clip 防止方差爆炸</h3>
+    <p>重要性权重 ρ = πθ/πθ_old 可能很大，导致方差爆炸。PPO 用 clip 限制：</p>
+    <div class="math-block" style="border:2px solid var(--c-rlhf);background:rgba(217,119,6,0.05)">
+      <strong>J^PPO(θ) = E[ min( ρ·A, clip(ρ, 1−ε, 1+ε)·A ) ]</strong><br><br>其中 ρ = πθ(a|s) / πθ_old(a|s)
+    </div>
+
+    <h3>min 操作的作用</h3>
+    <p>取 min 是<strong>悲观策略</strong>：</p>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li>当 A &gt; 0（好动作）：clip 限制 ρ ≤ 1+ε，防止单次过度强化</li>
+      <li>当 A &lt; 0（坏动作）：clip 限制 ρ ≥ 1−ε，防止单次过度削弱</li>
+    </ul>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">PPO 的精髓</div>
+      <p>PPO 用一个简单的 clip 操作，既保留了重要性采样的样本效率，又避免了方差爆炸。它是"足够好"和"足够简单"的平衡——这也是它被广泛使用的原因。</p>
+    </div>
+
+    <p><a href="rl.html#ppo" class="concept-link">← 返回 PPO 章节</a></p>
+  </section>
+
+  <section class="section" id="grpo-advantage">
+    <span class="tag tag-rlhf">RLHF</span>
+    <h2>GRPO 组相对优势</h2>
+
+    <h3>核心创新</h3>
+    <p>GRPO 不需要训练 Critic 网络估计价值，而是用<strong>一组轨迹的相对优势</strong>替代。</p>
+
+    <h3>计算流程</h3>
+    <p>对每个问题 qᵢ，采样 G 条回答 τᵢ,₁, ..., τᵢ,G，计算每条的奖励 rᵢ,ⱼ。然后组内归一化：</p>
+    <div class="math-block">μᵢ = mean(rᵢ,₁, ..., rᵢ,G)<br>σᵢ = std(rᵢ,₁, ..., rᵢ,G)<br><br>Aᵢ,ⱼ = (rᵢ,ⱼ − μᵢ) / σᵢ</div>
+
+    <h3>直观解读</h3>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li>表现<strong>高于平均</strong>的回答 → 正优势 → 被强化</li>
+      <li>表现<strong>低于平均</strong>的回答 → 负优势 → 被削弱</li>
+      <li>不需要训练额外的价值网络，节省 GPU 内存</li>
+    </ul>
+
+    <h3>GRPO 目标函数</h3>
+    <div class="math-block">J^GRPO(θ) = (1/G) Σᵢ (1/|τᵢ|) Σₜ min[ρ·A, clip(ρ, 1−ε, 1+ε)·A] − β·D_KL[πθ‖πref]</div>
+
+    <h3>DAPO 的改进</h3>
+    <p>字节提出的 DAPO 是 GRPO 的变种：</p>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li><strong>Token 级损失</strong>：每个 token 的优势 = 其所在轨迹的组相对优势</li>
+      <li><strong>移除 KL 散度</strong>：不需要参考策略网络，进一步节省内存</li>
+    </ul>
+
+    <div class="callout callout-info">
+      <div class="callout-title">为什么 GRPO 适合推理任务？</div>
+      <p>推理任务（数学、代码）有明确的正确性标准，适合作为奖励信号。GRPO 的"多条采样取最优"天然适合——对同一问题生成多个回答，好的强化、差的削弱。DeepSeek-R1 正是用此实现推理突破。</p>
+    </div>
+
+    <p><a href="rl.html#grpo" class="concept-link">← 返回 GRPO 章节</a> · <a href="rlhf.html#grpo-llm" class="concept-link">GRPO 复刻 R1</a></p>
+  </section>
+
+  <section class="section" id="dpo-derive">
+    <span class="tag tag-rlhf">RLHF</span>
+    <h2>DPO 目标函数推导</h2>
+
+    <h3>核心思想</h3>
+    <p>DPO（Direct Preference Optimization）的洞察：<strong>你的 LLM 本身就是奖励模型</strong>。不需要单独训练 RM，直接从偏好数据优化 LLM。</p>
+
+    <h3>偏好数据</h3>
+    <div class="code-block"><pre>{
+  <span class="string">"prompt"</span>: <span class="string">"这部电影怎么样？"</span>,
+  <span class="string">"chosen"</span>: <span class="string">"这部电影很好看。"</span>,      <span class="comment"># 偏好</span>
+  <span class="string">"rejected"</span>: <span class="string">"这部电影不好看。"</span>     <span class="comment"># 厌恶</span>
+}</pre></div>
+
+    <h3>DPO 目标函数</h3>
+    <div class="math-block">J_DPO(θ; πref) = E[ log σ( β · ( log[πθ(yw|x)/πθ(yl|x)] − log[πref(yw|x)/πref(yl|x)] ) ) ]</div>
+
+    <h3>推导关键步骤</h3>
+
+    <h4>第 1 步：补全概率</h4>
+    <p>给定 prompt x，模型输出 y 的概率：</p>
+    <div class="math-block">πθ(y|x) = ∏ₜ P_LLM(yₜ | x, y<ₜ)</div>
+
+    <h4>第 2 步：log 商 = log 差</h4>
+    <p>利用 log(A/B) = log A − log B：</p>
+    <div class="math-block">log[πθ(yw|x)/πθ(yl|x)] − log[πref(yw|x)/πref(yl|x)]<br>= log[πθ(yw|x)/πref(yw|x)] − log[πθ(yl|x)/πref(yl|x)]</div>
+
+    <h4>第 3 步：训练动态</h4>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li>训练开始：πθ = πref，内项为 0，σ(0) = 0.5</li>
+      <li>训练进行：πθ(yw|x)/πref(yw|x) 增大（偏好回答概率上升）</li>
+      <li>πθ(yl|x)/πref(yl|x) 减小（厌恶回答概率下降）</li>
+    </ul>
+
+    <h3>DPO 的三个问题</h3>
+    <div class="callout callout-warn">
+      <div class="callout-title">DPO 的局限性</div>
+      <p><strong>1. 分子分母同时变化</strong>：可能 chosen 和 rejected 的概率都上升，只是 chosen 上升更多，模型仍可能输出厌恶回答。</p>
+      <p><strong>2. 容易过拟合</strong>：随着训练 πθ(yw)→1, πθ(yl)→0，正则化项失效，模型失去探索能力。DPO 训练轮数不能多。</p>
+      <p><strong>3. 偏好循环</strong>：数据中 A&gt;B 和 B&gt;A 同时存在时，模型无法学习。</p>
+    </div>
+
+    <div class="callout callout-info">
+      <div class="callout-title">DPO 是强化学习吗？</div>
+      <p>本书作者认为 DPO 不算严格意义的强化学习——它需要预定的偏好数据集，而真正的 RL 是策略自己采样数据。但 DPO 仍是有效的对齐方法。</p>
+    </div>
+
+    <p><a href="rlhf.html#dpo" class="concept-link">← 返回 DPO 章节</a></p>
+  </section>
+
+  <section class="section" id="reward-rt">
+    <span class="tag tag-rlhf">RLHF</span>
+    <h2>即时奖励 Rₜ 的计算（InstructGPT）</h2>
+
+    <h3>问题背景</h3>
+    <p>在倒立摆环境中，每步奖励就是 +1。但在 LLM 中，奖励模型（RM）只能给<strong>完整补全</strong>打分，不能给单个 token 打分。如何把"序列级奖励"转化为"token 级奖励"？</p>
+
+    <h3>InstructGPT 的精妙设计</h3>
+    <p>分两种情况计算每个 token 的即时奖励：</p>
+
+    <h4>情况 1：&lt;eos&gt; 之前的 token</h4>
+    <div class="math-block">Rₜ = −β · log[ πθ(yₜ|x, y<ₜ) / πref(yₜ|x, y<ₜ) ]</div>
+    <p>这部分<strong>只有 KL 惩罚</strong>，没有 RM 分数——因为 RM 还没看到完整序列。</p>
+
+    <h4>情况 2：&lt;eos&gt;（最后一个 token）</h4>
+    <div class="math-block">R_T = RM 分数 − β · log[ πθ(y_T|x, y<T) / πref(y_T|x, y<T) ]</div>
+    <p>此时序列结束，RM 给出整体评分，作为最后一个 token 的奖励。</p>
+
+    <h3>KL 惩罚的作用</h3>
+    <div class="callout callout-danger">
+      <div class="callout-title">关键秘诀</div>
+      <p>KL 惩罚项 β·log[πθ/πref] 是 InstructGPT 成功的关键。它逐 token 计算——如果 πθ 对某 token 的概率远高于 πref，说明模型在"冒险"偏离原轨道，惩罚变大。</p>
+      <p><strong>RM 分数</strong>推模型往"人类喜欢"的方向走；<strong>KL 惩罚</strong>拽住模型不让它跑太偏。两者平衡才能产生有用的对齐。</p>
+    </div>
+
+    <h3>稀疏奖励的处理：GAE</h3>
+    <p>RM 分数只在序列末尾出现（稀疏奖励）。靠 <a href="derivations.html#gae" class="concept-link">GAE</a> 把最后的奖励"抹匀"分摊给前面的每个 token，让前面的词也能获得梯度更新。</p>
+
+    <p><a href="rlhf.html#ppo-llm" class="concept-link">← 返回 PPO 微调 LLM 章节</a></p>
+  </section>
+
+  <!-- ========== Multimodal ========== -->
+
+  <section class="section" id="diffusion-forward">
+    <span class="tag tag-mm">多模态</span>
+    <h2>正向扩散闭式公式推导</h2>
+
+    <h3>目标</h3>
+    <p>推导任意时间步 t 的噪声图像 xₜ 的直接采样公式，避免迭代加噪。</p>
+
+    <h3>前置：重参数化技巧</h3>
+    <p>如果 z ~ N(μ, σ²)，那么 z = μ + σ·ε，其中 ε ~ N(0, 1)。</p>
+    <p>两个独立正态分布的和仍是正态分布：X ~ N(μ_X, σ²_X), Y ~ N(μ_Y, σ²_Y) → X+Y ~ N(μ_X+μ_Y, σ²_X+σ²_Y)。</p>
+
+    <h3>单步加噪公式</h3>
+    <div class="math-block">xₜ = √(1−βₜ) · xₜ₋₁ + √βₜ · εₜ₋₁</div>
+
+    <h3>递归展开</h3>
+    <p>记 αₜ = 1 − βₜ， ᾱₜ = ∏ᵢ₌₁ᵗ αᵢ。逐步展开：</p>
+    <div class="math-block">xₜ = √αₜ · xₜ₋₁ + √(1−αₜ) · εₜ₋₁<br>= √αₜ · (√αₜ₋₁ · xₜ₋₂ + √(1−αₜ₋₁) · εₜ₋₂) + √(1−αₜ) · εₜ₋₁<br>= √(αₜ·αₜ₋₁) · xₜ₋₂ + √(αₜ(1−αₜ₋₁)) · εₜ₋₂ + √(1−αₜ) · εₜ₋₁</div>
+
+    <p>两个独立高斯噪声项合并（方差相加）：</p>
+    <div class="math-block">N(0, αₜ(1−αₜ₋₁)I) + N(0, (1−αₜ)I) = N(0, (1−αₜ·αₜ₋₁)I)</div>
+
+    <p>继续递归：</p>
+    <div class="math-block">= √(αₜ·αₜ₋₁) · xₜ₋₂ + √(1−αₜ·αₜ₋₁) · ε<br>= ... ...<br>= √(αₜ·αₜ₋₁·...·α₁) · x₀ + √(1−αₜ·αₜ₋₁·...·α₁) · ε</div>
+
+    <h3>最终闭式公式</h3>
+    <div class="math-block" style="border:2px solid var(--c-mm);background:rgba(220,38,38,0.05)">
+      <strong>xₜ = √ᾱₜ · x₀ + √(1−ᾱₜ) · ε</strong><br><br>其中 ε ~ N(0, I),  ᾱₜ = ∏ᵢ₌₁ᵗ (1−βᵢ)
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">为什么这个公式重要？</div>
+      <p>它让我们可以在任意时间步 t <strong>直接采样</strong> xₜ，不需要迭代 t 次。训练时随机采样 t，直接得到 (x₀, xₜ) 对，大幅加速训练。</p>
+    </div>
+
+    <p><a href="multimodal.html#diffusion" class="concept-link">← 返回扩散模型章节</a></p>
+  </section>
+
+  <section class="section" id="langevin">
+    <span class="tag tag-mm">多模态</span>
+    <h2>郎之万动力学（Langevin Dynamics）</h2>
+
+    <h3>背景</h3>
+    <p>扩散模型的理论基础来自郎之万动力学——一种 MCMC（马尔可夫蒙特卡洛）采样方法。</p>
+
+    <h3>概率分布的指数族形式</h3>
+    <p>假设目标分布 p(x) 属于指数分布族：</p>
+    <div class="math-block">p(x) ∝ e^{−f(x)}  ⟹  log p(x) = −f(x) + 常数</div>
+
+    <h3>梯度下降求模态</h3>
+    <p>如果我们只知道 f(x) 的梯度 ∇f(x)，可以用梯度下降找分布的峰值（模态）：</p>
+    <div class="math-block">xₜ = xₜ₋₁ − ηₜ · ∇f(xₜ₋₁)   ... (2)</div>
+
+    <p>峰值对应训练数据中"好"图像集中的区域——去到峰值就能得到好图像。</p>
+
+    <h3>加入噪声项：郎之万采样</h3>
+    <p>纯梯度下降只能找到<strong>一个</strong>峰值。郎之万采样在每个梯度步添加噪声项：</p>
+    <div class="math-block">xₜ₊₁ = xₜ − (ε²/2)·∇f(xₜ) + √ε · N(0, I)   ... (3)</div>
+
+    <p>噪声让采样过程能"跳出"局部峰值，探索整个分布，最终收敛到目标分布 p(x)。</p>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">稳定性问题</div>
+      <p>如果想加快采样，可能选择很大的 ε。但 ε 太大时方程 (3) 会不稳定并发散。扩散模型通过<strong>多步小噪声</strong>的方式保证收敛——这就是为什么扩散模型需要数百步迭代。</p>
+    </div>
+
+    <h3>与扩散模型的关系</h3>
+    <p>扩散模型的反向过程可以看作离散化的郎之万动力学：每步用神经网络预测 ∇f(xₜ)（即得分函数），然后用小步长去噪。这就是<strong>得分匹配</strong>视角下的扩散模型。</p>
+
+    <p><a href="multimodal.html#diffusion" class="concept-link">← 返回扩散模型章节</a></p>
+  </section>
+
+  <section class="section" id="cond-diffusion-derive">
+    <span class="tag tag-mm">多模态</span>
+    <h2>条件扩散模型 p(x|y) 推导</h2>
+
+    <h3>从无条件到条件</h3>
+    <p>普通扩散模型建模 p(x)，无法控制生成内容。我们希望建模 p(x|y)，通过条件 y（标签、文本、低分辨率图像等）控制生成。</p>
+
+    <h3>第 1 步：无条件模型的边际化</h3>
+    <div class="math-block">pθ(x₀) = ∫ pθ(x₀, x₁, ..., x_T) dx₁...dx_T<br>= ∫ pθ(x₀|x₁) · pθ(x₁|x₂) · ... · pθ(x_{T−1}|x_T) · p(x_T) dx₁...dx_T</div>
+
+    <h3>第 2 步：在每一步添加条件 y</h3>
+    <p>最简单的方法是在每个转移概率中加入条件 y：</p>
+    <div class="math-block">pθ(x₀|y) = ∫ pθ(x₀|x₁, y) · pθ(x₁|x₂, y) · ... · pθ(x_{T−1}|x_T, y) · p(x_T) dx₁...dx_T</div>
+
+    <h3>第 3 步：神经网络接收 y</h3>
+    <p>每步的去噪网络从 εθ(xₜ, t) 变为 εθ(xₜ, t, y)：</p>
+    <div class="math-block">pθ(xₜ₋₁|xₜ, y) = N(xₜ₋₁; μθ(xₜ, t, y), σ²_q(t)·I)</div>
+
+    <h3>条件的嵌入</h3>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li><strong>标签 y</strong>：通过嵌入层转为向量，与时间步嵌入相加</li>
+      <li><strong>文本 y</strong>：通过 CLIP 文本编码器转为向量</li>
+      <li><strong>图像 y</strong>：通过编码器转为特征图</li>
+    </ul>
+
+    <h3>分类器指引 vs 无分类器指引</h3>
+    <p><strong>分类器指引</strong>：在反向扩散每步，用分类器 ∇log p(y|xₜ) 引导生成方向。</p>
+    <p><strong>无分类器指引（CFG）</strong>：同时训练有条件 εθ(xₜ, t, y) 和无条件 εθ(xₜ, t)，推理时用两者的差值引导。Stable Diffusion 使用此方法。</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">DALL-E2 的条件</div>
+      <p>DALL-E2 的 Decoder 用<strong>先验模型生成的 CLIP 图像嵌入</strong>作为条件 y。先验模型把"文本"翻译成"图像条件"，这是 DALL-E2 两阶段架构的精髓。</p>
+    </div>
+
+    <p><a href="multimodal.html#cond-diffusion" class="concept-link">← 返回条件扩散章节</a> · <a href="multimodal.html#dalle2" class="concept-link">DALL-E2</a></p>
+  </section>
+
+</main>
+</div>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>多模态 AI — AI知识库</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="nav-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<div class="shell">
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h2>AI知识库</h2>
+    <p>大语言模型 · 强化学习 · 多模态</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">知识主线</div>
+      <a class="sidebar-link" href="index.html"><span class="dot" style="background:var(--c-llm)"></span>首页 · 知识地图</a>
+      <a class="sidebar-link" href="llm.html"><span class="dot" style="background:var(--c-llm)"></span>大语言模型</a>
+      <a class="sidebar-link" href="rl.html"><span class="dot" style="background:var(--c-rl)"></span>强化学习</a>
+      <a class="sidebar-link" href="rlhf.html"><span class="dot" style="background:var(--c-rlhf)"></span>RLHF 对齐训练</a>
+      <a class="sidebar-link active" href="multimodal.html"><span class="dot" style="background:var(--c-mm)"></span>多模态 AI</a>
+      <a class="sidebar-link" href="derivations.html" style="margin-top:8px;border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">本章内容</div>
+      <a class="sidebar-link" href="#vit">Vision Transformer</a>
+      <a class="sidebar-link" href="#clip">CLIP</a>
+      <a class="sidebar-link" href="#clipcap">ClipCap 图生文</a>
+      <a class="sidebar-link" href="#diffusion">扩散模型</a>
+      <a class="sidebar-link" href="#cond-diffusion">条件扩散模型</a>
+      <a class="sidebar-link" href="#dalle2">DALL-E2 文生图</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    第 14–20 章 · 162 页
+  </div>
+</aside>
+
+<main class="main">
+  <div class="breadcrumb">
+    <a href="index.html">首页</a>
+    <span class="breadcrumb-sep">/</span>
+    <span style="color:var(--c-mm);font-weight:600">多模态 AI</span>
+  </div>
+
+  <span class="tag tag-mm">PART IV</span>
+  <h1>多模态 AI</h1>
+  <p class="lead">从 Vision Transformer 到 CLIP，从扩散模型到 DALL-E2。探索 Transformer 如何从文本扩展到视觉，以及生成式 AI 如何从噪声中创造图像。</p>
+
+  <!-- ViT -->
+  <section class="section" id="vit">
+    <span class="tag tag-mm">第 14 章</span>
+    <h2>Vision Transformer</h2>
+
+    <p>2021 年，Dosovitsky 等人在论文《An Image is Worth 16×16 Words》中引入了将 Transformer 用于计算机视觉的想法。与卷积网络相比，Vision Transformer 能取得出色的结果，且需要更少的训练资源。</p>
+
+    <h3>核心思想：图像即序列</h3>
+    <p>ViT 的关键创新：将图像切分为固定大小的<strong>补丁（Patch）</strong>，将每个补丁视为一个"词"，然后用标准 Transformer 编码器处理。</p>
+
+    <h3>补丁嵌入（Patch Embedding）</h3>
+    <div class="code-block"><pre><span class="keyword">class</span> <span class="fn">PatchEmbedding</span>(nn.Module):
+    <span class="keyword">def</span> __init__(self, d_model, img_size, patch_size, n_channels):
+        super().__init__()
+        self.linear_project = nn.Conv2d(
+            n_channels,      <span class="comment"># 输入通道</span>
+            d_model,         <span class="comment"># 输出维度</span>
+            kernel_size=patch_size,
+            stride=patch_size
+        )
+
+    <span class="keyword">def</span> forward(self, x):
+        <span class="comment"># (B, C, H, W) → (B, d_model, P_col, P_row) → (B, P, d_model)</span>
+        x = self.linear_project(x)
+        x = x.flatten(2)
+        x = x.transpose(1, 2)
+        <span class="keyword">return</span> x</pre></div>
+
+    <h3>类别 Token 与位置编码</h3>
+    <p>ViT 在序列开头添加一个可学习的<strong>类别 token</strong>（[CLS]），用于聚合全局信息做分类。同时添加位置编码让模型知道每个补丁的空间位置。</p>
+
+    <h3>Transformer 编码器</h3>
+    <p>与 GPT-2 的 Decoder-Only 不同，ViT 使用<strong>Transformer 编码器</strong>（双向注意力）。每个补丁可以看到所有其他补丁。</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">ViT vs CNN</div>
+      <p>CNN 通过局部卷积提取特征，ViT 通过全局自注意力提取特征。ViT 的优势在于能捕捉长距离依赖，但需要更多数据才能超越 CNN。</p>
+    </div>
+
+    <!-- Related knowledge -->
+    <div class="related-box">
+      <div class="related-box-title">相关分支知识</div>
+      <a class="related-link" href="llm.html#gpt2">
+        <div class="related-link-icon" style="background:rgba(99,102,241,0.1);color:var(--c-llm)">→</div>
+        <div class="related-link-content">
+          <h4>Transformer 架构共享</h4>
+          <p>ViT 的 Transformer 编码器与 GPT-2 的 Transformer 块共享核心组件（多头注意力、前馈层、残差连接），区别在于编码器 vs 解码器。</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- CLIP -->
+  <section class="section" id="clip">
+    <span class="tag tag-mm">第 15 章</span>
+    <h2>CLIP — 图文对比学习</h2>
+
+    <p>CLIP 是一场革命：它允许通过"预测哪些图像和文本配对在一起"来识别开放世界中的对象，不再局限于固定类别。</p>
+
+    <h3>核心原理：对比学习</h3>
+    <p>CLIP 同时训练图像编码器和文本编码器，使匹配的图文对在嵌入空间中距离更近，不匹配的距离更远。</p>
+    <div class="code-block"><pre><span class="comment"># CLIP 对比学习（简化）</span>
+<span class="comment"># batch 中 N 个图文对</span>
+image_features = image_encoder(images)    <span class="comment"># (N, D)</span>
+text_features  = text_encoder(texts)      <span class="comment"># (N, D)</span>
+
+<span class="comment"># 计算相似度矩阵 (N, N)</span>
+logits = image_features @ text_features.T / temperature
+
+<span class="comment"># 对角线是正样本，其余是负样本</span>
+labels = torch.arange(N)
+loss = cross_entropy(logits, labels) + cross_entropy(logits.T, labels)</pre></div>
+
+    <h3>图像编码器与文本编码器</h3>
+    <p>CLIP 的图像编码器使用 Vision Transformer（或 ResNet），文本编码器使用 Transformer。两者将各自的输入映射到<strong>同一嵌入空间</strong>。</p>
+
+    <h3>零样本分类</h3>
+    <p>CLIP 最强大的能力：无需训练即可分类。将类别名称构造为文本（"a photo of a cat"），计算图像与每个文本的相似度，取最大的即为分类结果。</p>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">CLIP 的枢纽地位</div>
+      <p>CLIP 是多模态 AI 的关键枢纽：在 ClipCap 中驱动图生文，在 DALL-E2 中提供图文嵌入空间。理解 CLIP 是理解后续多模态模型的基础。</p>
+    </div>
+
+    <!-- Related knowledge -->
+    <div class="related-box">
+      <div class="related-box-title">相关分支知识</div>
+      <a class="related-link" href="#clipcap">
+        <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
+        <div class="related-link-content">
+          <h4>CLIP 驱动图生文</h4>
+          <p>ClipCap 利用 CLIP 的图像嵌入，通过映射网络输入到 GPT-2，实现图像描述生成。</p>
+        </div>
+      </a>
+      <a class="related-link" href="#dalle2">
+        <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
+        <div class="related-link-content">
+          <h4>CLIP 驱动文生图</h4>
+          <p>DALL-E2 使用 CLIP 的文本嵌入和图像嵌入，通过先验模型和扩散模型实现文生图。</p>
+        </div>
+      </a>
+      <a class="related-link" href="llm.html#gpt2">
+        <div class="related-link-icon" style="background:rgba(99,102,241,0.1);color:var(--c-llm)">→</div>
+        <div class="related-link-content">
+          <h4>Transformer 编码器</h4>
+          <p>CLIP 的文本编码器使用 Transformer 编码器，与 GPT-2 的 Decoder-Only 形成对比。</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ClipCap -->
+  <section class="section" id="clipcap">
+    <span class="tag tag-mm">第 16 章</span>
+    <h2>ClipCap — 图生文</h2>
+
+    <h3>工作原理</h3>
+    <p>ClipCap 结合 CLIP 和 GPT-2 实现图像标题生成：</p>
+    <div class="code-block"><pre><span class="comment"># ClipCap 工作流程</span>
+输入图片 → CLIP → 图像嵌入
+                        ↓
+               Mapping Network (MLP)
+                        ↓
+               前缀嵌入 (Prefix Embeddings)
+                        ↓
+              GPT-2 → 逐 token 生成标题
+                        ↓
+              "A drawing of a blue car"</pre></div>
+
+    <h3>关键问题：嵌入空间不匹配</h3>
+    <p>CLIP 和 GPT-2 的嵌入空间不同，不能直接连接。ClipCap 使用<strong>映射网络</strong>（Mapping Network）将 CLIP 嵌入映射到 GPT-2 的嵌入空间，生成"前缀嵌入"。</p>
+
+    <h3>两种变体</h3>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li><strong>微调 GPT-2</strong>：用 MLP 作为映射网络，GPT-2 和 MLP 都训练</li>
+      <li><strong>不微调 GPT-2</strong>：用 Transformer 作为映射网络，只训练映射网络</li>
+    </ul>
+
+    <h3>推理过程</h3>
+    <p>逐 token 自回归生成：前缀嵌入 → 预测第一个 token → 前缀+第一个token → 预测第二个 → ... → 生成 &lt;EOS&gt; 或达到最大长度。</p>
+  </section>
+
+  <!-- Diffusion -->
+  <section class="section" id="diffusion">
+    <span class="tag tag-mm">第 17-18 章</span>
+    <h2>扩散模型 — 从原理到数学</h2>
+
+    <p>扩散模型是近年来 AI 生成艺术突破的主要因素，是 DALL-E 和 Midjourney 等知名模型的核心机制。</p>
+
+    <h3>通俗理解</h3>
+    <p>想象一杯透明的水加入黄色液体——液体逐渐扩散，水不再透明。这是<strong>正向扩散</strong>。反向操作（将混合物恢复原状）则困难得多——这是<strong>反向扩散</strong>。</p>
+    <p>在图像中：正向扩散 = 逐步添加噪声直到变成纯噪声；反向扩散 = 从纯噪声逐步去噪恢复图像。</p>
+
+    <h3>正向扩散过程</h3>
+    <p>逐步向图像添加高斯噪声。经过 T 步后，图像变成纯噪声。利用重参数化技巧，可以直接采样任意时间步 t 的噪声图像：</p>
+    <a class="math-block" href="derivations.html#diffusion-forward">xₜ = √(αₜ) · x₀ + √(1 - αₜ) · ε<br><br>其中 ε ~ N(0, I),  αₜ = ∏(1 - βᵢ)</a>
+    <p>完整的闭式公式推导（重参数化技巧、递归展开、方差合并）见<a href="derivations.html#diffusion-forward" class="concept-link c-mm">正向扩散闭式公式</a>。</p>
+
+    <h3>反向扩散过程</h3>
+    <p>训练神经网络预测每一步添加的噪声，然后从噪声图像中减去预测的噪声：</p>
+    <div class="code-block"><pre><span class="comment"># 扩散模型训练（简化）</span>
+<span class="keyword">for</span> each training step:
+    x₀ = sample_real_image()           <span class="comment"># 真实图像</span>
+    t = random_timestep()              <span class="comment"># 随机时间步</span>
+    ε = sample_noise()                 <span class="comment"># 随机噪声</span>
+    xₜ = add_noise(x₀, t, ε)          <span class="comment"># 加噪</span>
+    predicted_noise = model(xₜ, t)     <span class="comment"># 预测噪声</span>
+    loss = mse(ε, predicted_noise)     <span class="comment"># MSE 损失</span></pre></div>
+
+    <h3>U-Net 神经网络</h3>
+    <p>扩散模型使用 U-Net 作为去噪网络。U-Net 有编码器（下采样）和解码器（上采样）路径，中间有跳跃连接，保留细节信息。</p>
+
+    <h3>数学理论：郎之万动力学</h3>
+    <p>扩散模型的理论基础来自郎之万动力学——一种 MCMC 采样方法。在梯度下降的每一步添加噪声项，使采样过程能探索整个分布：</p>
+    <a class="math-block" href="derivations.html#langevin">xₜ₊₁ = xₜ - (ε²/2)∇f(xₜ) + √ε · N(0, I)</a>
+    <p>从概率分布的指数族形式到梯度下降再到加噪采样的完整推导，见<a href="derivations.html#langevin" class="concept-link c-mm">郎之万动力学</a>。</p>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">预测噪声 vs 预测图像</div>
+      <p>虽然扩散模型可以预测"上一步的图像"或"添加的噪声"，但预测噪声更简单、更有效。这是 DDPM 的关键设计选择。</p>
+    </div>
+  </section>
+
+  <!-- Conditional Diffusion -->
+  <section class="section" id="cond-diffusion">
+    <span class="tag tag-mm">第 19 章</span>
+    <h2>条件扩散模型</h2>
+
+    <h3>为什么要条件化？</h3>
+    <p>普通扩散模型只能随机生成图像。我们希望能<strong>控制生成内容</strong>——给定标签、文本或低分辨率图像，生成对应的图像。</p>
+
+    <h3>添加条件的方法</h3>
+    <p>将条件 y 添加到神经网络的输入中，把建模 p(x) 转为建模 p(x|y)。对于标签条件，通过嵌入层将标签转为向量，与时间步嵌入相加：</p>
+    <a class="math-block" href="derivations.html#cond-diffusion-derive">pθ(x₀|y) = ∫ pθ(x₀|x₁, y) · pθ(x₁|x₂, y) · ... · pθ(x_{T−1}|x_T, y) · p(x_T) dx₁...dx_T</a>
+    <p>从无条件到条件的完整推导、条件嵌入方式、分类器指引 vs 无分类器指引的对比，见<a href="derivations.html#cond-diffusion-derive" class="concept-link c-mm">条件扩散p(x|y)推导</a>。</p>
+    <div class="code-block"><pre><span class="comment"># 条件扩散模型</span>
+<span class="comment"># 噪声预测网络接收额外条件 y</span>
+ε_θ(xₜ, t, y)  <span class="comment"># y 可以是标签、文本等</span>
+
+<span class="comment"># 标签条件：嵌入层 + 时间步嵌入</span>
+label_emb = embedding(y)       <span class="comment"># 标签 → 向量</span>
+time_emb = sinusoidal(t)       <span class="comment"># 时间步 → 向量</span>
+condition = label_emb + time_emb</pre></div>
+
+    <h3>分类器指引（Classifier Guidance）</h3>
+    <p>在反向扩散的每一步，使用分类器的梯度引导生成方向，使生成的图像更符合条件。</p>
+
+    <h3>无分类器指引（Classifier-Free Guidance）</h3>
+    <p>不需要额外分类器。同时训练有条件和无条件模型，在推理时通过两者的差值引导生成。这是 Stable Diffusion 使用的方法。</p>
+
+    <h3>Stable Diffusion</h3>
+    <p>Stable Diffusion 是条件扩散模型的里程碑：在<strong>潜在空间</strong>（而非像素空间）进行扩散，大幅降低计算成本，使得在消费级 GPU 上生成高质量图像成为可能。</p>
+
+    <!-- Related knowledge -->
+    <div class="related-box">
+      <div class="related-box-title">相关分支知识</div>
+      <a class="related-link" href="#dalle2">
+        <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
+        <div class="related-link-content">
+          <h4>DALL-E2 的条件扩散</h4>
+          <p>DALL-E2 使用 CLIP 图像嵌入作为条件，通过条件扩散模型（UNet）生成图像。</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- DALL-E2 -->
+  <section class="section" id="dalle2">
+    <span class="tag tag-mm">第 20 章</span>
+    <h2>DALL-E2 — 文生图完整实现</h2>
+
+    <p>DALL-E2 是条件扩散模型的应用巅峰：输入文本提示词，输出图像。它使用 unCLIP 方法，需要训练三个模型。</p>
+
+    <h3>三个模型的架构</h3>
+    <div class="code-block"><pre><span class="comment"># DALL-E2 = CLIP + 先验模型 + 条件扩散模型</span>
+1. <span class="fn">CLIP 模型</span>
+   → 学习图文对齐的嵌入空间
+   → 训练完毕后冻结
+
+2. <span class="fn">先验模型</span> (Prior Model)
+   → Decoder-Only Transformer
+   → 输入: 文本标题 + CLIP文本嵌入 + 时间步 + 噪声CLIP图像嵌入
+   → 输出: CLIP图像嵌入
+   → 作用: 根据文本预测高质量的图像条件
+
+3. <span class="fn">条件扩散模型</span> (Decoder)
+   → UNet 架构
+   → 输入: CLIP图像嵌入 + 噪声图像 + 时间步
+   → 输出: 去噪后的图像
+   → 作用: 根据条件生成最终图像</pre></div>
+
+    <h3>先验模型的训练</h3>
+    <p>先验模型的核心任务：根据文本标题预测 CLIP 图像嵌入。它是一个 Decoder-Only Transformer，接收 6 个输入：</p>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li>文本标题</li>
+      <li>CLIP 文本嵌入（冻结 CLIP 生成）</li>
+      <li>时间步嵌入</li>
+      <li>加噪声的 CLIP 图像嵌入</li>
+      <li>可学习嵌入</li>
+      <li>因果注意力掩码</li>
+    </ul>
+
+    <div class="callout callout-danger">
+      <div class="callout-title">关键注意</div>
+      <p>先验模型是对 <strong>CLIP 图像嵌入</strong>添加噪声进行扩散，而不是对图像本身！这是一个容易混淆的点。</p>
+    </div>
+
+    <h3>条件扩散模型（Decoder）</h3>
+    <p>Decoder 使用 UNet 架构，包含残差块、注意力块、下采样和上采样。以先验模型生成的 CLIP 图像嵌入作为条件，从纯噪声逐步去噪生成图像。</p>
+
+    <h3>完整生成流程</h3>
+    <div class="code-block"><pre><span class="comment"># DALL-E2 文生图流程</span>
+输入: <span class="string">"A drawing of a blue car"</span>
+
+Step 1: 文本 → 冻结的 CLIP → CLIP 文本嵌入
+Step 2: CLIP文本嵌入 → 先验模型(扩散) → CLIP图像嵌入
+Step 3: CLIP图像嵌入 + 纯噪声 → 条件扩散模型(去噪) → 生成图像
+
+输出: 🖼️ (一辆蓝色汽车的图像)</pre></div>
+
+    <h3>训练配置与结果</h3>
+    <p>本章提供了完整的训练配置，包括数据集准备、模型超参数、训练循环和损失计算。训练完成后能生成与文本描述匹配的图像。</p>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">DALL-E2 的精髓</div>
+      <p>DALL-E2 的精髓在于<strong>两阶段架构</strong>：先用先验模型将文本"翻译"为图像条件（CLIP 图像嵌入），再用扩散模型根据条件生成图像。这种解耦设计让每个子模型都能专注做好自己的任务。</p>
+    </div>
+
+    <!-- Related knowledge -->
+    <div class="related-box">
+      <div class="related-box-title">相关分支知识</div>
+      <a class="related-link" href="#clip">
+        <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
+        <div class="related-link-content">
+          <h4>CLIP 是 DALL-E2 的基石</h4>
+          <p>DALL-E2 的三个模型中，CLIP 是第一个且需要冻结的基础。没有 CLIP 的图文嵌入空间，DALL-E2 无法工作。</p>
+        </div>
+      </a>
+      <a class="related-link" href="#diffusion">
+        <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
+        <div class="related-link-content">
+          <h4>扩散模型是 DALL-E2 的生成引擎</h4>
+          <p>第 17-19 章的扩散模型理论是 DALL-E2 的 Decoder 部分（条件扩散模型）的直接基础。</p>
+        </div>
+      </a>
+      <a class="related-link" href="llm.html#gpt2">
+        <div class="related-link-icon" style="background:rgba(99,102,241,0.1);color:var(--c-llm)">→</div>
+        <div class="related-link-content">
+          <h4>先验模型 = Decoder-Only Transformer</h4>
+          <p>DALL-E2 的先验模型与 GPT-2 使用相同的架构：因果注意力掩码的 Decoder-Only Transformer。</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+</main>
+</div>
+</body>
+</html>

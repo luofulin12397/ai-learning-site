@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>大语言模型 — AI知识库</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="nav-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<div class="shell">
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h2>AI知识库</h2>
+    <p>大语言模型 · 强化学习 · 多模态</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">知识主线</div>
+      <a class="sidebar-link" href="index.html"><span class="dot" style="background:var(--c-llm)"></span>首页 · 知识地图</a>
+      <a class="sidebar-link active" href="llm.html"><span class="dot" style="background:var(--c-llm)"></span>大语言模型</a>
+      <a class="sidebar-link" href="rl.html"><span class="dot" style="background:var(--c-rl)"></span>强化学习</a>
+      <a class="sidebar-link" href="rlhf.html"><span class="dot" style="background:var(--c-rlhf)"></span>RLHF 对齐训练</a>
+      <a class="sidebar-link" href="multimodal.html"><span class="dot" style="background:var(--c-mm)"></span>多模态 AI</a>
+      <a class="sidebar-link" href="derivations.html" style="margin-top:8px;border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">本章内容</div>
+      <a class="sidebar-link" href="#microgpt">microgpt</a>
+      <a class="sidebar-link" href="#llm-intro">LLM 简介</a>
+      <a class="sidebar-link" href="#gpt2">GPT-2 实现</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    第 1–3 章 · 50 页
+  </div>
+</aside>
+
+<main class="main">
+  <div class="breadcrumb">
+    <a href="index.html">首页</a>
+    <span class="breadcrumb-sep">/</span>
+    <span style="color:var(--c-llm);font-weight:600">大语言模型</span>
+  </div>
+
+  <span class="tag tag-llm">PART I</span>
+  <h1>大语言模型</h1>
+  <p class="lead">从 200 行代码构建微型 GPT 开始，到理解 LLM 的核心原理，再到完整实现 GPT-2 并加载 OpenAI 预训练权重。这是整个 AI 技术栈的起点。</p>
+
+  <!-- microgpt -->
+  <section class="section" id="microgpt">
+    <span class="tag tag-llm">第 1 章</span>
+    <h2>microgpt — 200 行代码理解 GPT</h2>
+    <p><strong>"此文件包含了完整算法，其余一切不过是效率优化。"</strong> —— Andrej Karpathy</p>
+    <p>这 200 行代码中运行的数学运算，与 ChatGPT、Claude、Gemini 乃至所有基于 Transformer 架构的语言模型所执行的运算完全一致。区别仅在于规模与速度——而非算法本身。</p>
+
+    <h3>整体流程</h3>
+    <div class="code-block"><pre><span class="comment"># microgpt 的五步流程</span>
+1. <span class="fn">DATASET</span>:    Load 32,000 human names (<span class="string">"emma"</span>, ...)
+2. <span class="fn">TOKENIZER</span>: Map each character → integer ID
+3. <span class="fn">MODEL</span>:      Build a tiny GPT (4,192 parameters)
+4. <span class="fn">TRAIN</span>:      Show it names, adjust parameters
+5. <span class="fn">GENERATE</span>:   Ask it to invent new names</pre></div>
+
+    <p>训练完成后，模型能生成从未见过的、听起来合理的名字，比如 "Aalina" 或 "Relyn"。它纯粹通过示例学会了英文名字的统计规律。</p>
+
+    <h3>数据集：文档流</h3>
+    <p>大语言模型的燃料是文本数据流。在生产级应用中，每个文档可能是一个互联网网页，但对于 microgpt，我们使用更简单的示例：32,000 个名字，每行一个。</p>
+    <div class="code-block"><pre><span class="comment"># 加载数据集</span>
+docs = [l.strip() <span class="keyword">for</span> l <span class="keyword">in</span> open(<span class="string">'input.txt'</span>).read().strip().split(<span class="string">'\n'</span>) <span class="keyword">if</span> l.strip()]
+random.shuffle(docs)
+print(<span class="string">f"num docs: {len(docs)}"</span>)  <span class="comment"># ~32,000</span></pre></div>
+
+    <h3>分词器：字符到整数</h3>
+    <p>分词器将文本拆分为离散的 token。在 microgpt 中，每个字符就是一个 token。我们构建一个字符到整数的映射表。</p>
+
+    <h3>自动微分（Autograd）</h3>
+    <p>PyTorch 的 autograd 机制自动计算梯度。当我们对损失调用 <code>loss.backward()</code> 时，PyTorch 会沿着计算图反向传播，自动计算每个参数的梯度。</p>
+    <div class="callout callout-info">
+      <div class="callout-title">核心概念</div>
+      <p>Autograd 的本质是链式法则的自动执行。你只需要定义前向计算，PyTorch 会自动构建计算图并计算反向梯度。</p>
+    </div>
+
+    <h3>训练循环</h3>
+    <p>训练过程就是反复执行：前向传播计算损失 → 反向传播计算梯度 → 更新参数。</p>
+    <div class="code-block"><pre><span class="keyword">for</span> step <span class="keyword">in</span> range(max_steps):
+    <span class="comment"># 1. 采样一个 batch</span>
+    xb, yb = get_batch(<span class="string">'train'</span>)
+
+    <span class="comment"># 2. 前向传播</span>
+    logits, loss = model(xb, yb)
+
+    <span class="comment"># 3. 反向传播</span>
+    optimizer.zero_grad()
+    loss.backward()
+
+    <span class="comment"># 4. 更新参数</span>
+    optimizer.step()</pre></div>
+
+    <h3>推理：生成新名字</h3>
+    <p>模型训练好后，从一个起始 token 开始，反复预测下一个 token，直到生成结束符。</p>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">为什么从 microgpt 开始？</div>
+      <p>microgpt 用最少的代码揭示了 GPT 的本质：数据集 → 分词器 → 模型 → 训练 → 生成。理解了这个流程，后续的 GPT-2、甚至 ChatGPT 的架构都是在这个基础上的扩展。</p>
+    </div>
+
+    <!-- Related knowledge -->
+    <div class="related-box">
+      <div class="related-box-title">相关分支知识</div>
+      <a class="related-link" href="rlhf.html#llm-training">
+        <div class="related-link-icon" style="background:rgba(217,119,6,0.1);color:var(--c-rlhf)">→</div>
+        <div class="related-link-content">
+          <h4>LLM 训练流程概述</h4>
+          <p>microgpt 展示了"预训练"阶段。完整的 LLM 训练还包括 SFT 和 RLHF，详见第 10 章。</p>
+        </div>
+      </a>
+      <a class="related-link" href="multimodal.html#vit">
+        <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
+        <div class="related-link-content">
+          <h4>Transformer 架构的迁移</h4>
+          <p>microgpt 中的 Transformer 块同样适用于图像。Vision Transformer 将图像分块后用相同的架构处理。</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- LLM Intro -->
+  <section class="section" id="llm-intro">
+    <span class="tag tag-llm">第 2 章</span>
+    <h2>LLM 简介 — 核心原理</h2>
+
+    <h3>核心问题：预测下一个 Token</h3>
+    <p>大语言模型要解决的问题是<strong>预测下一个 token</strong>（next token prediction, NTP）。给定一段文本的前缀，模型预测下一个 token 是什么。详见<a href="derivations.html#next-token" class="concept-link">预测下一个Token</a>。</p>
+
+    <h3>训练数据：输入-目标对</h3>
+    <p>文本数据 "君不见黄河之水天上来" 被切分为输入-目标对：</p>
+    <div class="code-block"><pre>输入          预测目标
+君不见黄河    → 之
+君不见黄河之  → 水
+君不见黄河之水 → 天
+君不见黄河之水天 → 上</pre></div>
+    <p>预测目标不是人类标注而来，而是程序通过切分文本自动标注的，所以叫做<strong>自监督学习</strong>。</p>
+    <h3>模型结构：Decoder-Only Transformer</h3>
+    <p>LLM 采用<strong>仅解码器的 Transformer 架构</strong>（Decoder-Only Transformer）。核心组件包括：</p>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li>Token 嵌入层 + 位置嵌入层</li>
+      <li>多头自注意力（Multi-head Self-Attention）</li>
+      <li>前馈层（Feed Forward）</li>
+      <li>层归一化（LayerNorm）</li>
+      <li>残差连接（Residual Connection）</li>
+    </ul>
+
+    <h3>损失函数：交叉熵</h3>
+    <p>LLM 本质上是一个<strong>分类模型</strong>。从极大似然估计的角度看：</p>
+    <a class="math-block" href="derivations.html#cross-entropy">最大化 P(d|abc) · P(c|ab) · P(b|a)<br>等价于最小化 −log P(d|abc) − log P(c|ab) − log P(b|a)<br><br>这就是<strong>交叉熵损失函数</strong></a>
+    <p>给定输入 "ab"，我们希望预测的下一个 token 属于分类 "c" 的概率越大越好。详细推导见<a href="derivations.html#cross-entropy" class="concept-link">交叉熵损失推导</a>。</p>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">重要区分</div>
+      <p>LLM 的"分类"不是传统意义上的图片分类。它的类别是词表中的所有 token，可能高达数万个。模型输出的是对所有 token 的概率分布。</p>
+    </div>
+  </section>
+
+  <!-- GPT-2 -->
+  <section class="section" id="gpt2">
+    <span class="tag tag-llm">第 3 章</span>
+    <h2>GPT-2 — 完整实现</h2>
+    <p>从 microgpt 到 GPT-2，核心架构不变，但每个组件都更加完整和规范。本章从零实现 GPT-2 并加载 OpenAI 开源的预训练权重。</p>
+
+    <h3>数据集准备</h3>
+    <p>使用 tiktoken 分词器（GPT-2 的 BPE 分词），通过滑动窗口将文本切割成重叠的序列：</p>
+    <div class="code-block"><pre><span class="keyword">class</span> <span class="fn">GPTDatasetV1</span>(Dataset):
+    <span class="keyword">def</span> __init__(self, txt, tokenizer, max_length, stride):
+        self.input_ids = []
+        self.target_ids = []
+        token_ids = tokenizer.encode(txt)
+
+        <span class="keyword">for</span> i <span class="keyword">in</span> range(0, len(token_ids) - max_length, stride):
+            input_chunk = token_ids[i : i + max_length]
+            target_chunk = token_ids[i + 1 : i + max_length + 1]
+            self.input_ids.append(torch.tensor(input_chunk))
+            self.target_ids.append(torch.tensor(target_chunk))</pre></div>
+
+    <h3>模型结构定义</h3>
+    <p>GPT-2 模型自顶向下包含：</p>
+    <div class="code-block"><pre><span class="keyword">class</span> <span class="fn">GPTModel</span>(nn.Module):
+    <span class="keyword">def</span> __init__(self, cfg):
+        super().__init__()
+        self.tok_emb = nn.Embedding(cfg[<span class="string">"vocab_size"</span>], cfg[<span class="string">"emb_dim"</span>])
+        self.pos_emb = nn.Embedding(cfg[<span class="string">"context_length"</span>], cfg[<span class="string">"emb_dim"</span>])
+        self.drop_emb = nn.Dropout(cfg[<span class="string">"drop_rate"</span>])
+        self.trf_blocks = nn.Sequential(
+            *[TransformerBlock(cfg) <span class="keyword">for</span> _ <span class="keyword">in</span> range(cfg[<span class="string">"n_layers"</span>])]
+        )
+        self.final_norm = LayerNorm(cfg[<span class="string">"emb_dim"</span>])
+        self.out_head = nn.Linear(cfg[<span class="string">"emb_dim"</span>], cfg[<span class="string">"vocab_size"</span>], bias=<span class="keyword">False</span>)</pre></div>
+
+    <h3>核心组件详解</h3>
+
+    <h4>词嵌入 + 位置编码</h4>
+    <p>Token 嵌入将离散的 token ID 映射为连续向量。位置编码告诉模型每个 token 在序列中的位置。GPT-2 使用可学习的位置嵌入。</p>
+
+    <h4>多头自注意力</h4>
+    <p>自注意力机制让每个 token "看到" 序列中所有之前的 token。多头注意力将嵌入空间分成多个子空间，并行计算注意力。</p>
+    <a class="math-block" href="derivations.html#self-attention">Attention(Q, K, V) = softmax(QKᵀ / √dₖ) · V</a>
+    <p>公式详解和 Q/K/V 的来源见<a href="derivations.html#self-attention" class="concept-link">自注意力机制</a>。</p>
+
+    <h4>前馈层</h4>
+    <p>两层线性变换 + GELU 激活函数，对每个位置独立处理。</p>
+
+    <h4>层归一化 + 残差连接</h4>
+    <p>每个子层（注意力和前馈）都包裹在 LayerNorm + 残差连接中，稳定深层网络训练。</p>
+
+    <h3>加载 OpenAI 预训练权重</h3>
+    <p>训练好自己的 GPT-2 后，可以直接加载 OpenAI 开源的预训练权重，体验真正的语言模型能力。</p>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">实践建议</div>
+      <p>从零实现 GPT-2 是理解大语言模型最好的方式。当你亲手写出每一行代码，Attention 机制就不再是一个黑箱。</p>
+    </div>
+
+    <!-- Related knowledge -->
+    <div class="related-box">
+      <div class="related-box-title">相关分支知识</div>
+      <a class="related-link" href="rlhf.html#dpo">
+        <div class="related-link-icon" style="background:rgba(217,119,6,0.1);color:var(--c-rlhf)">→</div>
+        <div class="related-link-content">
+          <h4>GPT-2 用于 RLHF</h4>
+          <p>第 11-12 章使用 GPT-2 作为基础模型，进行 DPO 和 PPO 微调实验。GPT-2 是学习 RLHF 的理想载体。</p>
+        </div>
+      </a>
+      <a class="related-link" href="multimodal.html#clipcap">
+        <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
+        <div class="related-link-content">
+          <h4>GPT-2 用于图生文</h4>
+          <p>ClipCap 将 CLIP 图像嵌入映射到 GPT-2 的嵌入空间，利用 GPT-2 的文本生成能力实现图生文。</p>
+        </div>
+      </a>
+      <a class="related-link" href="rl.html#policy-gradient">
+        <div class="related-link-icon" style="background:rgba(5,150,105,0.1);color:var(--c-rl)">→</div>
+        <div class="related-link-content">
+          <h4>LLM 即策略</h4>
+          <p>在 RLHF 中，LLM 被视为强化学习中的"策略函数"。理解第 5 章的策略梯度法是理解 RLHF 的前提。</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+</main>
+</div>
+</body>
+</html>

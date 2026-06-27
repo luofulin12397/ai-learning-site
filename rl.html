@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>强化学习 — AI知识库</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<button class="nav-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<div class="shell">
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h2>AI知识库</h2>
+    <p>大语言模型 · 强化学习 · 多模态</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">知识主线</div>
+      <a class="sidebar-link" href="index.html"><span class="dot" style="background:var(--c-llm)"></span>首页 · 知识地图</a>
+      <a class="sidebar-link" href="llm.html"><span class="dot" style="background:var(--c-llm)"></span>大语言模型</a>
+      <a class="sidebar-link active" href="rl.html"><span class="dot" style="background:var(--c-rl)"></span>强化学习</a>
+      <a class="sidebar-link" href="rlhf.html"><span class="dot" style="background:var(--c-rlhf)"></span>RLHF 对齐训练</a>
+      <a class="sidebar-link" href="multimodal.html"><span class="dot" style="background:var(--c-mm)"></span>多模态 AI</a>
+      <a class="sidebar-link" href="derivations.html" style="margin-top:8px;border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
+    </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">本章内容</div>
+      <a class="sidebar-link" href="#rl-intro">RL 基础与 MDP</a>
+      <a class="sidebar-link" href="#policy-gradient">策略梯度法</a>
+      <a class="sidebar-link" href="#ppo">PPO 近端优化</a>
+      <a class="sidebar-link" href="#ppo-math">PPO 数学理论</a>
+      <a class="sidebar-link" href="#grpo">GRPO 组优化</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    第 4–9 章 · 92 页
+  </div>
+</aside>
+
+<main class="main">
+  <div class="breadcrumb">
+    <a href="index.html">首页</a>
+    <span class="breadcrumb-sep">/</span>
+    <span style="color:var(--c-rl);font-weight:600">强化学习</span>
+  </div>
+
+  <span class="tag tag-rl">PART II</span>
+  <h1>强化学习</h1>
+  <p class="lead">从智能体与环境交互的基本概念出发，逐步推导策略梯度法、REINFORCE、Actor-Critic、PPO 直到 GRPO。这是理解 RLHF 和 DeepSeek-R1 的理论基石。</p>
+
+  <!-- RL Basics -->
+  <section class="section" id="rl-intro">
+    <span class="tag tag-rl">第 4 章</span>
+    <h2>强化学习基础</h2>
+
+    <h3>核心概念：智能体与环境</h3>
+    <p>强化学习讨论的问题是<strong>智能体（agent）怎么在复杂、不确定的环境中最大化它能获得的奖励</strong>。</p>
+    <p>核心循环：智能体获取环境状态 → 根据状态采取动作 → 环境转移到新状态 → 反馈即时奖励。</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">关键术语</div>
+      <p><strong>Agent</strong>（智能体）· <strong>Environment</strong>（环境）· <strong>State</strong>（状态）· <strong>Action</strong>（动作）· <strong>Reward</strong>（即时奖励）· <strong>Policy</strong>（策略）</p>
+    </div>
+
+    <h3>倒立摆环境</h3>
+    <p>本书用倒立摆（CartPole）作为贯穿始终的示例环境。智能体是推车，目标是通过左右移动保持木杆不倒。</p>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li><strong>动作空间</strong>：向左推 / 向右推</li>
+      <li><strong>状态</strong>：推车位置、速度、木杆角度、角速度</li>
+      <li><strong>即时奖励</strong>：木杆不倒 = +1</li>
+      <li><strong>结束条件</strong>：杆倒下 / 推出屏幕 / 坚持 200 步（成功）</li>
+    </ul>
+
+    <h3>策略函数</h3>
+    <p>策略是智能体的动作模型，决定了在给定状态下采取什么动作。策略是一个函数：</p>
+    <div class="math-block">π(a|s) = p(aₜ = a | sₜ = s)<br><br>输入状态 s，输出动作的概率分布</div>
+
+    <p>策略不一定是确定性的——往往是从概率分布中采样动作。这涉及<strong>探索与利用</strong>的平衡。</p>
+
+    <div class="analogy-box">
+      <div class="analogy-box-header">
+        <span class="analogy-box-title">机器学习类比</span>
+        <span class="analogy-box-subtitle">用监督学习理解 RL 基本概念</span>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>状态 S / 动作 A</strong>
+          <span>环境描述 / 智能体的选择</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>特征 X / 标签 ỹ</strong>
+          <span>数据描述 / 模型的预测</span>
+        </div>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>策略函数 π(a|s)</strong>
+          <span>输入状态→输出动作概率分布</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>分类器 / softmax 输出</strong>
+          <span>输入特征→输出类别概率分布</span>
+        </div>
+      </div>
+      <div class="analogy-note">
+        <strong>类比要点：</strong>策略网络和分类器的网络结构几乎一样——都是全连接层 + softmax。区别在于：分类器的"正确答案"来自人工标注（ground truth），而策略的"正确答案"由回报信号反推。状态就是 RL 中的"输入特征"，动作就是 RL 中的"预测输出"。
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">探索 vs 利用</div>
+      <p>如果每次都选概率最大的动作（利用），可能陷入局部最优。偶尔选择概率低的动作（探索），可能发现更好的长期策略。就像去熟悉的餐厅（安全）还是尝试新餐厅（可能惊喜也可能失望）。</p>
+    </div>
+
+    <h3>价值函数</h3>
+    <p>价值函数衡量在某个状态下，未来能获得的期望累积奖励。状态价值函数 V(s) 和动作价值函数 Q(s,a) 是 RL 的核心概念。</p>
+
+    <div class="analogy-box">
+      <div class="analogy-box-header">
+        <span class="analogy-box-title">机器学习类比</span>
+        <span class="analogy-box-subtitle">价值函数 = 模型期望表现</span>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>价值函数 V(s)</strong>
+          <span>从状态 s 出发的期望回报</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>模型期望准确率</strong>
+          <span>在特征 x 上的期望表现</span>
+        </div>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>优势 A = Q − V</strong>
+          <span>动作相对基准的好坏</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>残差 = 实际 − 预测</strong>
+          <span>预测偏离基准的程度</span>
+        </div>
+      </div>
+      <div class="analogy-note">
+        <strong>类比要点：</strong>价值函数告诉你"当前状态本身值多少分"（基准线），动作的好坏要相对这个基准来衡量。就像在监督学习中，残差衡量"实际值偏离预测多少"——优势函数衡量"这个动作比平均水平好多少"。
+      </div>
+    </div>
+
+    <h3>马尔可夫决策过程（MDP）</h3>
+    <p>MDP 是 RL 的数学框架，包含：状态集 S、动作集 A、转移概率 P、奖励函数 R、折扣因子 γ。</p>
+    <p>MDP 的目标是找到一个策略 π，使得期望累积奖励最大化。</p>
+
+    <h3>贝尔曼方程</h3>
+    <p>贝尔曼方程是 RL 的核心递推关系，将价值函数分解为即时奖励 + 下一状态的价值：</p>
+    <a class="math-block" href="derivations.html#bellman">V(s) = E[Rₜ + γ·V(Sₜ₊₁) | Sₜ = s]</a>
+    <p>推导过程和动作价值函数 Q(s,a) 的贝尔曼方程见<a href="derivations.html#bellman" class="concept-link c-rl">贝尔曼方程详解</a>。</p>
+
+    <div class="analogy-box">
+      <div class="analogy-box-header">
+        <span class="analogy-box-title">机器学习类比</span>
+        <span class="analogy-box-subtitle">贝尔曼方程 = 递归的损失分解</span>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>贝尔曼方程</strong>
+          <span>V(s) = E[Rₜ + γV(Sₜ₊₁)]</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>残差连接 / 梯度反传</strong>
+          <span>当前损失 = 即时误差 + 未来误差的反传</span>
+        </div>
+      </div>
+      <div class="analogy-note">
+        <strong>类比要点：</strong>贝尔曼方程把"长期累积回报"分解为"即时奖励 + 下一状态价值"，就像残差网络把深层误差分解为"当前层误差 + 传给前一层的误差"。这种递归结构让 RL 能像反向传播一样逐步更新价值估计。
+      </div>
+    </div>
+  </section>
+
+  <!-- Policy Gradient -->
+  <section class="section" id="policy-gradient">
+    <span class="tag tag-rl">第 5 章</span>
+    <h2>策略梯度法</h2>
+
+    <h3>核心思想</h3>
+    <p>策略梯度法的核心：将策略函数建模为神经网络，用梯度上升直接优化策略参数 θ，使期望回报最大化。</p>
+    <a class="math-block" href="derivations.html#policy-gradient-thm">∇θ J(θ) = Eτ~πθ [ G(τ) · ∇θ log πθ(Aₜ|Sₜ) ]</a>
+    <p>完整的策略梯度定理推导（含 log-导数技巧）见<a href="derivations.html#policy-gradient-thm" class="concept-link c-rl">策略梯度定理</a>。</p>
+
+    <div class="analogy-box">
+      <div class="analogy-box-header">
+        <span class="analogy-box-title">机器学习类比</span>
+        <span class="analogy-box-subtitle">策略梯度 ↔ 梯度下降，奖励 ↔ 负损失</span>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>奖励 R（越大越好）</strong>
+          <span>环境的即时反馈</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>−损失 L（越大越好）</strong>
+          <span>预测误差的负值</span>
+        </div>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>策略梯度 ∇log π(a|s)</strong>
+          <span>增大好动作的概率</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>梯度下降 ∇θ L</strong>
+          <span>减小预测误差</span>
+        </div>
+      </div>
+      <div class="analogy-note">
+        <strong>类比要点：</strong>监督学习有 ground truth → 算交叉熵 → 反向传播 → 梯度下降减小损失。RL 没有 ground truth → 采样轨迹 → 用回报 G 作为权重 → 梯度上升增大好动作概率。两者优化机制本质相同，区别仅在于梯度的来源：监督学习的梯度来自标注，RL 的梯度来自回报信号。<strong>记住：最大化奖励 ⟺ 最小化负奖励 ⟺ 最小化损失。</strong>
+      </div>
+    </div>
+
+    <h3>REINFORCE 算法</h3>
+    <p>REINFORCE 是最基础的策略梯度算法：采集一条完整轨迹 → 计算累积回报 → 更新策略。其改进是用 Gₜ 替代 G(τ)，去除时刻 t 之前的奖励噪声。详见<a href="derivations.html#reinforce-derive" class="concept-link c-rl">REINFORCE推导</a>。</p>
+    <div class="code-block"><pre><span class="keyword">def</span> <span class="fn">reinforce</span>(agent, env, num_episodes):
+    <span class="keyword">for</span> episode <span class="keyword">in</span> range(num_episodes):
+        <span class="comment"># 1. 采集一条完整轨迹</span>
+        trajectory = agent.collect_trajectory(env)
+
+        <span class="comment"># 2. 计算每步的累积回报 G(t)</span>
+        returns = compute_returns(trajectory)
+
+        <span class="comment"># 3. 计算策略梯度并更新</span>
+        loss = -sum(log_prob * G <span class="keyword">for</span> log_prob, G <span class="keyword">in</span> zip(trajectory.log_probs, returns))
+        loss.backward()
+        optimizer.step()</pre></div>
+
+    <h3>带基线的策略梯度</h3>
+    <p>原始策略梯度方差很大。引入基线（baseline）可以减小方差而不改变梯度的期望。常用基线是价值函数 V(s)。</p>
+
+    <h3>Actor-Critic 架构</h3>
+    <p>Actor-Critic 结合了策略梯度和价值函数方法：</p>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li><strong>Actor</strong>（演员）：策略网络 πθ(a|s)，决定采取什么动作</li>
+      <li><strong>Critic</strong>（评论家）：价值网络 V(s)，评估当前策略的好坏</li>
+    </ul>
+    <p>Actor 根据 Critic 的反馈调整策略，Critic 根据实际回报调整评估。</p>
+
+    <div class="analogy-box">
+      <div class="analogy-box-header">
+        <span class="analogy-box-title">机器学习类比</span>
+        <span class="analogy-box-subtitle">Actor-Critic ↔ GAN 生成器-判别器</span>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>Actor（演员）</strong>
+          <span>策略网络，负责"产出"动作</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>GAN 生成器</strong>
+          <span>负责"造假"生成数据</span>
+        </div>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>Critic（评论家）</strong>
+          <span>价值网络，负责"评估"动作好坏</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>GAN 判别器</strong>
+          <span>负责"鉴别"真假数据</span>
+        </div>
+      </div>
+      <div class="analogy-note">
+        <strong>类比要点：</strong>两者都是"博弈式协同"——一方生成、一方评估，互相促进。Actor 根据 Critic 的反馈改进策略，Critic 根据实际回报修正评估；正如生成器骗判别器、判别器识破生成器。<strong>这个类比在 RLHF 中尤为直观</strong>：LLM 是 Actor（生成回答），奖励模型是 Critic（评估好坏），两者对抗式优化。
+      </div>
+    </div>
+
+    <h3>广义优势估计（GAE）</h3>
+    <p>GAE 通过多步 TD 误差的指数加权平均，在偏差和方差之间取得平衡：</p>
+    <a class="math-block" href="derivations.html#gae">Aₜ^GAE = Σₗ (γλ)ˡ · δₜ₊ₗ<br><br>其中 δₜ = Rₜ + γV(Sₜ₊₁) - V(Sₜ) 是 TD 误差</a>
+    <p>λ 参数的作用和展开形式见<a href="derivations.html#gae" class="concept-link c-rl">GAE详解</a>。</p>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">策略梯度法的致命问题</div>
+      <p>策略梯度法的训练数据是当前策略采样的轨迹。如果一次更新步子太大，新策略可能比旧策略差很多，而且很难恢复——因为差的策略会产生差的数据。这就是 PPO 要解决的问题。</p>
+    </div>
+
+    <!-- Related knowledge -->
+    <div class="related-box">
+      <div class="related-box-title">相关分支知识</div>
+      <a class="related-link" href="rlhf.html#llm-training">
+        <div class="related-link-icon" style="background:rgba(217,119,6,0.1);color:var(--c-rlhf)">→</div>
+        <div class="related-link-content">
+          <h4>LLM 即策略网络</h4>
+          <p>在 RLHF 中，LLM 就是 Actor-Critic 中的 Actor。理解策略梯度法是理解 RLHF 的前提。</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- PPO -->
+  <section class="section" id="ppo">
+    <span class="tag tag-rl">第 6-7 章</span>
+    <h2>PPO — 近端策略优化</h2>
+
+    <h3>策略梯度法的问题</h3>
+    <p>策略梯度法的核心问题：步子迈太大会导致策略崩溃。在深度学习中，训练数据是固定的；但在 RL 中，训练数据是策略采样的——策略变差 → 数据变差 → 策略更差，形成恶性循环。</p>
+
+    <h3>PPO 的核心思想</h3>
+    <p>PPO 通过<strong>置信域方法</strong>（Trust Region Method）限制策略更新的幅度，保证新策略不会偏离旧策略太远。</p>
+
+    <div class="analogy-box">
+      <div class="analogy-box-header">
+        <span class="analogy-box-title">机器学习类比</span>
+        <span class="analogy-box-subtitle">PPO 的 clip ↔ 学习率调度 / 梯度裁剪</span>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>PPO 的 clip(ρ, 1−ε, 1+ε)</strong>
+          <span>限制新旧策略概率比的波动</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>梯度裁剪 / 学习率衰减</strong>
+          <span>限制单次参数更新的幅度</span>
+        </div>
+      </div>
+      <div class="analogy-note">
+        <strong>类比要点：</strong>监督学习中用梯度裁剪防止梯度爆炸、用学习率调度控制训练步幅；PPO 用 clip 操作限制策略更新幅度，防止"步子太大扯着蛋"。核心都是<strong>限制单次更新的幅度以保证稳定性</strong>。区别在于：监督学习的训练数据固定，步子大了顶多这一 batch 训练不好；RL 的训练数据是策略采样的，步子太大策略崩溃 → 数据变差 → 越崩溃越难恢复。
+      </div>
+    </div>
+
+    <h3>PPO 的替代目标函数</h3>
+    <a class="math-block" href="derivations.html#ppo-surrogate">J^PPO(θ) = E[ min( ρ·A, clip(ρ, 1-ε, 1+ε)·A ) ]<br><br>其中 ρ = πθ(a|s) / πθ_old(a|s) 是重要性采样比率</a>
+    <p>clip 操作将重要性采样比率限制在 [1-ε, 1+ε] 范围内，防止单次更新过大。完整推导（含 CPI 目标和 min 操作的作用）见<a href="derivations.html#ppo-surrogate" class="concept-link c-rl">PPO替代目标推导</a>。</p>
+
+    <h3>PPO 实战</h3>
+    <p>定义 Actor（策略网络）和 Critic（价值网络）：</p>
+    <div class="code-block"><pre><span class="keyword">class</span> <span class="fn">PolicyNet</span>(nn.Module):
+    <span class="keyword">def</span> __init__(self, action_size):
+        super().__init__()
+        self.l1 = nn.Linear(4, 128)
+        self.l2 = nn.Linear(128, action_size)
+
+    <span class="keyword">def</span> forward(self, x):
+        x = F.relu(self.l1(x))
+        x = F.softmax(self.l2(x), dim=1)
+        <span class="keyword">return</span> x
+
+<span class="keyword">class</span> <span class="fn">ValueNet</span>(nn.Module):
+    <span class="keyword">def</span> __init__(self):
+        super().__init__()
+        self.l1 = nn.Linear(4, 128)
+        self.l2 = nn.Linear(128, 1)
+
+    <span class="keyword">def</span> forward(self, x):
+        x = F.relu(self.l1(x))
+        x = self.l2(x)
+        <span class="keyword">return</span> x</pre></div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">PPO 的地位</div>
+      <p>PPO 是目前最广泛使用的 RL 算法之一。OpenAI 的 InstructGPT 使用 PPO 进行 RLHF，它也是许多游戏 AI 和机器人控制的基础。</p>
+    </div>
+  </section>
+
+  <!-- PPO Math -->
+  <section class="section" id="ppo-math">
+    <span class="tag tag-rl">第 8 章</span>
+    <h2>PPO 背后的数学</h2>
+
+    <h3>KL 散度</h3>
+    <p>KL 散度衡量两个概率分布的差异：</p>
+    <a class="math-block" href="derivations.html#kl-divergence">D_KL(p‖q) = Σ p(x) log [p(x)/q(x)]</a>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li>两个分布差异越大，KL 散度越大</li>
+      <li>KL 散度 ≥ 0，当且仅当两分布相同时为 0</li>
+      <li>KL 散度是非对称的：D_KL(p‖q) ≠ D_KL(q‖p)</li>
+    </ul>
+    <p>定义、抛硬币实例和三大性质详解见<a href="derivations.html#kl-divergence" class="concept-link c-rlhf">KL散度</a>。</p>
+
+    <div class="analogy-box">
+      <div class="analogy-box-header">
+        <span class="analogy-box-title">机器学习类比</span>
+        <span class="analogy-box-subtitle">KL 散度惩罚 ↔ L1/L2 正则化</span>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>KL 散度惩罚 β·D_KL[πθ‖πref]</strong>
+          <span>防止策略偏离参考模型太远</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>L1 / L2 正则化 λ·||w||²</strong>
+          <span>防止权重过大导致过拟合</span>
+        </div>
+      </div>
+      <div class="analogy-note">
+        <strong>类比要点：</strong>两者都是加在目标函数上的"约束项"，防止模型走极端。正则化防止权重过大 → 过拟合训练集噪声；KL 惩罚防止策略偏离参考模型 → 奖励黑客（Reward Hacking）。在 RLHF 中，没有 KL 惩罚，模型会生成乱码骗高分；就像没有正则化，模型会记住训练集的噪声。<strong>超参数 β 和 λ 的作用也对应</strong>：太大欠拟合，太小过拟合。
+      </div>
+    </div>
+
+    <h3>重要性采样</h3>
+    <p>重要性采样允许用旧策略采样的数据来更新新策略，通过重要性权重修正分布偏差：</p>
+    <a class="math-block" href="derivations.html#importance-sampling">E_{x~p}[f(x)] = E_{x~q}[ f(x) · p(x)/q(x) ]</a>
+    <p>方差问题、与 PPO 的关系详见<a href="derivations.html#importance-sampling" class="concept-link c-rlhf">重要性采样</a>。</p>
+
+    <h3>替代目标</h3>
+    <p>PPO 的理论基础来自单调改进理论：通过限制新旧策略的 KL 散度，保证策略的单调改进。</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">为什么需要 KL 散度？</div>
+      <p>在 RLHF 中，KL 散度惩罚项防止微调后的 LLM 偏离原始模型太远。没有它，模型会"奖励黑客"——利用奖励模型的漏洞获得高分但生成无意义文本。</p>
+    </div>
+  </section>
+
+  <!-- GRPO -->
+  <section class="section" id="grpo">
+    <span class="tag tag-rl">第 9 章</span>
+    <h2>GRPO — 组相对策略优化</h2>
+
+    <h3>GRPO 原理</h3>
+    <p>GRPO 是 DeepSeek 提出的 RL 算法，专为 LLM 推理任务设计。与 PPO 的关键区别：<strong>不需要 Critic 网络</strong>，而是用一组轨迹的相对优势来估计 baseline。</p>
+
+    <a class="math-block" href="derivations.html#grpo-advantage">J^GRPO(θ) = (1/G) Σᵢ (1/|τᵢ|) Σₜ min[ρ·A, clip(ρ, 1-ε, 1+ε)·A]<br><br>其中 ρ = πθ(a|s) / πθ_old(a|s)</a>
+
+    <h3>组相对优势</h3>
+    <p>对每个问题采样 G 条轨迹，计算每条轨迹的奖励，然后用组内归一化计算优势：</p>
+    <a class="math-block" href="derivations.html#grpo-advantage">Aᵢ = (rᵢ - μ) / σ<br><br>μ = mean(r₁, ..., rG),  σ = std(r₁, ..., rG)</a>
+    <p>这种方法简单有效：表现好于平均的轨迹获得正优势，表现差于平均的获得负优势。计算流程与 DAPO 改进见<a href="derivations.html#grpo-advantage" class="concept-link c-rlhf">GRPO组相对优势</a>。</p>
+
+    <div class="analogy-box">
+      <div class="analogy-box-header">
+        <span class="analogy-box-title">机器学习类比</span>
+        <span class="analogy-box-subtitle">GRPO 组相对优势 ↔ Batch 内归一化</span>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>GRPO 优势 A = (r − μ) / σ</strong>
+          <span>组内轨迹奖励的归一化</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>Batch Normalization</strong>
+          <span>batch 内特征的归一化</span>
+        </div>
+      </div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl">
+          <strong>不用 Critic，用组均值替代</strong>
+          <span>用同伴表现作为基准</span>
+        </div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml">
+          <strong>不用 running mean，用 batch 均值</strong>
+          <span>用当前 batch 统计量替代</span>
+        </div>
+      </div>
+      <div class="analogy-note">
+        <strong>类比要点：</strong>GRPO 不训练独立的 Critic 网络估计价值，而是用"同一批采样的多条轨迹的统计量"作为基准——就像 BatchNorm 不维护全局均值，而用当前 batch 的统计量。这种"用同伴做基准"的思路节省了额外网络的训练成本，特别适合参数量巨大的 LLM 微调场景。
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <div class="callout-title">GRPO 的优势</div>
+      <p>不需要训练额外的 Critic 网络，节省 GPU 内存。这对于参数量巨大的 LLM 微调尤为重要。DeepSeek-R1 正是使用 GRPO 实现了推理能力的突破。</p>
+    </div>
+
+    <!-- Related knowledge -->
+    <div class="related-box">
+      <div class="related-box-title">相关分支知识</div>
+      <a class="related-link" href="rlhf.html#grpo-llm">
+        <div class="related-link-icon" style="background:rgba(217,119,6,0.1);color:var(--c-rlhf)">→</div>
+        <div class="related-link-content">
+          <h4>用 GRPO 复刻 DeepSeek-R1</h4>
+          <p>第 13 章使用 DAPO（GRPO 变种）微调 Qwen2.5-3B，从零复刻 DeepSeek-R1 的推理能力，产生思维链。</p>
+        </div>
+      </a>
+      <a class="related-link" href="rlhf.html#ppo-llm">
+        <div class="related-link-icon" style="background:rgba(217,119,6,0.1);color:var(--c-rlhf)">→</div>
+        <div class="related-link-content">
+          <h4>PPO vs GRPO 对比</h4>
+          <p>PPO 需要训练 Critic 网络估计价值，GRPO 用组内相对优势替代。两种方法在 RLHF 中的应用对比。</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+</main>
+</div>
+</body>
+</html>
