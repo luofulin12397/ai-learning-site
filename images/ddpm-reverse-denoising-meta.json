@@ -1,0 +1,9 @@
+{
+  "paper": "Denoising Diffusion Probabilistic Models (Ho et al., NeurIPS 2020)",
+  "model": "google/ddpm-cifar10-32",
+  "inference_steps": 100,
+  "frames": 12,
+  "seed": 42,
+  "training_steps": 1000,
+  "note": "Real DDPM reverse denoising process. x_T ~ N(0,I), iterative denoising via p_θ(x_{t-1}|x_t). 12-frame dense visualization."
+}

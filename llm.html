@@ -9,6 +9,18 @@
 <body>
 <button class="nav-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
 
+<!-- 搜索覆盖层 -->
+<div id="search-overlay" class="search-overlay">
+  <div class="search-box">
+    <input type="text" id="search-input" class="search-input" placeholder="搜索概念、公式、章节... (Ctrl+K)" autocomplete="off">
+    <div id="search-results" class="search-results"></div>
+    <div class="search-hint">ESC 关闭 · ↑↓ 选择 · Enter 跳转</div>
+  </div>
+</div>
+
+<!-- 主题切换 -->
+<button class="theme-toggle" id="theme-toggle" title="切换主题">🌓</button>
+
 <div class="shell">
 
 <aside class="sidebar">
@@ -24,168 +36,395 @@
       <a class="sidebar-link" href="rl.html"><span class="dot" style="background:var(--c-rl)"></span>强化学习</a>
       <a class="sidebar-link" href="rlhf.html"><span class="dot" style="background:var(--c-rlhf)"></span>RLHF 对齐训练</a>
       <a class="sidebar-link" href="multimodal.html"><span class="dot" style="background:var(--c-mm)"></span>多模态 AI</a>
-      <a class="sidebar-link" href="derivations.html" style="margin-top:8px;border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
+      <a class="sidebar-link" href="knowledge-graph.html" style="margin-top:8px"><span class="dot" style="background:linear-gradient(135deg,var(--c-llm),var(--c-rl),var(--c-rlhf),var(--c-mm))"></span>🔗 知识图谱</a>
+      <a class="sidebar-link" href="derivations.html" style="border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
     </div>
     <div class="sidebar-group">
-      <div class="sidebar-group-title">本章内容</div>
-      <a class="sidebar-link" href="#microgpt">microgpt</a>
-      <a class="sidebar-link" href="#llm-intro">LLM 简介</a>
-      <a class="sidebar-link" href="#gpt2">GPT-2 实现</a>
+      <div class="sidebar-group-title">本章导航</div>
+      <a class="sidebar-link" href="#microgpt">01 · microGPT</a>
+      <a class="sidebar-link" href="#llm-intro">02 · LLM 简介</a>
+      <a class="sidebar-link" href="#gpt2">03 · GPT-2 实现</a>
     </div>
   </nav>
-  <div class="sidebar-footer">
-    第 1–3 章 · 50 页
-  </div>
+  <div class="sidebar-footer">第 1–3 章 · 50 页 · 🧱 第一部分</div>
 </aside>
 
 <main class="main">
+
+  <!-- ====== 页面头部 ====== -->
   <div class="breadcrumb">
-    <a href="index.html">首页</a>
-    <span class="breadcrumb-sep">/</span>
+    <a href="index.html">首页</a> <span class="breadcrumb-sep">/</span>
     <span style="color:var(--c-llm);font-weight:600">大语言模型</span>
   </div>
 
   <span class="tag tag-llm">PART I</span>
   <h1>大语言模型</h1>
-  <p class="lead">从 200 行代码构建微型 GPT 开始，到理解 LLM 的核心原理，再到完整实现 GPT-2 并加载 OpenAI 预训练权重。这是整个 AI 技术栈的起点。</p>
 
-  <!-- microgpt -->
-  <section class="section" id="microgpt">
-    <span class="tag tag-llm">第 1 章</span>
-    <h2>microgpt — 200 行代码理解 GPT</h2>
-    <p><strong>"此文件包含了完整算法，其余一切不过是效率优化。"</strong> —— Andrej Karpathy</p>
-    <p>这 200 行代码中运行的数学运算，与 ChatGPT、Claude、Gemini 乃至所有基于 Transformer 架构的语言模型所执行的运算完全一致。区别仅在于规模与速度——而非算法本身。</p>
+  <div class="page-intro page-intro-llm fade-in">
+    <p class="lead"><strong>大模型不是魔法。</strong>它的核心，是一个<strong>不停猜下一个字</strong>的游戏。从 60 行代码的 microGPT，到理解 LLM 的核心原理，再到完整实现 GPT-2 并加载 OpenAI 预训练权重——这是整个 AI 技术栈的起点。Karpathy 说得好："此文件包含了完整算法，其余一切不过是效率优化。"</p>
+  </div>
 
-    <h3>整体流程</h3>
-    <div class="code-block"><pre><span class="comment"># microgpt 的五步流程</span>
-1. <span class="fn">DATASET</span>:    Load 32,000 human names (<span class="string">"emma"</span>, ...)
-2. <span class="fn">TOKENIZER</span>: Map each character → integer ID
-3. <span class="fn">MODEL</span>:      Build a tiny GPT (4,192 parameters)
-4. <span class="fn">TRAIN</span>:      Show it names, adjust parameters
-5. <span class="fn">GENERATE</span>:   Ask it to invent new names</pre></div>
+  <!-- ====== 章节导航卡片 ====== -->
+  <div class="section-nav-grid fade-in fade-in-delay-1">
+    <a class="section-nav-card" data-branch="llm" href="#microgpt">
+      <div class="section-nav-num">第 1 章</div>
+      <h4>microGPT：60 行看懂全貌</h4>
+      <p>4192 参数的"迷你 ChatGPT"，麻雀虽小五脏俱全</p>
+    </a>
+    <a class="section-nav-card" data-branch="llm" href="#llm-intro">
+      <div class="section-nav-num">第 2 章</div>
+      <h4>LLM 在干嘛：预测下一个词</h4>
+      <p>自监督 · 交叉熵 · 滑动窗口 · 词表分类</p>
+    </a>
+    <a class="section-nav-card" data-branch="llm" href="#gpt2">
+      <div class="section-nav-num">第 3 章</div>
+      <h4>GPT-2：把 Transformer 拆开看</h4>
+      <p>6 个核心零件逐个拆解 · 工业级完整实现</p>
+    </a>
+  </div>
 
-    <p>训练完成后，模型能生成从未见过的、听起来合理的名字，比如 "Aalina" 或 "Relyn"。它纯粹通过示例学会了英文名字的统计规律。</p>
+  <!-- ====== 章节分隔线 ====== -->
+  <div class="chapter-sep"><span>第 1 章</span></div>
 
-    <h3>数据集：文档流</h3>
-    <p>大语言模型的燃料是文本数据流。在生产级应用中，每个文档可能是一个互联网网页，但对于 microgpt，我们使用更简单的示例：32,000 个名字，每行一个。</p>
+  <!-- ============================ CHAPTER 1: microGPT ============================ -->
+  <section class="section fade-in" id="microgpt">
+    <h2>microGPT — 60 行代码看懂大模型全貌</h2>
+
+    <blockquote class="big-quote">
+      "此文件包含了完整算法，其余一切不过是效率优化。"
+      <span class="big-quote-attribution">—— Andrej Karpathy</span>
+    </blockquote>
+
+    <h3>🎯 导读</h3>
+    <p>ChatGPT、Claude、Gemini 这些大模型，核心算法其实只有薄薄一层。这章我们用一个<strong>只有 4192 个参数、能学着编人名</strong>的迷你模型 microGPT，把"大模型到底在干嘛"一次看穿。看完你会发现：剩下的一切，不过是"把它做大做快"。</p>
+
+    <h3>🌰 先讲个直觉：接龙游戏</h3>
+    <p>想象你在玩一个<strong>接龙游戏</strong>：我给你看几万个英文名字（emma、olivia、ava……），不告诉你任何规则。看多了之后，我让你<strong>自己编一个新名字</strong>。</p>
+    <p>你大概率会编出 "Aalina" 或 "Relyn"——念起来像名字，但现实中查无此人。你并没有背规则，只是<strong>凭语感</strong>：哪个字母后面"顺嘴"接哪个字母。</p>
+    <p><strong>大模型干的就是这件事</strong>，只不过：它接龙的不是"字母"，而是"词"（token）；它看的不是几万个名字，而是<strong>整个互联网</strong>；它的"语感"不是凭感觉，而是几千亿个可调参数。ChatGPT 跟你聊天，本质就是把你俩的对话当成一份<strong>没写完的文档</strong>，一个词一个词地<strong>猜着补全</strong>。</p>
+
+    <h3>整体流程：一条五步流水线</h3>
+    <div class="code-block"><pre><span class="comment"># microGPT 的五步流程</span>
+1. <span class="fn">DATASET</span>:    加载 32,000 个人名（"emma", "olivia", ...）
+2. <span class="fn">TOKENIZER</span>: 每个字符 → 整数 ID（翻译官）
+3. <span class="fn">MODEL</span>:      构建微型 GPT（4,192 个参数）
+4. <span class="fn">TRAIN</span>:      给它看名字，猜错 → 调参数
+5. <span class="fn">GENERATE</span>:   让它编新名字</pre></div>
+
+    <h3>数据集与分词器</h3>
+    <p>microGPT 用最简单的"字符级"分词：26 个小写字母各给一个编号（a→0, b→1……z→25），再加特殊符 BOS。名字 "emma" 就变成数字串 <code>[BOS, 4, 12, 12, 0, BOS]</code>。</p>
     <div class="code-block"><pre><span class="comment"># 加载数据集</span>
 docs = [l.strip() <span class="keyword">for</span> l <span class="keyword">in</span> open(<span class="string">'input.txt'</span>).read().strip().split(<span class="string">'\n'</span>) <span class="keyword">if</span> l.strip()]
 random.shuffle(docs)
 print(<span class="string">f"num docs: {len(docs)}"</span>)  <span class="comment"># ~32,000</span></pre></div>
-
-    <h3>分词器：字符到整数</h3>
-    <p>分词器将文本拆分为离散的 token。在 microgpt 中，每个字符就是一个 token。我们构建一个字符到整数的映射表。</p>
-
-    <h3>自动微分（Autograd）</h3>
-    <p>PyTorch 的 autograd 机制自动计算梯度。当我们对损失调用 <code>loss.backward()</code> 时，PyTorch 会沿着计算图反向传播，自动计算每个参数的梯度。</p>
     <div class="callout callout-info">
-      <div class="callout-title">核心概念</div>
-      <p>Autograd 的本质是链式法则的自动执行。你只需要定义前向计算，PyTorch 会自动构建计算图并计算反向梯度。</p>
+      <div class="callout-title">真正的 GPT-4 用什么分词？</div>
+      <p>真正的 GPT-4 用 BPE（子词分词），词表约 20 万。常见词如 "the" 是一个 token，生僻词才拆开。<strong>原理完全一样</strong>：把文字变成整数序列。</p>
     </div>
+
+    <h3>自动微分：模型怎么知道往哪改？</h3>
+    <p>训练 = <strong>不停地微调参数，让"错误"变小</strong>。问题是：有 4192 个参数，每个该调大还是调小、调多少？</p>
+    <p>关键问题：<strong>"如果我把这个参数动一点点，错误会变大还是变小？"</strong> 这个"动一点点会怎样"，数学上叫<strong>导数 / 梯度</strong>。</p>
+    <p><strong>反向传播的魔法</strong>：把每一步运算记成一块"乐高积木"，每块积木知道"输入动一点，输出会动多少"。从最后的"错误"出发，沿着计算路径一路往回乘（链式法则），跑一遍就能算出全部 4192 个梯度。</p>
+
+    <details class="expand-detail">
+      <summary>📐 几块常用"积木"的求导规则（可展开）</summary>
+      <div style="background:var(--bg-soft);border-radius:var(--r-sm);padding:16px;margin-top:8px;overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <tr><th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">运算</th><th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">前向（算出什么）</th><th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">梯度（怎么往回传）</th></tr>
+          <tr><td style="padding:8px;font-family:var(--font-mono)">a + b</td><td style="padding:8px;font-family:var(--font-mono)">a + b</td><td style="padding:8px">对 a、对 b 都是 1</td></tr>
+          <tr><td style="padding:8px;font-family:var(--font-mono)">a × b</td><td style="padding:8px;font-family:var(--font-mono)">a·b</td><td style="padding:8px">对 a 是 b，对 b 是 a</td></tr>
+          <tr><td style="padding:8px;font-family:var(--font-mono)">aⁿ</td><td style="padding:8px;font-family:var(--font-mono)">aⁿ</td><td style="padding:8px;font-family:var(--font-mono)">n·aⁿ⁻¹</td></tr>
+          <tr><td style="padding:8px;font-family:var(--font-mono)">ln a</td><td style="padding:8px;font-family:var(--font-mono)">ln a</td><td style="padding:8px;font-family:var(--font-mono)">1/a</td></tr>
+          <tr><td style="padding:8px;font-family:var(--font-mono)">eᵃ</td><td style="padding:8px;font-family:var(--font-mono)">eᵃ</td><td style="padding:8px;font-family:var(--font-mono)">eᵃ</td></tr>
+          <tr><td style="padding:8px;font-family:var(--font-mono)">relu(a)</td><td style="padding:8px;font-family:var(--font-mono)">max(0,a)</td><td style="padding:8px">a&gt;0 时为 1，否则 0</td></tr>
+        </table>
+      </div>
+    </details>
+
+    <h3>三个反复出现的小积木</h3>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li><strong>softmax</strong>：把一串分数变成"加起来等于 1 的概率"</li>
+      <li><strong>rmsnorm</strong>：给向量做"标准化体检"，防止数值越滚越大</li>
+      <li><strong>Adam</strong>：比普通梯度下降更聪明的优化器——会记住梯度"惯性"，自动给每个参数调步长</li>
+    </ul>
 
     <h3>训练循环</h3>
-    <p>训练过程就是反复执行：前向传播计算损失 → 反向传播计算梯度 → 更新参数。</p>
     <div class="code-block"><pre><span class="keyword">for</span> step <span class="keyword">in</span> range(max_steps):
-    <span class="comment"># 1. 采样一个 batch</span>
-    xb, yb = get_batch(<span class="string">'train'</span>)
-
-    <span class="comment"># 2. 前向传播</span>
-    logits, loss = model(xb, yb)
-
-    <span class="comment"># 3. 反向传播</span>
+    xb, yb = get_batch(<span class="string">'train'</span>)          <span class="comment"># 1. 取一批名字</span>
+    logits, loss = model(xb, yb)         <span class="comment"># 2. 猜下一个，算错多少</span>
     optimizer.zero_grad()
-    loss.backward()
+    loss.backward()                      <span class="comment"># 3. 反向传播，算梯度</span>
+    optimizer.step()                     <span class="comment"># 4. 朝"错误更小"微调参数</span></pre></div>
 
-    <span class="comment"># 4. 更新参数</span>
-    optimizer.step()</pre></div>
+    <details class="expand-detail">
+      <summary>💻 模型主干伪代码</summary>
+      <div class="code-block"><pre><span class="keyword">def</span> <span class="fn">gpt</span>(token_id, pos_id, keys, values):
+    x = wte[token_id] + wpe[pos_id]    <span class="comment"># 查表：token + 位置 → 向量</span>
+    <span class="keyword">for</span> layer <span class="keyword">in</span> layers:
+        x = x + attention(rmsnorm(x), keys, values)  <span class="comment"># 注意力：看前面</span>
+        x = x + mlp(rmsnorm(x))         <span class="comment"># MLP：自己想</span>
+    <span class="keyword">return</span> linear(x, lm_head)           <span class="comment"># 输出：给每个词打分</span></pre></div>
+    </details>
 
-    <h3>推理：生成新名字</h3>
-    <p>模型训练好后，从一个起始 token 开始，反复预测下一个 token，直到生成结束符。</p>
-
-    <div class="callout callout-tip">
-      <div class="callout-title">为什么从 microgpt 开始？</div>
-      <p>microgpt 用最少的代码揭示了 GPT 的本质：数据集 → 分词器 → 模型 → 训练 → 生成。理解了这个流程，后续的 GPT-2、甚至 ChatGPT 的架构都是在这个基础上的扩展。</p>
+    <!-- 产品视角：网格卡片布局 -->
+    <div class="insight-grid">
+      <div class="insight-grid-title">产品经理视角</div>
+      <div class="insight-card">
+        <div class="insight-card-num">1</div>
+        <div class="insight-card-body"><strong>"大模型 = 超大号接龙游戏"</strong>足以解释 80% 的产品现象。它能补全、能对话、能写代码，本质都是"预测下一个 token"。</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-card-num">2</div>
+        <div class="insight-card-body"><strong>幻觉不是 bug，是机制。</strong>模型只学了统计规律，没有"真假"概念。产品上必须配检索、引用、校验等护栏。</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-card-num">3</div>
+        <div class="insight-card-body"><strong>温度是你能直接调的"创意旋钮"</strong>：低温→保守稳定；高温→发散有创意但易跑偏。</div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-card-num">4</div>
+        <div class="insight-card-body"><strong>从 microGPT 到 ChatGPT，变的全是工程不是算法。</strong>更大的数据、模型、GPU 并行、BPE、SFT+RL、推理加速。理解这章就抓住了主干。</div>
+      </div>
     </div>
 
-    <!-- Related knowledge -->
+    <p class="one-liner">📌 <strong>一句话记住</strong>：大模型 = 一个疯狂放大的"猜下一个词"游戏；训练 = 不停地"猜错→算梯度→微调参数"，让它越猜越准。</p>
+
     <div class="related-box">
       <div class="related-box-title">相关分支知识</div>
-      <a class="related-link" href="rlhf.html#llm-training">
+      <a class="related-link" href="rlhf.html#training-overview">
         <div class="related-link-icon" style="background:rgba(217,119,6,0.1);color:var(--c-rlhf)">→</div>
         <div class="related-link-content">
-          <h4>LLM 训练流程概述</h4>
-          <p>microgpt 展示了"预训练"阶段。完整的 LLM 训练还包括 SFT 和 RLHF，详见第 10 章。</p>
+          <h4>LLM 训练流程全貌</h4>
+          <p>microGPT 展示了"预训练"。完整流程还包括 SFT 和 RLHF，详见 RLHF 页面第 10 章。</p>
         </div>
       </a>
       <a class="related-link" href="multimodal.html#vit">
         <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
         <div class="related-link-content">
-          <h4>Transformer 架构的迁移</h4>
-          <p>microgpt 中的 Transformer 块同样适用于图像。Vision Transformer 将图像分块后用相同的架构处理。</p>
+          <h4>Transformer 架构迁移</h4>
+          <p>microGPT 中的 Transformer 块同样适用于图像。ViT 将图像分块后用相同架构处理。</p>
         </div>
       </a>
     </div>
   </section>
 
-  <!-- LLM Intro -->
-  <section class="section" id="llm-intro">
-    <span class="tag tag-llm">第 2 章</span>
-    <h2>LLM 简介 — 核心原理</h2>
+  <!-- ====== 章节分隔线 ====== -->
+  <div class="chapter-sep"><span>第 2 章</span></div>
 
-    <h3>核心问题：预测下一个 Token</h3>
-    <p>大语言模型要解决的问题是<strong>预测下一个 token</strong>（next token prediction, NTP）。给定一段文本的前缀，模型预测下一个 token 是什么。详见<a href="derivations.html#next-token" class="concept-link">预测下一个Token</a>。</p>
+  <!-- ============================ CHAPTER 2: LLM Intro ============================ -->
+  <section class="section fade-in" id="llm-intro">
+    <h2>LLM 简介 — 大模型在干嘛：预测下一个词</h2>
 
-    <h3>训练数据：输入-目标对</h3>
-    <p>文本数据 "君不见黄河之水天上来" 被切分为输入-目标对：</p>
-    <div class="code-block"><pre>输入          预测目标
-君不见黄河    → 之
-君不见黄河之  → 水
-君不见黄河之水 → 天
-君不见黄河之水天 → 上</pre></div>
-    <p>预测目标不是人类标注而来，而是程序通过切分文本自动标注的，所以叫做<strong>自监督学习</strong>。</p>
-    <h3>模型结构：Decoder-Only Transformer</h3>
-    <p>LLM 采用<strong>仅解码器的 Transformer 架构</strong>（Decoder-Only Transformer）。核心组件包括：</p>
-    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
-      <li>Token 嵌入层 + 位置嵌入层</li>
-      <li>多头自注意力（Multi-head Self-Attention）</li>
-      <li>前馈层（Feed Forward）</li>
-      <li>层归一化（LayerNorm）</li>
-      <li>残差连接（Residual Connection）</li>
-    </ul>
+    <h3>🎯 导读</h3>
+    <p>上一章用 microGPT 看了全貌，这章把"预测下一个词"讲得更透：大模型到底在解决什么任务？喂给它的训练数据长啥样、为什么不用人标注？它怎么衡量自己猜得好不好？看完你能用一句话向任何人解释"GPT 是怎么工作的"。</p>
 
-    <h3>损失函数：交叉熵</h3>
-    <p>LLM 本质上是一个<strong>分类模型</strong>。从极大似然估计的角度看：</p>
-    <a class="math-block" href="derivations.html#cross-entropy">最大化 P(d|abc) · P(c|ab) · P(b|a)<br>等价于最小化 −log P(d|abc) − log P(c|ab) − log P(b|a)<br><br>这就是<strong>交叉熵损失函数</strong></a>
-    <p>给定输入 "ab"，我们希望预测的下一个 token 属于分类 "c" 的概率越大越好。详细推导见<a href="derivations.html#cross-entropy" class="concept-link">交叉熵损失推导</a>。</p>
+    <h3>🌰 直觉：念诗接龙</h3>
+    <p>念一句诗：<strong>"君不见黄河之水天上来"</strong>。</p>
+    <p>我念到"君不见黄河"，停住，问你下一个字——你几乎不假思索就说"之"。再念"君不见黄河之"，你说"水"。再念"君不见黄河之水"，你说"天"……</p>
+    <p>注意：每次你都是<strong>只盯着"已经出现的字"，去猜"下一个最该出现的字"</strong>。你没有想好整句话，而是一个字一个字往后蹦，每一步都基于前面所有字做判断。大语言模型干的就是这件事，<strong>一模一样</strong>。</p>
 
-    <div class="callout callout-warn">
-      <div class="callout-title">重要区分</div>
-      <p>LLM 的"分类"不是传统意义上的图片分类。它的类别是词表中的所有 token，可能高达数万个。模型输出的是对所有 token 的概率分布。</p>
+    <blockquote class="big-quote">
+      "大模型不是在理解问题然后回答，它是在把你的话当成一篇没写完的文档，一个词一个词地往下补。"
+      <span class="big-quote-attribution">—— 理解大模型的终极直觉</span>
+    </blockquote>
+
+    <p>你问它"中国的首都是哪？"，它之所以回答"北京"，不是因为它"查到了答案"，而是因为在它念过的海量文字里，"中国的首都是"后面<strong>接"北京"的概率最高</strong>。就这么回事。</p>
+
+    <h3>① 核心任务：预测下一个 Token（NTP）</h3>
+    <p>先说 token：<strong>模型不是按"字"或"词"处理文字，而是按一种切碎的小块。</strong>中文里它可能差不多是一个字，英文里 "playing" 可能被切成 "play"+"ing"。Token 就是模型眼里的一个基本单位。</p>
+    <div class="code-block"><pre>给它  "君不见黄河"      →  它猜  "之"
+给它  "君不见黄河之"     →  它猜  "水"
+给它  "君不见黄河之水"    →  它猜  "天"
+<span class="comment"># 每猜出一个就接到末尾，作为新输入再猜下一个。循环往复。</span></pre></div>
+
+    <h3>② 自监督学习：数据自己当老师</h3>
+    <p>训练 AI 最烦的就是标注。但"预测下一个词"有个<strong>天大的便宜</strong>：答案藏在文本自己身上。</p>
+    <p>拿"君不见黄河之水天上来"这句话，不用人来标注，程序自动切：</p>
+    <div class="code-block"><pre>输入（模型看到的）          预测目标（正确答案）
+君不见黄河                之
+君不见黄河之              水
+君不见黄河之水            天
+君不见黄河之水天          上
+<span class="comment"># 每个"正确答案"就是原文的下一个字，根本不用人标！</span></pre></div>
+    <p>整个互联网的文本，都能这样自动变成无穷无尽的练习题。这种"标准答案是数据自己给的"的玩法，就叫<strong>自监督学习</strong>——它是大模型能"吃下整个互联网"的关键前提。</p>
+
+    <h3>③ 滑动窗口：喂饱 GPU</h3>
+    <p>实际训练不会真从"君"一个字开始加长。为了喂饱 GPU 的并行能力，数据用一个<strong>固定长度的框</strong>去截取：</p>
+    <div class="code-block"><pre>窗口长度 = 5：
+[君 不 见 黄 河]  →  目标是 [不 见 黄 河 之]
+[不 见 黄 河 之]  →  目标是 [见 黄 河 之 水]
+<span class="comment"># 一个窗口产生 5 道练习题（每个位置都在预测下一个），GPU 并行算！</span></pre></div>
+    <p>这个框的长度就是<strong>上下文长度（Context Length）</strong>——模型一次最多能"往回看"几个 token。GPT-2 是 1024，今天是几十万。框越大，模型能记住的前文越长。</p>
+
+    <h3>④ 模型结构：Decoder-Only Transformer</h3>
+    <p>名字很唬人，但你已经见过它的全部零件了——嵌入层、一摞"注意力 + MLP"积木、输出层。它的设计天生为"从左往右、看着前文猜下一个"服务。一条铁律：<strong>只能看前面、不许偷看后面</strong>（因为要预测的就是后面那个词）。</p>
+    <p>下一章会把 GPT-2 这个结构彻底拆开。</p>
+
+    <h3>📐 损失函数：交叉熵</h3>
+    <p><strong>预测下一个 token，本质上是一道"超大号选择题"。</strong>模型每次从整个词表（几万个候选）里选一个。所以输出不是"一个词"，而是给词表里每个候选词打一个概率分。</p>
+    <p>假设训练数据是 "abcd"，我们希望模型：看到 "abc" 时给 "d" 的概率高，看到 "ab" 时给 "c" 的概率高……把这些概率乘起来，越大越好：</p>
+
+    <div class="formula-step">
+      <div class="formula-step-num">①</div>
+      <div class="formula-step-body">P(d|abc) · P(c|ab) · P(b|a) → <strong>最大化</strong></div>
+    </div>
+    <div class="formula-step">
+      <div class="formula-step-num">②</div>
+      <div class="formula-step-body">取 log（单调递增，不改变最优解在哪）：log P(d|abc) + log P(c|ab) + log P(b|a)</div>
+    </div>
+    <div class="formula-step">
+      <div class="formula-step-num">③</div>
+      <div class="formula-step-body">加负号变最小化：<strong>−log P(d|abc) − log P(c|ab) − log P(b|a) = 交叉熵损失</strong></div>
+    </div>
+
+    <p>人话版：模型给正确答案的概率越高（越不惊讶），损失越小。给 100% 把握 → 0 损失；几乎没料到 → 损失爆炸。训练就是让这个"惊讶程度"越来越小。</p>
+
+    <h4>那"正确答案"长什么样？独热编码</h4>
+    <p>假设词表只有 a、b、c，正确答案是 c → 独热编码 = <code>[0, 0, 1]</code>。模型预测可能是 <code>[0.8, 0.1, 0.1]</code>——它以为多半是 a。给正确答案只打了 0.1 的概率 → 损失 = −log(0.1) ≈ 2.3，<strong>很大，该挨训了</strong>。</p>
+
+    <p>详细推导见<a href="derivations.html#cross-entropy" class="concept-link">交叉熵损失推导</a>。</p>
+
+    <h3>💻 代码主干</h3>
+    <div class="code-block"><pre><span class="comment"># ① 自监督：自动切"输入→目标"练习题</span>
+<span class="keyword">def</span> <span class="fn">make_pairs</span>(tokens, window):
+    pairs = []
+    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(tokens) - window):
+        x = tokens[i : i + window]          <span class="comment"># 输入：连续 window 个 token</span>
+        y = tokens[i + 1 : i + window + 1]  <span class="comment"># 目标：整体往右挪一格</span>
+        pairs.append((x, y))                <span class="comment"># 注意：没人标注！</span>
+    <span class="keyword">return</span> pairs
+
+<span class="comment"># ② 算一句话的交叉熵损失</span>
+<span class="keyword">def</span> <span class="fn">loss_of_sequence</span>(model, x, y):
+    total = 0
+    <span class="keyword">for</span> i <span class="keyword">in</span> range(len(x)):
+        logits = model(x[: i + 1])           <span class="comment"># 看着前 i+1 个 token</span>
+        probs  = softmax(logits)             <span class="comment"># 变成概率分布</span>
+        total += -log(probs[y[i]])           <span class="comment"># 正确答案概率越低，罚越多</span>
+    <span class="keyword">return</span> total / len(x)</pre></div>
+
+    <!-- 产品视角：对话式排版 -->
+    <div class="callout callout-tip">
+      <div class="callout-title">🧠 产品经理视角</div>
+      <p><strong>「一切皆预测下一个词」是理解大模型的总钥匙。</strong>翻译、写代码、做总结——内部全是同一个动作。所谓"让模型做某件事"，本质是设计好 prompt，把你想要的轨道铺好。</p>
+      <p style="margin-top:12px"><strong>它没有"对错"概念，只有"像不像"。</strong>模型优化的是"接得像不像训练数据"，不是"对不对"。所以它能流畅编造不存在的事——<strong>幻觉的根源就在损失函数里</strong>。</p>
+      <p style="margin-top:12px"><strong>上下文长度是硬约束。</strong>模型一次只能看进窗口那么多 token，超出的旧内容真看不见。长文档问答必须考虑切片、检索、摘要。</p>
+      <p style="margin-top:12px"><strong>自监督是大模型便宜又强大的根本原因。</strong>训练答案是文本自己提供的，所以能无限扩大数据规模——"喂更多数据几乎总能让模型更强"（Scaling Law 的前提）。</p>
+    </div>
+
+    <p class="one-liner">📌 <strong>一句话记住</strong>：大模型只会做一件事——把你的话当成没写完的文档，从词表里挑概率最高的下一个 token 接上去；训练就是用"右移一格"自动造海量练习题，再用交叉熵损失逼它"少惊讶、多猜对"。</p>
+
+    <div class="related-box">
+      <div class="related-box-title">相关分支知识</div>
+      <a class="related-link" href="rl.html#rl-intro">
+        <div class="related-link-icon" style="background:rgba(5,150,105,0.1);color:var(--c-rl)">→</div>
+        <div class="related-link-content">
+          <h4>交叉熵在强化学习中也出现</h4>
+          <p>在策略梯度法中，损失函数同样是交叉熵——只是每个答案乘以了"奖励"做权重。详见 RL 页面第 5 章。</p>
+        </div>
+      </a>
+      <a class="related-link" href="rlhf.html#dpo">
+        <div class="related-link-icon" style="background:rgba(217,119,6,0.1);color:var(--c-rlhf)">→</div>
+        <div class="related-link-content">
+          <h4>从 NTP 到 RLHF</h4>
+          <p>预训练用 NTP + 交叉熵，但"下一个词"不一定是"人类喜欢的词"。RLHF 就是帮模型学会哪个词是对的。</p>
+        </div>
+      </a>
     </div>
   </section>
 
-  <!-- GPT-2 -->
-  <section class="section" id="gpt2">
-    <span class="tag tag-llm">第 3 章</span>
-    <h2>GPT-2 — 完整实现</h2>
-    <p>从 microgpt 到 GPT-2，核心架构不变，但每个组件都更加完整和规范。本章从零实现 GPT-2 并加载 OpenAI 开源的预训练权重。</p>
+  <!-- ====== 章节分隔线 ====== -->
+  <div class="chapter-sep"><span>第 3 章</span></div>
 
-    <h3>数据集准备</h3>
-    <p>使用 tiktoken 分词器（GPT-2 的 BPE 分词），通过滑动窗口将文本切割成重叠的序列：</p>
-    <div class="code-block"><pre><span class="keyword">class</span> <span class="fn">GPTDatasetV1</span>(Dataset):
-    <span class="keyword">def</span> __init__(self, txt, tokenizer, max_length, stride):
-        self.input_ids = []
-        self.target_ids = []
-        token_ids = tokenizer.encode(txt)
+  <!-- ============================ CHAPTER 3: GPT-2 ============================ -->
+  <section class="section fade-in" id="gpt2">
+    <h2>GPT-2 — 把 Transformer 拆开看</h2>
 
-        <span class="keyword">for</span> i <span class="keyword">in</span> range(0, len(token_ids) - max_length, stride):
-            input_chunk = token_ids[i : i + max_length]
-            target_chunk = token_ids[i + 1 : i + max_length + 1]
-            self.input_ids.append(torch.tensor(input_chunk))
-            self.target_ids.append(torch.tensor(target_chunk))</pre></div>
+    <h3>🎯 导读</h3>
+    <p>microGPT 是"60 行看全貌"的玩具，GPT-2 是"把每个零件焊到工业级"的工厂。这一章从零实现 GPT-2（1.24 亿参数起步）并加载 OpenAI 开源的预训练权重——把 6 个核心零件<strong>逐个拆开看清楚</strong>。看完你会明白：GPT-2 和今天的 GPT-4，零件清单几乎一模一样，只是堆得更多更大。</p>
 
-    <h3>模型结构定义</h3>
-    <p>GPT-2 模型自顶向下包含：</p>
+    <h3>🌰 直觉：一条信息加工流水线</h3>
+    <p>假想你是一条流水线的厂长，要把"一句话"变成"下一个词的预测"：</p>
+    <div style="background:var(--bg-soft);border-radius:var(--r-md);padding:20px;margin-bottom:16px;line-height:2">
+      <p>🏭 <strong>① 翻译工位</strong>：把文字（token）翻译成数字向量——因为机器只认数字。这叫<strong>词嵌入</strong>。</p>
+      <p>🏷️ <strong>② 贴座位号工位</strong>：给每个词贴一个"第几位"标签——"狗咬人"和"人咬狗"完全不同。这叫<strong>位置编码</strong>。</p>
+      <p>⚙️ <strong>③ 核心车间（重复 N 遍）</strong>：每个词先抬头看前面的词（注意力），把相关信息搬过来；再低头自己琢磨（前馈层）。一"看"一"想"组成一个<strong>Transformer 块</strong>，GPT-2 叠了 12 层。</p>
+      <p>📦 <strong>④ 出货工位</strong>：给词表里 5 万多个词每个打一个分，分最高的就是"下一个词"。</p>
+    </div>
+
+    <!-- Component 1: Word Embedding -->
+    <h3>① 词嵌入 — "给每个词配一个坐标"</h3>
+    <p><strong>人话定义</strong>：一张超大的查找表。词表 50257 个词，每个对应一行 768 个浮点数。给我一个 token ID，我就返回那行的 768 个数——这串数就是这个词的<strong>含义向量</strong>。</p>
+    <p>训练后，意思相近的词坐标会靠得近（"国王"和"女王"离得近）。</p>
+    <div class="callout callout-tip">
+      <div class="callout-title">嵌入层 = 一种省力的矩阵乘法</div>
+      <p>nn.Embedding 做的事，完全等价于"把 token 变成独热向量再乘权重矩阵"。但独热向量里 99.99% 都是 0，乘起来全是"乘 0 的无效计算"。所以工程上直接用<strong>查表</strong>代替矩阵乘——结果一样，快得多。</p>
+    </div>
+
+    <!-- Component 2: Positional Encoding -->
+    <h3>② 位置编码 — "座位号"</h3>
+    <p><strong>人话定义</strong>：又一张查找表，按"位置"查。第 0 个位置一个 768 维向量，第 1 个一个……一直到上下文长度。</p>
+    <p><strong>为什么需要它</strong>：注意力机制<strong>不分先后</strong>——它眼里所有词是一袋子混在一起，没有顺序概念。但语言里顺序是命根子。所以我们给每个位置一个向量，<strong>直接加到词嵌入上</strong>，相当于在每个词的坐标里掺进"我排第几"的信息。GPT-2 的位置编码是<strong>训练出来的</strong>，不是人工公式。</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">"我是左元" vs "我是莎士比亚" — 说明为什么还不够</div>
+      <p>这两个句子里第一个"我"，token 相同、位置相同，所以<strong>词嵌入+位置编码一模一样</strong>！但这两个"我"指的人不同。怎么区分？<strong>靠后面的注意力——让"我"去看后面的"左元/莎士比亚"，从而获得不同含义。</strong>这就引出了注意力机制的必要性。</p>
+    </div>
+
+    <!-- Component 3: Decoder-Only Transformer -->
+    <h3>③ 仅解码器 Transformer — "叠 12 层积木"</h3>
+    <p>GPT-2 把同一种"积木块"（TransformerBlock）<strong>叠了 12 层</strong>。一层只能做有限的"看+想"，叠 12 层信息能反复"看了再想、想完再看"，逐层抽象出越来越高级的语义。</p>
+    <p><strong>一条铁律</strong>：每个块的输入和输出形状必须完全一样——都是 (批量, 序列长度, 768)。否则上一块的输出就接不进下一块。</p>
+    <p>每个块内部是固定模式：<strong>先归一化→子层→加回残差</strong>。残差连接 = 留一条"高速直达通道"，叠几十层也不会把原始信息弄丢。</p>
+
+    <!-- Component 4: LayerNorm -->
+    <h3>④ 层归一化 — "给每个词做标准化体检"</h3>
+    <p><strong>人话定义</strong>：把一个词的 768 个数字，减掉平均值、再除以波动幅度，拉成"均值 0、波动 1"的标准状态；再用两个可学习参数 γ、β 缩放平移回合适的尺度。</p>
+    <p><strong>为什么需要</strong>：深层网络里数字传着传着容易"越滚越大"或"越缩越小"。归一化就像每过一关给数据"校准一次仪表盘"。microGPT 用 rmsnorm，GPT-2 用 LayerNorm，<strong>思路一样：稳住数值、稳住训练</strong>。</p>
+    <div class="math-block">
+      y = (x − E[x]) / √(Var[x] + ε) · γ + β
+    </div>
+
+    <!-- Component 5: Multi-Head Attention -->
+    <h3>⑤ 多头注意力 — "开 12 个分身同时找重点"</h3>
+    <p><strong>这是整个 Transformer 的灵魂。</strong>先记住直觉：<strong>注意力是 token 之间唯一能互相通信的地方。</strong></p>
+    <p>每个词带着三样东西：<strong>Query（我在找什么）、Key（我有什么）、Value（被选中我能给什么）。</strong>当前词拿自己的 Q 去和前面所有词的 K 对暗号，谁对得上就多看谁一眼，把它的 V 信息拿过来。</p>
+    <div class="math-block">
+      Attention(Q, K, V) = softmax(QKᵀ / √dₖ) · V
+    </div>
+    <p><strong>"多头"</strong>是不止一个注意力，而是拆成 12 个"分身（头）"并行工作，每个头关注不同类型的关系（有的盯语法、有的盯指代……），最后把各头的发现拼回来。</p>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">因果掩码 — "不能偷看后面的答案"</div>
+      <p>算分时把"未来的词"那部分分数填成 −∞，softmax 后权重就是 0。这样每个词<strong>只能看到自己和前面的词</strong>。考试不能偷看后面的答案——掩码就是蒙住"未来"的那块布。</p>
+    </div>
+
+    <!-- Component 6: FFN -->
+    <h3>⑥ 前馈层 FFN — "看完之后自己消化一下"</h3>
+    <p><strong>人话定义</strong>：一个小小的两层全连接网络，对<strong>每个词单独</strong>做一次"放大→筛选→压缩"的非线性加工。</p>
+    <p>注意力只会做"加权平均"——把别人信息按权重搬过来混在一起，本质是线性操作。FFN负责把混来的信息加工、判断、抽象。</p>
+    <blockquote class="big-quote">
+      "开会时，注意力是听取大家意见，FFN 是自己回去消化一下。不然只听不想，会议纪要很热闹，决策不一定靠谱。"
+    </blockquote>
+
+    <div class="math-block">
+      FFN(x) = W₂ · σ(W₁x + b₁) + b₂<br>
+      <small>W₁：768→3072 放大；σ(GELU)：非线性筛选；W₂：3072→768 压回</small>
+    </div>
+
+    <details class="expand-detail">
+      <summary>📐 为什么 FFN 的参数比注意力还多？（可展开）</summary>
+      <div style="background:var(--bg-soft);border-radius:var(--r-sm);padding:16px;margin-top:8px;font-size:14px;line-height:1.8">
+        <p>设模型维度 d、FFN 中间维度 d_ff = 4d：</p>
+        <p>FFN 两个矩阵：d×4d + 4d×d = <strong>8d²</strong></p>
+        <p>注意力 Q、K、V、O 四个矩阵：<strong>4d²</strong></p>
+        <p>所以<strong>单论参数，FFN 是注意力的约 2 倍</strong>。业界普遍认为模型大量的"知识"和"事实记忆"存在 FFN 里——注意力负责"从哪取信息"，FFN 负责"把信息变成什么"。</p>
+      </div>
+    </details>
+
+    <h3>💻 完整代码</h3>
+    <p>GPT-2 主干：</p>
     <div class="code-block"><pre><span class="keyword">class</span> <span class="fn">GPTModel</span>(nn.Module):
     <span class="keyword">def</span> __init__(self, cfg):
         super().__init__()
@@ -198,38 +437,57 @@ print(<span class="string">f"num docs: {len(docs)}"</span>)  <span class="commen
         self.final_norm = LayerNorm(cfg[<span class="string">"emb_dim"</span>])
         self.out_head = nn.Linear(cfg[<span class="string">"emb_dim"</span>], cfg[<span class="string">"vocab_size"</span>], bias=<span class="keyword">False</span>)</pre></div>
 
-    <h3>核心组件详解</h3>
+    <p>一个 TransformerBlock 的固定节奏：</p>
+    <div class="code-block"><pre><span class="keyword">def</span> <span class="fn">transformer_block</span>(x):
+    x = x + attention(layernorm(x))   <span class="comment"># 子层1：看别人（残差直通）</span>
+    x = x + ffn(layernorm(x))         <span class="comment"># 子层2：自己想（残差直通）</span>
+    <span class="keyword">return</span> x                          <span class="comment"># 形状和输入完全一致</span></pre></div>
 
-    <h4>词嵌入 + 位置编码</h4>
-    <p>Token 嵌入将离散的 token ID 映射为连续向量。位置编码告诉模型每个 token 在序列中的位置。GPT-2 使用可学习的位置嵌入。</p>
+    <p>多头注意力核心（最容易绕晕的"切头/拼头"）：</p>
+    <div class="code-block"><pre><span class="keyword">def</span> <span class="fn">multi_head_attention</span>(x):     <span class="comment"># x: (批量b, 词数t, 768)</span>
+    Q, K, V = W_q(x), W_k(x), W_v(x) <span class="comment"># 线形变换出 Q/K/V</span>
 
-    <h4>多头自注意力</h4>
-    <p>自注意力机制让每个 token "看到" 序列中所有之前的 token。多头注意力将嵌入空间分成多个子空间，并行计算注意力。</p>
-    <a class="math-block" href="derivations.html#self-attention">Attention(Q, K, V) = softmax(QKᵀ / √dₖ) · V</a>
-    <p>公式详解和 Q/K/V 的来源见<a href="derivations.html#self-attention" class="concept-link">自注意力机制</a>。</p>
+    <span class="comment"># 把 768 切成 12 个头，每头 64 维：(b,t,768) → (b,12,t,64)</span>
+    Q, K, V = split_heads(Q), split_heads(K), split_heads(V)
 
-    <h4>前馈层</h4>
-    <p>两层线性变换 + GELU 激活函数，对每个位置独立处理。</p>
+    scores  = Q @ K.transpose()      <span class="comment"># 每头各算一遍：词与词的相关分</span>
+    scores  = mask_future(scores)     <span class="comment"># 因果掩码：未来填 -inf</span>
+    weights = softmax(scores / 64**0.5) <span class="comment"># 缩放 + 归一成权重</span>
 
-    <h4>层归一化 + 残差连接</h4>
-    <p>每个子层（注意力和前馈）都包裹在 LayerNorm + 残差连接中，稳定深层网络训练。</p>
+    out = weights @ V                 <span class="comment"># 按权重搬运信息</span>
+    out = merge_heads(out)            <span class="comment"># 12 个头拼回 768 维</span>
+    <span class="keyword">return</span> W_o(out)                  <span class="comment"># 最后再做一次线性投影</span></pre></div>
 
-    <h3>加载 OpenAI 预训练权重</h3>
-    <p>训练好自己的 GPT-2 后，可以直接加载 OpenAI 开源的预训练权重，体验真正的语言模型能力。</p>
+    <h3>GPT-2 的四个尺寸</h3>
+    <div style="background:var(--bg-soft);border-radius:var(--r-md);overflow:hidden;margin-bottom:16px">
+      <table class="reading-table">
+        <tr><th>模型</th><th>参数量</th><th>嵌入维度</th><th>层数</th><th>头数</th></tr>
+        <tr><td>GPT-2 Small</td><td>124M</td><td>768</td><td>12</td><td>12</td></tr>
+        <tr><td>GPT-2 Medium</td><td>355M</td><td>1024</td><td>24</td><td>16</td></tr>
+        <tr><td>GPT-2 Large</td><td>774M</td><td>1280</td><td>36</td><td>20</td></tr>
+        <tr><td>GPT-2 XL</td><td>1.5B</td><td>1600</td><td>48</td><td>25</td></tr>
+      </table>
+    </div>
+    <p>"模型大小"在工程上就是三个超参数的放大。产品选型时<strong>先想清楚任务多难，选最小够用的尺寸</strong>——大模型贵且慢。</p>
 
-    <div class="callout callout-tip">
-      <div class="callout-title">实践建议</div>
-      <p>从零实现 GPT-2 是理解大语言模型最好的方式。当你亲手写出每一行代码，Attention 机制就不再是一个黑箱。</p>
+    <!-- 产品视角：紧凑型要点列表 -->
+    <div class="callout callout-info">
+      <div class="callout-title">🧠 产品经理视角</div>
+      <p><strong>"零件清单"是通用的。</strong>词嵌入 + 位置编码 + N层(注意力+FFN+归一化+残差) + 输出头——从 GPT-2 到 GPT-4 基本没换。后来的改进（RoPE、GQA、SwiGLU）都是在固定零件上换型号。理解了 GPT-2，你就有了看懂所有新模型架构的"底图"。</p>
+      <p style="margin-top:12px"><strong>优先用开源权重，别从头训练。</strong>架构代码一样时，权重可以直接灌进去。99% 的情况优先用现成的开源/闭源基座模型，把钱花在微调和应用层。</p>
+      <p style="margin-top:12px"><strong>上下文长度是硬上限。</strong>GPT-2 是 1024 token，今天几十万——但注意力要看的词越多，算力消耗涨得越快。长上下文一直是成本痛点。</p>
+      <p style="margin-top:12px"><strong>FFN 存知识，注意力查信息。</strong>理解这个分工有助于理解模型的行为——比如为什么模型有时"知道"一个事实但"注意不到"它。</p>
     </div>
 
-    <!-- Related knowledge -->
+    <p class="one-liner">📌 <strong>一句话记住</strong>：GPT-2 = microGPT 的工业放大版：查表→叠 N 层（看别人 + 自己想）→打分猜下一个词。零件清单从 GPT-2 到 GPT-4 基本没变，只是越堆越大。而你大概率永远不用从头训练——下载开源权重直接用就行。</p>
+
     <div class="related-box">
       <div class="related-box-title">相关分支知识</div>
       <a class="related-link" href="rlhf.html#dpo">
         <div class="related-link-icon" style="background:rgba(217,119,6,0.1);color:var(--c-rlhf)">→</div>
         <div class="related-link-content">
-          <h4>GPT-2 用于 RLHF</h4>
-          <p>第 11-12 章使用 GPT-2 作为基础模型，进行 DPO 和 PPO 微调实验。GPT-2 是学习 RLHF 的理想载体。</p>
+          <h4>GPT-2 用于 RLHF 实验</h4>
+          <p>第 11-12 章使用 GPT-2 作为基础模型进行 DPO 和 PPO 微调。GPT-2 是学习 RLHF 的理想载体。</p>
         </div>
       </a>
       <a class="related-link" href="multimodal.html#clipcap">
@@ -243,13 +501,161 @@ print(<span class="string">f"num docs: {len(docs)}"</span>)  <span class="commen
         <div class="related-link-icon" style="background:rgba(5,150,105,0.1);color:var(--c-rl)">→</div>
         <div class="related-link-content">
           <h4>LLM 即策略</h4>
-          <p>在 RLHF 中，LLM 被视为强化学习中的"策略函数"。理解第 5 章的策略梯度法是理解 RLHF 的前提。</p>
+          <p>在 RLHF 中，LLM 被视为强化学习中的"策略函数"。理解策略梯度法是理解 RLHF 的前提。</p>
         </div>
       </a>
     </div>
   </section>
 
+  <div class="dotted-nav">
+    <a href="index.html">← 返回首页</a>
+    <a href="rl.html">下一部分：强化学习 →</a>
+  </div>
+
 </main>
 </div>
+
+<script>
+// ============ 主题切换 ============
+const themeToggle = document.getElementById('theme-toggle');
+const body = document.body;
+
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+  body.classList.add('dark');
+  themeToggle.textContent = '☀️';
+}
+
+themeToggle.addEventListener('click', () => {
+  body.classList.toggle('dark');
+  const isDark = body.classList.contains('dark');
+  themeToggle.textContent = isDark ? '☀️' : '🌓';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+});
+
+// ============ 搜索功能 ============
+const searchOverlay = document.getElementById('search-overlay');
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+let searchIndex = [];
+let selectedIndex = -1;
+
+function buildSearchIndex() {
+  const headings = document.querySelectorAll('.section h2, .section h3, .section h4');
+  searchIndex = [];
+  headings.forEach(h => {
+    const text = h.textContent.trim();
+    const id = h.closest('.section') ? h.closest('.section').id : '';
+    if (text && text.length > 2) {
+      searchIndex.push({ text: text.substring(0, 80), id });
+    }
+  });
+  // 补充概念关键词
+  const concepts = [
+    { text: 'microGPT 微型GPT', tags: ['microGPT', '微型'] },
+    { text: '自监督学习 Self-Supervised', tags: ['自监督', 'Self-Supervised'] },
+    { text: '交叉熵损失 Cross-Entropy', tags: ['交叉熵', 'Cross-Entropy'] },
+    { text: '下一个词预测 Next Token Prediction', tags: ['NTP', '预测下一个词'] },
+    { text: '滑动窗口 Sliding Window', tags: ['滑动窗口', 'Sliding Window'] },
+    { text: '词嵌入 Word Embedding', tags: ['词嵌入', 'Embedding'] },
+    { text: '位置编码 Positional Encoding', tags: ['位置编码', 'Positional Encoding'] },
+    { text: '多头注意力 Multi-Head Attention', tags: ['注意力', 'Attention', '多头'] },
+    { text: '层归一化 LayerNorm', tags: ['LayerNorm', '层归一化'] },
+    { text: '前馈层 FFN Feed-Forward', tags: ['FFN', '前馈层', 'Feed-Forward'] },
+    { text: '因果掩码 Causal Mask', tags: ['因果掩码', 'Causal Mask'] },
+    { text: '软最大化 Softmax', tags: ['Softmax', '软最大化'] },
+    { text: 'GPT-2 实现', tags: ['GPT-2', 'GPT2'] },
+    { text: '自动微分 反向传播', tags: ['自动微分', '反向传播', 'Autograd'] },
+    { text: 'BPE 分词', tags: ['BPE', '分词'] },
+    { text: '温度 Temperature', tags: ['温度', 'Temperature'] },
+    { text: '幻觉 Hallucination', tags: ['幻觉', 'Hallucination'] },
+  ];
+  concepts.forEach(c => {
+    searchIndex.push({ text: c.text, tags: c.tags });
+  });
+}
+
+buildSearchIndex();
+
+searchInput.addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  searchResults.innerHTML = '';
+  selectedIndex = -1;
+  if (!query) return;
+
+  const results = searchIndex.filter(item => {
+    const textMatch = item.text.toLowerCase().includes(query);
+    const tagMatch = item.tags && item.tags.some(t => t.toLowerCase().includes(query));
+    return textMatch || tagMatch;
+  }).slice(0, 8);
+
+  results.forEach((result, idx) => {
+    const div = document.createElement('div');
+    div.className = 'search-result-item';
+    div.textContent = result.text;
+    div.addEventListener('click', () => {
+      if (result.id) {
+        window.location.hash = result.id;
+      }
+      closeSearch();
+    });
+    searchResults.appendChild(div);
+  });
+});
+
+// 键盘快捷键
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    searchOverlay.classList.add('active');
+    searchInput.focus();
+  }
+  if (e.key === 'Escape') closeSearch();
+
+  if (searchOverlay.classList.contains('active')) {
+    const items = searchResults.querySelectorAll('.search-result-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+      updateSelection(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, -1);
+      updateSelection(items);
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      e.preventDefault();
+      items[selectedIndex].click();
+    }
+  }
+});
+
+function updateSelection(items) {
+  items.forEach((item, idx) => {
+    item.classList.toggle('selected', idx === selectedIndex);
+  });
+}
+
+function closeSearch() {
+  searchOverlay.classList.remove('active');
+  searchInput.value = '';
+  searchResults.innerHTML = '';
+}
+
+searchOverlay.addEventListener('click', (e) => {
+  if (e.target === searchOverlay) closeSearch();
+});
+
+// ============ 滚动渐入动画 ============
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
 </body>
 </html>

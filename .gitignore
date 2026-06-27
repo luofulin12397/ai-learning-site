@@ -4,3 +4,4 @@ node_modules/
 *.log
 .env
 .workbuddy/
+garden-gpt-image-2/

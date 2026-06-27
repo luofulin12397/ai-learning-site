@@ -9,6 +9,18 @@
 <body>
 <button class="nav-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
 
+<!-- 搜索覆盖层 -->
+<div id="search-overlay" class="search-overlay">
+  <div class="search-box">
+    <input type="text" id="search-input" class="search-input" placeholder="搜索概念、公式、章节... (Ctrl+K)" autocomplete="off">
+    <div id="search-results" class="search-results"></div>
+    <div class="search-hint">ESC 关闭 · ↑↓ 选择 · Enter 跳转</div>
+  </div>
+</div>
+
+<!-- 主题切换按钮 -->
+<button class="theme-toggle" id="theme-toggle" title="切换主题">🌓</button>
+
 <div class="shell">
 
 <aside class="sidebar">
@@ -24,19 +36,21 @@
       <a class="sidebar-link" href="rl.html"><span class="dot" style="background:var(--c-rl)"></span>强化学习</a>
       <a class="sidebar-link active" href="rlhf.html"><span class="dot" style="background:var(--c-rlhf)"></span>RLHF 对齐训练</a>
       <a class="sidebar-link" href="multimodal.html"><span class="dot" style="background:var(--c-mm)"></span>多模态 AI</a>
-      <a class="sidebar-link" href="derivations.html" style="margin-top:8px;border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
+      <a class="sidebar-link" href="knowledge-graph.html" style="margin-top:8px"><span class="dot" style="background:linear-gradient(135deg,var(--c-llm),var(--c-rl),var(--c-rlhf),var(--c-mm))"></span>🔗 知识图谱</a>
+      <a class="sidebar-link" href="derivations.html" style="border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
     </div>
     <div class="sidebar-group">
-      <div class="sidebar-group-title">本章内容</div>
-      <a class="sidebar-link" href="#llm-training">训练流程概述</a>
-      <a class="sidebar-link" href="#dpo">DPO 微调</a>
-      <a class="sidebar-link" href="#ppo-llm">PPO 微调 LLM</a>
-      <a class="sidebar-link" href="#grpo-llm">GRPO 复刻 R1</a>
+      <div class="sidebar-group-title">本章导航</div>
+      <a class="sidebar-link" href="#llm-training">10 · 训练流程概述</a>
+      <a class="sidebar-link" href="#dpo">11 · DPO 微调</a>
+      <a class="sidebar-link" href="#ppo-llm">12 · PPO 复刻 InstructGPT</a>
+      <a class="sidebar-link" href="#grpo-llm">13 · GRPO 复刻 R1</a>
     </div>
   </nav>
   <div class="sidebar-footer">
-    第 10–13 章 · 88 页
+    第 10–13 章 · 88 页 · 🎯 第三部分
   </div>
+  <div class="search-shortcut">Ctrl+K 搜索</div>
 </aside>
 
 <main class="main">
@@ -48,54 +62,53 @@
 
   <span class="tag tag-rlhf">PART III</span>
   <h1>人类反馈强化学习</h1>
-  <p class="lead">将强化学习应用于大语言模型：从预训练到 SFT，再到 DPO、PPO、GRPO 三种对齐方法。本章是 LLM 与 RL 两条主线的交汇点。</p>
+  <div class="page-intro page-intro-rlhf">
+    <p class="lead">预训练出来的大模型是个<strong>"话痨补全机"</strong>——会说话，但不知道什么叫"好"。RLHF（基于人类反馈的强化学习）就是把它<strong>调教成听话的助手</strong>。这是 LLM 与 RL 两条主线的交汇点，也是 ChatGPT 成功的核心秘诀。</p>
+  </div>
+
+  <div class="section-nav-grid">
+    <a class="section-nav-card" data-branch="rlhf" href="#llm-training"><div class="section-nav-num">第 10 章</div><h4>训练流程概述</h4><p>预训练 · SFT · RLHF 全景</p></a>
+    <a class="section-nav-card" data-branch="rlhf" href="#dpo"><div class="section-nav-num">第 11 章</div><h4>DPO 直接偏好优化</h4><p>你的 LLM 就是奖励模型</p></a>
+    <a class="section-nav-card" data-branch="rlhf" href="#ppo-llm"><div class="section-nav-num">第 12 章</div><h4>PPO 复刻 InstructGPT</h4><p>SFT → RM → PPO 三步走</p></a>
+    <a class="section-nav-card" data-branch="rlhf" href="#grpo-llm"><div class="section-nav-num">第 13 章</div><h4>GRPO 复刻 R1</h4><p>用组优势训练推理能力</p></a>
+  </div>
 
   <!-- LLM Training Overview -->
-  <section class="section" id="llm-training">
+  <section class="section fade-in" id="llm-training">
     <span class="tag tag-rlhf">第 10 章</span>
     <h2>LLM 训练流程概述</h2>
 
-    <h3>三阶段训练流程</h3>
-    <p>大语言模型的完整训练流程分为三个阶段：</p>
+    <h3>🌰 先讲个直觉</h3>
+    <p>想象一个小孩，你给他看一万本教科书，他学会了写文章——这叫<strong>预训练</strong>，他会写了但写的可能乱七八糟。然后你给他看一百篇范文让他模仿格式——这叫<strong>SFT</strong>，他学会了按"问题→回答"的格式写。最后你不给范文了，只是他每次写完之后你表扬或批评——这叫<strong>RLHF</strong>，他学会了写"让人喜欢"的内容。</p>
+    <p><strong>预训练让模型会说话，RLHF 让它说得讨人喜欢。</strong></p>
 
+    <h3>三阶段训练流程</h3>
     <div class="code-block"><pre><span class="comment"># LLM 训练三阶段</span>
 Stage 1: <span class="fn">预训练</span> (Pre-training)
   → 自回归预测下一个 token
   → 学习语言的通用统计规律
+  → 输出：Base Model（会说话，但不太可控）
 
 Stage 2: <span class="fn">监督微调</span> (SFT)
   → 给定指令，预测回答的下一个 token
-  → 让模型遵循指令格式
+  → 让模型学会遵循指令格式
+  → 输出：SFT Model（会按格式回答）
 
 Stage 3: <span class="fn">RLHF</span> (基于人类反馈的强化学习)
   → 用 RL 优化模型使其符合人类偏好
-  → DPO / PPO / GRPO 三种方法</pre></div>
+  → 三种方法：DPO / PPO / GRPO
+  → 输出：Aligned Model（回答既正确又讨人喜欢）</pre></div>
 
-    <h3>预训练：自监督学习</h3>
-    <p>训练数据 "abcd"，目标函数：</p>
-    <a class="math-block" href="derivations.html#next-token">J(θ) = πθ(b|a) · πθ(c|a,b) · πθ(d|a,b,c)<br><br>最大化正确预测下一个 token 的概率</a>
-
-    <h3>监督微调（SFT）</h3>
-    <p>SFT 也是"预测下一个词"，但只在回答部分计算损失：</p>
-    <div class="code-block"><pre>输入:  How are you? I am fine.
-                    ↓↓↓↓↓↓↓↓
-目标:  are you? I am fine. <eos>
-       <span class="comment">[指令部分不计算损失]  [回答部分计算损失]</span></div>
-
+    <h3>SFT：为什么只训几轮？</h3>
+    <p>SFT 也是"预测下一个词"，但<strong>只在回答部分计算损失</strong>（指令部分不参与）。</p>
     <div class="callout callout-danger">
-      <div class="callout-title">危险：灾难性遗忘</div>
-      <p>SFT 一般不会训练很多轮！如果训练过多，模型会过拟合微调数据，发生灾难性遗忘——丢失预训练阶段学到的通用能力。因为 SFT 目标函数中没有约束新旧模型的偏差（KL 散度）。</p>
+      <div class="callout-title">⚠️ 灾难性遗忘</div>
+      <p>SFT 一般不会训练很多轮！如果训练太多，模型会过拟合微调数据，丢失预训练阶段学到的通用能力——因为 SFT 目标函数中没有约束新旧模型的 KL 散度。</p>
     </div>
 
-    <h3>RLHF：为什么需要强化学习？</h3>
-    <p>当我们谈论 LLM 的强化学习时，发生了根本性的转变：</p>
-    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
-      <li>优化目标是<strong>人类偏好</strong>，而不是对环境的掌控</li>
-      <li>数据来自<strong>人类的判断</strong>，而不是环境互动</li>
-      <li>需要在<strong>奖励最大化与保持接近原始行为</strong>之间取得平衡</li>
-    </ul>
-    <p>在 LLM 这个 RL 环境中：</p>
-    <div class="code-block"><pre><span class="comment"># LLM 即 RL 环境</span>
+    <h3>LLM 即 RL 环境</h3>
+    <p>在 RLHF 中，LLM 就是强化学习的"智能体"：</p>
+    <div class="code-block"><pre><span class="comment"># LLM = RL 环境中的智能体</span>
 策略 πθ    = LLM
 状态 Sₜ    = 上下文（已生成的文本）
 动作 Aₜ    = 输出一个 token
@@ -103,353 +116,350 @@ Stage 3: <span class="fn">RLHF</span> (基于人类反馈的强化学习)
 奖励 Rₜ    = 奖励模型的评分 - KL散度惩罚</pre></div>
 
     <div class="analogy-box">
-      <div class="analogy-box-header">
-        <span class="analogy-box-title">机器学习类比</span>
-        <span class="analogy-box-subtitle">RLHF = 给 LLM 装上"判分老师"的微调</span>
+      <div class="analogy-box-header"><span class="analogy-box-title">机器学习类比</span><span class="analogy-box-subtitle">RLHF = 给 LLM 装上"判分老师"</span></div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl"><strong>SFT 监督微调</strong><span>给 LLM 看示范答案，模仿回答</span></div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml"><strong>监督学习 / 微调</strong><span>有标注的标准答案</span></div>
       </div>
       <div class="analogy-row">
-        <div class="analogy-side analogy-side-rl">
-          <strong>SFT 监督微调</strong>
-          <span>给 LLM 看示范答案，模仿回答</span>
-        </div>
+        <div class="analogy-side analogy-side-rl"><strong>RLHF 强化学习</strong><span>不告诉答案，只打分，自己探索</span></div>
         <div class="analogy-arrow">↔</div>
-        <div class="analogy-side analogy-side-ml">
-          <strong>监督学习 / 微调</strong>
-          <span>给模型标注数据，学习输入-输出映射</span>
-        </div>
+        <div class="analogy-side analogy-side-ml"><strong>主动学习 / 弱监督</strong><span>没有精确标签，只有反馈信号</span></div>
       </div>
-      <div class="analogy-row">
-        <div class="analogy-side analogy-side-rl">
-          <strong>RLHF 强化学习</strong>
-          <span>不告诉标准答案，只给打分，自己探索</span>
-        </div>
-        <div class="analogy-arrow">↔</div>
-        <div class="analogy-side analogy-side-ml">
-          <strong>主动学习 / 弱监督</strong>
-          <span>没有精确标签，只有反馈信号</span>
-        </div>
-      </div>
-      <div class="analogy-note">
-        <strong>类比要点：</strong>SFT 像传统的监督微调——有人工标注的标准答案。RLHF 像弱监督学习——没有标准答案，只有"这个回答好不好"的评分。RLHF 的价值在于：人类评判"好不好"比写"标准答案"容易得多，所以能大规模收集反馈数据。这就是 OpenAI 所说的"如何用数学定义'乐于助人'"——用人类偏好数据训练奖励模型，再用 RL 优化。
-      </div>
+      <div class="analogy-note"><strong>类比要点：</strong>SFT 像传统监督微调——有人工标注的标准答案。RLHF 像弱监督——人类评判"好不好"比写"标准答案"容易得多，所以能大规模收集反馈。这就是 OpenAI 所说的"如何用数学定义'乐于助人'"。</div>
     </div>
 
-    <h3>三种 RLHF 方法</h3>
-    <div class="conn-grid" style="margin-top:20px">
+    <h3>三种 RLHF 方法对比</h3>
+    <div class="conn-grid">
       <a class="conn-card" href="#dpo" style="text-decoration:none;color:inherit">
         <span class="conn-card-tag" style="background:var(--c-rlhf)">方法一</span>
         <h4>DPO — 直接偏好优化</h4>
-        <p>不需要奖励模型，直接从偏好数据学习。你的 LLM 本身就是奖励模型。</p>
+        <p>不需要奖励模型，直接从偏好数据学习。LLM 本身就是奖励模型。最简单，但效果有限。</p>
       </a>
       <a class="conn-card" href="#ppo-llm" style="text-decoration:none;color:inherit">
         <span class="conn-card-tag" style="background:var(--c-rlhf)">方法二</span>
         <h4>PPO — 复刻 InstructGPT</h4>
-        <p>三步走：SFT → 训练奖励模型 → PPO 微调。OpenAI 的经典方案。</p>
+        <p>SFT → 训练奖励模型 → PPO 微调。OpenAI 的经典方案，最成熟但需要额外训练 Critic。</p>
       </a>
       <a class="conn-card" href="#grpo-llm" style="text-decoration:none;color:inherit">
         <span class="conn-card-tag" style="background:var(--c-rlhf)">方法三</span>
         <h4>GRPO — 复刻 DeepSeek-R1</h4>
-        <p>不需要 Critic，用组相对优势。专为推理任务设计的 RL 方法。</p>
+        <p>不需要 Critic，用组相对优势。专为推理任务设计的 RL 方法，DeepSeek 的核心技术。</p>
       </a>
-      <div class="conn-card" style="opacity:0.5">
-        <span class="conn-card-tag" style="background:var(--ink-3)">对比</span>
-        <h4>三种方法的选择</h4>
-        <p>DPO 最简单但效果有限；PPO 最成熟但复杂；GRPO 最适合推理任务。</p>
-      </div>
     </div>
   </section>
 
-  <!-- DPO -->
-  <section class="section" id="dpo">
+  <div class="chapter-sep"><span>第 11 章</span></div>
+
+  <section class="section fade-in" id="dpo">
     <span class="tag tag-rlhf">第 11 章</span>
     <h2>DPO — 直接偏好优化</h2>
 
-    <h3>核心思想</h3>
-    <p>DPO 的核心洞察：<strong>你的大语言模型实际上就是一个奖励模型</strong>。不需要单独训练奖励模型，直接从偏好数据优化 LLM。</p>
+    <h3>🎯 导读</h3>
+    <p>DPO 的核心洞察：<strong>你的大语言模型实际上就是一个奖励模型</strong>。不需要单独训练 RM，直接从偏好数据优化 LLM。就像拿两份作业比较——"A 比 B 好"比给 A 打 8 分更容易、更可靠。</p>
 
     <div class="analogy-box">
-      <div class="analogy-box-header">
-        <span class="analogy-box-title">机器学习类比</span>
-        <span class="analogy-box-subtitle">DPO ↔ 对比学习 / 排序学习</span>
+      <div class="analogy-box-header"><span class="analogy-box-title">机器学习类比</span><span class="analogy-box-subtitle">DPO ↔ 对比学习 / 排序学习</span></div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl"><strong>DPO 偏好数据</strong><span>chosen 和 rejected 成对比较</span></div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml"><strong>对比学习正负样本对</strong><span>anchor + positive vs negative</span></div>
       </div>
       <div class="analogy-row">
-        <div class="analogy-side analogy-side-rl">
-          <strong>DPO 偏好数据</strong>
-          <span>chosen 和 rejected 成对比较</span>
-        </div>
+        <div class="analogy-side analogy-side-rl"><strong>拉开 chosen/rejected 概率</strong><span>偏好回答概率 > 厌恶回答</span></div>
         <div class="analogy-arrow">↔</div>
-        <div class="analogy-side analogy-side-ml">
-          <strong>对比学习正负样本对</strong>
-          <span>anchor + positive vs negative</span>
-        </div>
+        <div class="analogy-side analogy-side-ml"><strong>对比损失拉近/拉远嵌入</strong><span>正样本靠近，负样本远离</span></div>
       </div>
-      <div class="analogy-row">
-        <div class="analogy-side analogy-side-rl">
-          <strong>DPO 拉开 chosen/rejected 概率</strong>
-          <span>让偏好回答概率高于厌恶回答</span>
-        </div>
-        <div class="analogy-arrow">↔</div>
-        <div class="analogy-side analogy-side-ml">
-          <strong>对比损失拉开正负样本嵌入</strong>
-          <span>让正样本靠近 anchor，负样本远离</span>
-        </div>
-      </div>
-      <div class="analogy-note">
-        <strong>类比要点：</strong>DPO 和对比学习（如 CLIP、SimCLR）的思路惊人地相似——都是通过"成对比较"学习，拉开好的、推开差的。DPO 拉开的是<strong>回答的概率</strong>，对比学习拉开的是<strong>嵌入空间的距离</strong>。这种"相对比较"比"绝对打分"更容易收集数据，因为人类判断"A 比 B 好"比给 A 打 8 分更可靠。
-      </div>
+      <div class="analogy-note"><strong>类比要点：</strong>DPO 和 CLIP、SimCLR 的思路惊人相似——都是通过"成对比较"学习。DPO 拉开的是回答概率，对比学习拉开的是嵌入距离。这种"相对比较"比"绝对打分"更容易收集数据。</div>
     </div>
 
     <h3>偏好数据集</h3>
     <div class="code-block"><pre><span class="comment"># 偏好数据格式</span>
 {
   <span class="string">"prompt"</span>: <span class="string">"这部电影怎么样？"</span>,
-  <span class="string">"chosen"</span>: <span class="string">"这部电影很好看。"</span>,      <span class="comment"># 人类偏好的回答</span>
-  <span class="string">"rejected"</span>: <span class="string">"这部电影不好看。"</span>     <span class="comment"># 人类厌恶的回答</span>
+  <span class="string">"chosen"</span>: <span class="string">"这部电影很好看，推荐！"</span>,     <span class="comment"># 人类偏好</span>
+  <span class="string">"rejected"</span>: <span class="string">"这部电影不好看。"</span>     <span class="comment"># 人类厌恶</span>
 }</pre></div>
 
-    <p>数据集来源：调整温度让 LLM 生成不同回答 → 人工标注偏好；ChatGPT 用户选择；合成数据等。</p>
+    <h3>DPO 目标函数</h3>
+    <a class="math-block" href="derivations.html#dpo-derive">J_DPO(θ; πref) = E[ log σ( β · ( log[πθ(yw|x)/πθ(yl|x)] − log[πref(yw|x)/πref(yl|x)] ) ) ]</a>
+    <p>yw=偏好回答，yl=厌恶回答，πref=冻结的参考模型，β=超参数。当模型对偏好回答的概率相对厌恶回答上升时，目标函数增大。完整推导见<a href="derivations.html#dpo-derive" class="concept-link c-rlhf">DPO目标函数推导</a>。</p>
 
     <div class="callout callout-warn">
-      <div class="callout-title">DPO 数据集的常见问题</div>
-      <p><strong>正负例区分不明显</strong>：chosen 和 rejected 太相似，人类都分不清。<br><strong>偏好循环</strong>：A>B 和 B>A 同时存在，模型无法学到任何东西。</p>
-    </div>
-
-    <h3>DPO 目标函数</h3>
-    <a class="math-block" href="derivations.html#dpo-derive">J_DPO(θ; π_ref) = E[ log σ( β · ( log πθ(yw|x)/πθ(yl|x) - log πref(yw|x)/πref(yl|x) ) ) ]</a>
-    <p>其中 yw 是偏好回答，yl 是厌恶回答，πref 是冻结的参考模型，β 是超参数。完整推导（含 log 商 = log 差的变换、训练动态分析）见<a href="derivations.html#dpo-derive" class="concept-link c-rlhf">DPO目标函数推导</a>。</p>
-
-    <h3>DPO 实战流程</h3>
-    <div class="code-block"><pre><span class="comment"># DPO 两步走</span>
-Step 1: SFT — 对预训练模型进行基于指令的监督微调
-Step 2: DPO — 使用偏好数据集对 SFT 模型进行 DPO 微调</pre></div>
-
-    <!-- Related knowledge -->
-    <div class="related-box">
-      <div class="related-box-title">相关分支知识</div>
-      <a class="related-link" href="llm.html#gpt2">
-        <div class="related-link-icon" style="background:rgba(99,102,241,0.1);color:var(--c-llm)">→</div>
-        <div class="related-link-content">
-          <h4>GPT-2 作为基础模型</h4>
-          <p>DPO 实战使用 GPT-2 作为基础模型，先 SFT 再 DPO。GPT-2 体量适中，适合学习。</p>
-        </div>
-      </a>
-      <a class="related-link" href="rl.html#ppo-math">
-        <div class="related-link-icon" style="background:rgba(5,150,105,0.1);color:var(--c-rl)">→</div>
-        <div class="related-link-content">
-          <h4>KL 散度约束</h4>
-          <p>DPO 目标函数中的 log πθ/πref 项本质上是 KL 散度约束，防止模型偏离参考模型太远。</p>
-        </div>
-      </a>
+      <div class="callout-title">DPO 的局限性</div>
+      <p><strong>容易过拟合</strong>：训练太多模型会崩溃（chosen→1, rejected→0），不能多轮。<br>
+      <strong>偏好循环</strong>：数据中 A>B 和 B>A 同时存在时无法学习。<br>
+      <strong>DPO 算 RL 吗？</strong>本书作者认为不算——它需要预定的偏好数据集，而真正的 RL 是策略自己采样数据。</p>
     </div>
   </section>
 
-  <!-- PPO LLM -->
-  <section class="section" id="ppo-llm">
+  <div class="chapter-sep"><span>第 12 章</span></div>
+
+  <section class="section fade-in" id="ppo-llm">
     <span class="tag tag-rlhf">第 12 章</span>
     <h2>PPO 微调 LLM — 复刻 InstructGPT</h2>
 
-    <h3>InstructGPT 三步流程</h3>
-    <div class="code-block"><pre><span class="comment"># InstructGPT 训练流程</span>
+    <h3>🎯 导读</h3>
+    <p>OpenAI 的 InstructGPT（ChatGPT 的前身）使用经典的三步流程：SFT → 训练奖励模型 → PPO 微调。这套流程是 RLHF 的"黄金标准"。</p>
+
+    <div class="code-block"><pre><span class="comment"># InstructGPT 三步流程</span>
 Step 1: <span class="fn">SFT</span> — 有监督微调
   输入: Prompt → 输出: 人工编写的回复
+  → 学会基本的回答格式
 
 Step 2: <span class="fn">RM</span> — 训练奖励模型
   SFT 生成 4-9 个回复 → 人工排序 → 训练 RM
+  → 学习"什么是好回答"
 
 Step 3: <span class="fn">RL</span> — PPO 强化学习
   LLM 生成回复 → RM 打分 → PPO 更新参数
-  + KL散度惩罚（防止偏离SFT太远）</pre></div>
+  + KL散度惩罚（防止偏离SFT太远）
+  → 让 LLM 朝着"人类喜欢"的方向进化</pre></div>
 
     <div class="analogy-box">
-      <div class="analogy-box-header">
-        <span class="analogy-box-title">机器学习类比</span>
-        <span class="analogy-box-subtitle">InstructGPT 三步 = 监督预训练 + 训练评估器 + 对抗微调</span>
+      <div class="analogy-box-header"><span class="analogy-box-title">机器学习类比</span><span class="analogy-box-subtitle">InstructGPT 三步 = 监督预训练 + 训练评估器 + 对抗微调</span></div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl"><strong>Step 1: SFT 监督微调</strong><span>学习基本的回答格式</span></div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml"><strong>预训练 / 初始化</strong><span>给模型一个合理的起点</span></div>
       </div>
       <div class="analogy-row">
-        <div class="analogy-side analogy-side-rl">
-          <strong>Step 1: SFT 监督微调</strong>
-          <span>学习基本的回答格式</span>
-        </div>
+        <div class="analogy-side analogy-side-rl"><strong>Step 2: RM 训练奖励模型</strong><span>学习"什么是好回答"</span></div>
         <div class="analogy-arrow">↔</div>
-        <div class="analogy-side analogy-side-ml">
-          <strong>预训练 / 初始化</strong>
-          <span>给模型一个合理的起点</span>
-        </div>
+        <div class="analogy-side analogy-side-ml"><strong>训练评估指标 / 判别器</strong><span>定义"什么是好模型"</span></div>
       </div>
       <div class="analogy-row">
-        <div class="analogy-side analogy-side-rl">
-          <strong>Step 2: RM 训练奖励模型</strong>
-          <span>学习"什么是好回答"</span>
-        </div>
+        <div class="analogy-side analogy-side-rl"><strong>Step 3: PPO 强化学习</strong><span>优化 LLM 使 RM 打高分</span></div>
         <div class="analogy-arrow">↔</div>
-        <div class="analogy-side analogy-side-ml">
-          <strong>训练评估指标 / 判别器</strong>
-          <span>定义"什么是好模型"</span>
-        </div>
+        <div class="analogy-side analogy-side-ml"><strong>对抗训练 / GAN</strong><span>优化生成器骗过判别器</span></div>
       </div>
-      <div class="analogy-row">
-        <div class="analogy-side analogy-side-rl">
-          <strong>Step 3: PPO 强化学习</strong>
-          <span>优化 LLM 使 RM 打高分</span>
-        </div>
-        <div class="analogy-arrow">↔</div>
-        <div class="analogy-side analogy-side-ml">
-          <strong>对抗训练 / GAN</strong>
-          <span>优化生成器骗过判别器</span>
-        </div>
-      </div>
-      <div class="analogy-note">
-        <strong>类比要点：</strong>Step 2+3 的组合本质上就是 GAN 的思路——训练一个判别器（RM）区分好坏，再训练生成器（LLM）骗过判别器。区别在于 GAN 的判别器和生成器同时训练、直接对抗；InstructGPT 是先训好 RM 再用它指导 LLM，且加了 KL 约束防止 LLM 跑偏。<strong>这也解释了为什么 DPO 更简单</strong>——它跳过了 Step 2，直接用偏好数据做 Step 3。
-      </div>
+      <div class="analogy-note"><strong>类比要点：</strong>Step 2+3 的组合本质上就是 GAN——训练判别器区分好坏，再训练生成器骗过判别器。区别：GAN 同时训练对抗，InstructGPT 先训好 RM 再用它指导 LLM，且加 KL 约束防止跑偏。</div>
     </div>
 
-    <h3>即时奖励 Rₜ 的计算</h3>
-    <p>在倒立摆环境中，每步奖励简单为 +1。但在 LLM 中，奖励计算更复杂——奖励模型只能给完整序列打分，如何转化为 token 级奖励？</p>
-    <a class="math-block" href="derivations.html#reward-rt">Rₜ = −β · log[ πθ(yₜ|x, y<ₜ) / πref(yₜ|x, y<ₜ) ]  (每个 token)<br><br>R_T = RM得分 − β · log[ πθ(yₜ|x, y<ₜ) / πref(yₜ|x, y<ₜ) ]  (最后一个 token)</a>
-    <p>分两种情况的精妙设计、KL 惩罚逐 token 计算的原因，以及稀疏奖励如何用 GAE 抹匀，详见<a href="derivations.html#reward-rt" class="concept-link c-rlhf">即时奖励Rt计算</a>。</p>
+    <h3>即时奖励 Rₜ 的精妙设计</h3>
+    <p>奖励模型只能给<strong>完整序列</strong>打分，不能给单个 token 打分。怎么把"序列级奖励"转化为"token 级奖励"？InstructGPT 的做法：</p>
+    <a class="math-block" href="derivations.html#reward-rt">非最后一个 token：Rₜ = −β · log[ πθ(yₜ|...) / πref(yₜ|...) ]<br>只有 KL 惩罚，没有 RM 分数<br><br>最后一个 token（&lt;eos&gt;）：<br>R_T = RM分数 − β · log[ πθ(y_T|...) / πref(y_T|...) ]<br>RM 分数在序列结束时一次性给出</a>
+    <p>RM 分数只在序列末尾出现（稀疏奖励），靠 <a href="derivations.html#gae" class="concept-link">GAE</a> 把最后的奖励"抹匀"分给前面每个 token。</p>
 
     <div class="callout callout-danger">
       <div class="callout-title">关键秘诀：KL 散度惩罚</div>
-      <p>InstructGPT 成功的关键是 KL 散度惩罚项。它防止<strong>奖励黑客</strong>（Reward Hacking）：如果没有约束，RL 模型会利用奖励模型的漏洞获得高分但生成无意义文本。KL 惩罚让微调后的模型不偏离原始 SFT 模型太远。</p>
-    </div>
-
-    <h3>PPO 微调实战</h3>
-    <p>实战包含完整的 InstructGPT 复刻流程：</p>
-    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
-      <li><strong>SFT</strong>：对 GPT-2 进行指令微调</li>
-      <li><strong>训练奖励模型</strong>：基于排序数据训练</li>
-      <li><strong>ActorCritic 模型</strong>：LLM 作为 Actor + 价值网络作为 Critic</li>
-      <li><strong>GAE 计算</strong>：广义优势估计</li>
-      <li><strong>PPO 训练循环</strong>：采样 → 计算奖励 → 计算优势 → 更新</li>
-      <li><strong>评估</strong>：对比微调前后模型质量</li>
-    </ul>
-
-    <!-- Related knowledge -->
-    <div class="related-box">
-      <div class="related-box-title">相关分支知识</div>
-      <a class="related-link" href="rl.html#ppo">
-        <div class="related-link-icon" style="background:rgba(5,150,105,0.1);color:var(--c-rl)">→</div>
-        <div class="related-link-content">
-          <h4>PPO 算法原理</h4>
-          <p>第 6-7 章详细介绍了 PPO 的理论和实战。这里的 PPO 微调 LLM 是同一算法在 LLM 环境中的应用。</p>
-        </div>
-      </a>
-      <a class="related-link" href="rl.html#policy-gradient">
-        <div class="related-link-icon" style="background:rgba(5,150,105,0.1);color:var(--c-rl)">→</div>
-        <div class="related-link-content">
-          <h4>Actor-Critic 与 GAE</h4>
-          <p>第 5 章的 Actor-Critic 架构和 GAE 是 PPO 微调 LLM 的直接基础。</p>
-        </div>
-      </a>
+      <p><strong>RM 分数</strong>推模型往"人类喜欢"的方向走；<strong>KL 惩罚</strong>拽住模型不让它跑偏。没有 KL 约束 → <strong>奖励黑客</strong>：模型生成乱码骗高分。InstructGPT 成功的关键就是两者的平衡。</p>
     </div>
   </section>
 
-  <!-- GRPO LLM -->
-  <section class="section" id="grpo-llm">
+  <div class="chapter-sep"><span>第 13 章</span></div>
+
+  <section class="section fade-in" id="grpo-llm">
     <span class="tag tag-rlhf">第 13 章</span>
     <h2>GRPO 微调 LLM — 复刻 DeepSeek-R1</h2>
 
-    <h3>DeepSeek-R1 的突破</h3>
-    <p>DeepSeek 在 DeepSeek-Math 和 DeepSeek-R1 上的突破，展现了 RL 在提升 LLM 推理能力方面的巨大潜力。这得益于 GRPO 算法。</p>
+    <h3>🎯 导读</h3>
+    <p>DeepSeek 用 GRPO 在推理任务上取得了突破。本章使用 DAPO（GRPO 变种）微调 Qwen2.5-3B，从零复刻类似 DeepSeek-R1 的推理模型，让模型产生思维链。</p>
 
-    <h3>GRPO 目标函数</h3>
-    <a class="math-block" href="derivations.html#grpo-advantage">J^GRPO(θ) = (1/G) Σᵢ (1/|τᵢ|) Σₜ min[ρ·A, clip(ρ, 1-ε, 1+ε)·A] − β·D_KL[πθ‖πref]</a>
-
-    <h3>使用 DAPO 微调 Qwen2.5-3B</h3>
-    <p>本章使用 DAPO（GRPO 的变种，由字节提出）微调 Qwen2.5-3B-Instruct，从零复刻类似 DeepSeek-R1 的推理模型，产生思维链。</p>
+    <h3>核心理念</h3>
+    <p>GRPO 训练推理模型像"自监督的多路投票"——对每道题生成多个解答，对的强化、错的削弱。模型逐渐学会"怎么思考才能答对"。<strong>注意</strong>：这和 GAN 不同，GRPO 的奖励来自客观正确性验证（数学题能验证答案），不需要人类标注。</p>
 
     <div class="analogy-box">
-      <div class="analogy-box-header">
-        <span class="analogy-box-title">机器学习类比</span>
-        <span class="analogy-box-subtitle">GRPO 训练推理 = 自监督 + 多路采样投票</span>
+      <div class="analogy-box-header"><span class="analogy-box-title">机器学习类比</span><span class="analogy-box-subtitle">GRPO 训练推理 = 自监督 + 多路采样投票</span></div>
+      <div class="analogy-row">
+        <div class="analogy-side analogy-side-rl"><strong>对同一问题采样 G 条回答</strong><span>生成多个候选，比较优劣</span></div>
+        <div class="analogy-arrow">↔</div>
+        <div class="analogy-side analogy-side-ml"><strong>多路采样 / Beam Search</strong><span>生成多个候选，选最优的</span></div>
       </div>
       <div class="analogy-row">
-        <div class="analogy-side analogy-side-rl">
-          <strong>对同一问题采样 G 条回答</strong>
-          <span>生成多个候选，比较优劣</span>
-        </div>
+        <div class="analogy-side analogy-side-rl"><strong>用正确性作为奖励</strong><span>答案对=正奖励，错=负奖励</span></div>
         <div class="analogy-arrow">↔</div>
-        <div class="analogy-side analogy-side-ml">
-          <strong>多路采样 / Beam Search</strong>
-          <span>生成多个候选，选最优的</span>
-        </div>
+        <div class="analogy-side analogy-side-ml"><strong>自监督学习</strong><span>用数据本身验证模型输出</span></div>
       </div>
-      <div class="analogy-row">
-        <div class="analogy-side analogy-side-rl">
-          <strong>用正确性作为奖励</strong>
-          <span>答案对=正奖励，错=负奖励</span>
-        </div>
-        <div class="analogy-arrow">↔</div>
-        <div class="analogy-side analogy-side-ml">
-          <strong>自监督学习</strong>
-          <span>用数据本身验证模型输出</span>
-        </div>
-      </div>
-      <div class="analogy-note">
-        <strong>类比要点：</strong>GRPO 训练推理模型的过程像"自监督的多路投票"——对每道题生成多个解答，对的强化、错的削弱，模型逐渐学会"怎么思考才能答对"。这比人类标注思维链成本低得多，这也是 DeepSeek-R1 能低成本获得强推理能力的关键。<strong>注意</strong>：这和 GAN 的对抗不同，GRPO 没有"判别器"，奖励来自客观的正确性验证（数学题能验证答案）。
-      </div>
+      <div class="analogy-note"><strong>类比要点：</strong>GRPO 训练推理像"自监督的多路投票"。DeepSeek-R1 靠此低成本获得强推理能力——不需要人类标注思维链，只需数学题的正确性作为奖励。</div>
     </div>
 
-    <h4>DAPO 的两项改进</h4>
-    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
-      <li><strong>Token 级策略梯度损失</strong>：每个 token 的优势等于其所在轨迹的组相对优势</li>
-      <li><strong>移除 KL 散度</strong>：不再需要参考策略网络，减少 GPU 内存</li>
-    </ul>
-
     <h3>DAPO 算法流程</h3>
-    <div class="code-block"><pre><span class="comment"># DAPO 伪代码</span>
+    <div class="code-block"><pre><span class="comment"># DAPO 伪代码（GRPO 变种，字节提出）</span>
 <span class="keyword">for</span> each training step:
     1. 随机选取 N 个问题: q₁, q₂, ..., qₙ
     2. 对每个问题 qᵢ，采样 G 条回答: aᵢ,₁, ..., aᵢ,G
-    3. 计算每条回答的奖励 rᵢ,ⱼ
+    3. 计算每条回答的奖励 rᵢ,ⱼ（正确=1，错误=0等）
     4. 组内归一化: μᵢ = mean(rᵢ,₁,...,rᵢ,G)
                  σᵢ = std(rᵢ,₁,...,rᵢ,G)
     5. Token 级优势: Aᵢ,ⱼ[t] = (rᵢ,ⱼ - μᵢ) / σᵢ
     6. 使用 GRPO 目标函数计算梯度并更新</pre></div>
 
-    <h3>奖励函数设计</h3>
-    <p>推理任务的奖励函数设计至关重要。常见策略：正确性奖励（答案对不对）、格式奖励（是否有思维链格式）、过程奖励（中间步骤质量）。</p>
+    <h4>DAPO 的两项关键改进</h4>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li><strong>Token 级策略梯度损失</strong>：每个 token 的优势 = 其所在轨迹的组相对优势</li>
+      <li><strong>移除 KL 散度</strong>：不需要参考策略网络，减少 GPU 内存</li>
+    </ul>
 
     <h3>GRPO 应用场景</h3>
-    <div class="conn-grid" style="margin-top:20px">
-      <div class="conn-card">
-        <span class="conn-card-tag" style="background:var(--c-rlhf)">场景一</span>
-        <h4>医疗思维链</h4>
-        <p>使用 GRPO 训练 LLM 产生结构化的医疗推理过程，提升诊断准确性。</p>
-      </div>
-      <div class="conn-card">
-        <span class="conn-card-tag" style="background:var(--c-rlhf)">场景二</span>
-        <h4>Text-To-SQL</h4>
-        <p>用 GRPO 优化 LLM 的 SQL 生成能力，通过执行正确性作为奖励信号。</p>
-      </div>
+    <div class="conn-grid">
+      <div class="conn-card"><span class="conn-card-tag" style="background:var(--c-rlhf)">场景一</span><h4>医疗思维链</h4><p>使用 GRPO 训练 LLM 产生结构化的医疗推理过程，提升诊断准确性。</p></div>
+      <div class="conn-card"><span class="conn-card-tag" style="background:var(--c-rlhf)">场景二</span><h4>Text-To-SQL</h4><p>用 GRPO 优化 LLM 的 SQL 生成能力，以执行正确性作为奖励信号。</p></div>
     </div>
 
     <div class="callout callout-tip">
       <div class="callout-title">为什么 GRPO 适合推理任务？</div>
-      <p>推理任务（数学、代码、逻辑）有明确的正确性标准，适合作为奖励信号。GRPO 的组相对优势天然适合这类"多条采样取最优"的场景——对同一问题生成多个回答，好的强化、差的削弱。</p>
+      <p>推理任务（数学、代码、逻辑）有明确的正确性标准，适合作为奖励信号。GRPO 的"多条采样取最优"天然适合——对同一问题生成多个回答，好的强化、差的削弱。</p>
     </div>
 
-    <!-- Related knowledge -->
+    <p class="one-liner">📌 <strong>一句话记住 RLHF</strong>：预训练让模型<strong>会说话</strong>，RLHF 让它<strong>说得讨人喜欢</strong>。三种方法——DPO 最简单（不需要 RM）、PPO 最成熟（需要 Critic）、GRPO 最省内存（用组优势替代 Critic）——DeepSeek-R1 的推理突破靠的就是 GRPO。</p>
+
     <div class="related-box">
       <div class="related-box-title">相关分支知识</div>
-      <a class="related-link" href="rl.html#grpo">
-        <div class="related-link-icon" style="background:rgba(5,150,105,0.1);color:var(--c-rl)">→</div>
-        <div class="related-link-content">
-          <h4>GRPO 算法原理</h4>
-          <p>第 9 章介绍了 GRPO 的基本原理和在倒立摆环境中的实现。本章是其在 LLM 上的应用。</p>
-        </div>
-      </a>
-      <a class="related-link" href="#ppo-llm">
-        <div class="related-link-icon" style="background:rgba(217,119,6,0.1);color:var(--c-rlhf)">→</div>
-        <div class="related-link-content">
-          <h4>PPO vs GRPO 对比</h4>
-          <p>两种 RLHF 方法的核心差异：PPO 需要 Critic 网络估计价值，GRPO 用组内相对优势替代。</p>
-        </div>
-      </a>
+      <a class="related-link" href="rl.html#grpo"><div class="related-link-icon" style="background:rgba(5,150,105,0.1);color:var(--c-rl)">→</div><div class="related-link-content"><h4>GRPO 算法原理</h4><p>第 9 章介绍了 GRPO 的基本原理和在倒立摆环境中的实现。</p></div></a>
+      <a class="related-link" href="rl.html#ppo"><div class="related-link-icon" style="background:rgba(5,150,105,0.1);color:var(--c-rl)">→</div><div class="related-link-content"><h4>PPO 算法原理</h4><p>第 6-7 章详细介绍了 PPO 的理论和实战。</p></div></a>
     </div>
   </section>
 
+  <div class="dotted-nav">
+    <a href="rl.html">← 强化学习</a>
+    <a href="multimodal.html">下一部分：多模态 AI →</a>
+  </div>
+
 </main>
 </div>
+
+<script>
+// ============ 主题切换功能 ============
+const themeToggle = document.getElementById('theme-toggle');
+const body = document.body;
+
+// 加载保存的主题
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+  body.classList.add('dark');
+  themeToggle.textContent = '☀️';
+}
+
+themeToggle.addEventListener('click', () => {
+  body.classList.toggle('dark');
+  const isDark = body.classList.contains('dark');
+  themeToggle.textContent = isDark ? '☀️' : '🌓';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+});
+
+// ============ 搜索功能 ============
+const searchOverlay = document.getElementById('search-overlay');
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+let searchIndex = [];
+let selectedIndex = -1;
+
+// 构建搜索索引
+function buildSearchIndex() {
+  const headings = document.querySelectorAll('.section h2, .section h3, .section h4');
+  searchIndex = [];
+  headings.forEach(h => {
+    const text = h.textContent.trim();
+    const id = h.closest('.section') ? h.closest('.section').id : '';
+    if (text && text.length > 2) {
+      searchIndex.push({ text: text.substring(0, 80), id });
+    }
+  });
+  const concepts = [
+    { text: 'RLHF 人类反馈强化学习', tags: ['RLHF', '人类反馈'] },
+    { text: 'DPO 直接偏好优化', tags: ['DPO', '直接偏好优化'] },
+    { text: 'PPO 近端策略优化', tags: ['PPO', '近端策略优化'] },
+    { text: 'GRPO 组相对策略优化', tags: ['GRPO', '组相对'] },
+    { text: 'KL 散度', tags: ['KL散度', 'KL divergence'] },
+    { text: '奖励模型 Reward Model', tags: ['奖励模型', 'Reward Model'] },
+    { text: 'SFT 监督微调', tags: ['SFT', '监督微调'] },
+    { text: 'InstructGPT', tags: ['InstructGPT', '指令微调'] }
+  ];
+  
+  concepts.forEach(concept => {
+    searchIndex.push({ text: concept.text, tags: concept.tags });
+  });
+}
+
+buildSearchIndex();
+
+// 搜索功能
+searchInput.addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  searchResults.innerHTML = '';
+  selectedIndex = -1;
+  
+  if (!query) return;
+  
+  const results = searchIndex.filter(item => {
+    const textMatch = item.text.toLowerCase().includes(query);
+    const tagMatch = item.tags && item.tags.some(tag => tag.toLowerCase().includes(query));
+    return textMatch || tagMatch;
+  }).slice(0, 8);
+  
+  results.forEach((result, idx) => {
+    const div = document.createElement('div');
+    div.className = 'search-result-item';
+    div.textContent = result.text;
+    div.addEventListener('click', () => {
+      if (result.id) {
+        window.location.hash = result.id;
+      }
+      closeSearch();
+    });
+    searchResults.appendChild(div);
+  });
+});
+
+// 键盘快捷键
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    searchOverlay.classList.add('active');
+    searchInput.focus();
+  }
+  
+  if (e.key === 'Escape') {
+    closeSearch();
+  }
+  
+  // 方向键选择
+  if (searchOverlay.classList.contains('active')) {
+    const items = searchResults.querySelectorAll('.search-result-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+      updateSelection(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, -1);
+      updateSelection(items);
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      e.preventDefault();
+      items[selectedIndex].click();
+    }
+  }
+});
+
+function updateSelection(items) {
+  items.forEach((item, idx) => {
+    item.classList.toggle('selected', idx === selectedIndex);
+  });
+}
+
+function closeSearch() {
+  searchOverlay.classList.remove('active');
+  searchInput.value = '';
+  searchResults.innerHTML = '';
+}
+
+searchOverlay.addEventListener('click', (e) => {
+  if (e.target === searchOverlay) closeSearch();
+});
+
+// ============ 滚动渐入动画 ============
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
 </body>
 </html>

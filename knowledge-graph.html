@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>知识图谱 — AI知识库</title>
+<link rel="stylesheet" href="style.css">
+<style>
+/* Knowledge Graph Specific Styles */
+.graph-container {
+  width: 100%;
+  height: 600px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  margin: 32px 0;
+  position: relative;
+  overflow: hidden;
+}
+.graph-svg { width: 100%; height: 100%; }
+.node { cursor: pointer; transition: all 0.3s; }
+.node:hover { filter: brightness(1.2); }
+.node-text {
+  font-family: var(--font-display);
+  font-weight: 600; font-size: 14px;
+  fill: var(--ink); text-anchor: middle; pointer-events: none;
+}
+.node-subtext {
+  font-family: var(--font-body);
+  font-size: 11px; fill: var(--ink-2);
+  text-anchor: middle; pointer-events: none;
+}
+.link { stroke: var(--border); stroke-width: 2; fill: none; opacity: 0.6; }
+.link-highlight { stroke: var(--c-llm); opacity: 1; stroke-width: 3; }
+.node-tooltip {
+  position: absolute; background: var(--bg-card);
+  border: 1px solid var(--border); border-radius: var(--r-md);
+  padding: 16px; box-shadow: var(--shadow-lg);
+  display: none; z-index: 100; max-width: 300px;
+  font-size: 13px; line-height: 1.6;
+}
+</style>
+</head>
+<body>
+<button class="nav-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<!-- Theme Toggle -->
+<button class="theme-toggle" id="theme-toggle" title="切换深色/浅色模式">🌓</button>
+
+<!-- Search Overlay -->
+<div id="search-overlay" class="search-overlay">
+  <div class="search-box">
+    <input type="text" id="search-input" class="search-input" placeholder="搜索概念、章节、公式... (Ctrl+K)" autocomplete="off">
+    <div id="search-results" class="search-results"></div>
+    <div class="search-hint">ESC 关闭 · ↑↓ 选择 · Enter 跳转</div>
+  </div>
+</div>
+
+<div class="shell">
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <h2>AI知识库</h2>
+    <p>大语言模型 · 强化学习 · 多模态</p>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">知识主线</div>
+      <a class="sidebar-link" href="index.html"><span class="dot" style="background:var(--c-llm)"></span>首页 · 知识地图</a>
+      <a class="sidebar-link" href="llm.html"><span class="dot" style="background:var(--c-llm)"></span>大语言模型</a>
+      <a class="sidebar-link" href="rl.html"><span class="dot" style="background:var(--c-rl)"></span>强化学习</a>
+      <a class="sidebar-link" href="rlhf.html"><span class="dot" style="background:var(--c-rlhf)"></span>RLHF 对齐训练</a>
+      <a class="sidebar-link" href="multimodal.html"><span class="dot" style="background:var(--c-mm)"></span>多模态 AI</a>
+      <a class="sidebar-link active" href="knowledge-graph.html"><span class="dot" style="background:var(--ink)"></span>知识图谱</a>
+      <a class="sidebar-link" href="derivations.html" style="margin-top:8px;border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    交互式知识探索 · <span style="font-size:11px;opacity:0.6">Ctrl+K 搜索</span>
+  </div>
+</aside>
+
+<main class="main">
+  <div class="breadcrumb">
+    <a href="index.html">首页</a> <span class="breadcrumb-sep">/</span>
+    <span style="color:var(--ink);font-weight:600">知识图谱</span>
+  </div>
+
+  <h1>知识图谱</h1>
+  <p class="lead">探索AI知识库中概念之间的关系。点击节点查看详细信息，拖拽节点重新布局。</p>
+
+  <!-- Interactive Knowledge Graph -->
+  <div class="graph-container" id="graphContainer">
+    <svg class="graph-svg" id="graphSvg"></svg>
+    <div class="node-tooltip" id="nodeTooltip"></div>
+  </div>
+
+  <!-- Legend -->
+  <div class="graph-legend">
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--c-llm)"></div>
+      <span>大语言模型</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--c-rl)"></div>
+      <span>强化学习</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--c-rlhf)"></div>
+      <span>RLHF 对齐</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot" style="background:var(--c-mm)"></div>
+      <span>多模态</span>
+    </div>
+  </div>
+
+  <!-- Knowledge Connections Detail -->
+  <section class="section fade-in">
+    <h2>核心知识关联</h2>
+    <p style="color:var(--ink-2);margin-bottom:24px;">这些概念贯穿多个知识分支，理解它们将帮助你建立完整的AI技术栈认知。</p>
+
+    <div class="conn-grid">
+      <div class="conn-card">
+        <span class="conn-card-tag" style="background:var(--c-llm)">核心机制</span>
+        <h4>Transformer 与注意力机制</h4>
+        <p>从 GPT-2 的自注意力到 ViT 的图像分块注意力，再到 CLIP 的跨模态注意力——是理解所有模型的基础。</p>
+        <div class="conn-card-branches">
+          <a href="llm.html#gpt2"><span style="color:var(--c-llm)">LLM</span></a>
+          <a href="multimodal.html#vit"><span style="color:var(--c-mm)">ViT</span></a>
+          <a href="multimodal.html#clip"><span style="color:var(--c-mm)">CLIP</span></a>
+        </div>
+      </div>
+
+      <div class="conn-card">
+        <span class="conn-card-tag" style="background:var(--c-rl)">算法桥梁</span>
+        <h4>PPO 与 GRPO — 从 RL 到 RLHF</h4>
+        <p>PPO 先在 RL 基础篇用于游戏控制，然后扩展到 LLM 对齐训练（InstructGPT）。GRPO 进一步简化 PPO，专为 LLM 推理任务设计。</p>
+        <div class="conn-card-branches">
+          <a href="rl.html#ppo"><span style="color:var(--c-rl)">RL</span></a>
+          <a href="rlhf.html#ppo-llm"><span style="color:var(--c-rlhf)">RLHF</span></a>
+          <a href="rlhf.html#grpo-llm"><span style="color:var(--c-rlhf)">DeepSeek-R1</span></a>
+        </div>
+      </div>
+
+      <div class="conn-card">
+        <span class="conn-card-tag" style="background:var(--c-rlhf)">渐进学习</span>
+        <h4>扩散模型 — 从原理到 DALL·E 2</h4>
+        <p>第 17-21 章构成递进路径：扩散基础 → 正向/反向数学 → 条件扩散 → Stable Diffusion → DALL·E 2 → 全书总结。</p>
+        <div class="conn-card-branches">
+          <a href="multimodal.html#diffusion"><span style="color:var(--c-mm)">DDPM</span></a>
+          <a href="multimodal.html#clip"><span style="color:var(--c-mm)">CLIP</span></a>
+          <a href="multimodal.html#dalle2"><span style="color:var(--c-mm)">DALL·E 2</span></a>
+        </div>
+      </div>
+
+      <div class="conn-card">
+        <span class="conn-card-tag" style="background:var(--c-mm)">桥梁模型</span>
+        <h4>CLIP — 图文理解的关键枢纽</h4>
+        <p>CLIP 连接视觉与语言：在多模态中作为图文对齐模型，在 ClipCap 中驱动图生文，在 DALL·E 2 中提供图文嵌入空间。</p>
+        <div class="conn-card-branches">
+          <a href="multimodal.html#clipcap"><span style="color:var(--c-mm)">ClipCap</span></a>
+          <a href="multimodal.html#dalle2"><span style="color:var(--c-mm)">DALL·E 2</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Learning Path Visualization -->
+  <section class="section fade-in">
+    <h2>学习路径</h2>
+    <div class="path-container">
+      <div class="path-flow">
+        <div class="path-step path-step-llm">
+          <div class="path-step-num">STEP 1</div>
+          <h4>大语言模型基础</h4>
+          <p>从 microGPT 入手理解 GPT 架构</p>
+        </div>
+        <div class="path-arrow">→</div>
+        <div class="path-step path-step-rl">
+          <div class="path-step-num">STEP 2</div>
+          <h4>强化学习核心</h4>
+          <p>掌握 MDP、策略梯度、PPO</p>
+        </div>
+        <div class="path-arrow">→</div>
+        <div class="path-step path-step-rlhf">
+          <div class="path-step-num">STEP 3</div>
+          <h4>LLM 对齐训练</h4>
+          <p>DPO、PPO、GRPO 三种方法</p>
+        </div>
+        <div class="path-arrow">→</div>
+        <div class="path-step path-step-mm">
+          <div class="path-step-num">STEP 4</div>
+          <h4>多模态扩展</h4>
+          <p>ViT、CLIP、扩散模型、DALL·E 2</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+// ============ 主题切换 ============
+const themeToggle = document.getElementById('theme-toggle');
+const body = document.body;
+
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+  body.classList.add('dark');
+  themeToggle.textContent = '☀️';
+}
+
+themeToggle.addEventListener('click', () => {
+  body.classList.toggle('dark');
+  const isDark = body.classList.contains('dark');
+  themeToggle.textContent = isDark ? '☀️' : '🌓';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  initGraph(); // re-render graph for dark/light mode
+});
+const graphData = {
+  nodes: [
+    // LLM Branch (Ch1-3)
+    { id: 'microgpt', label: 'microGPT', branch: 'llm', desc: 'Ch1 · 60行代码', x: 500, y: 100 },
+    { id: 'llm-intro', label: 'LLM基础', branch: 'llm', desc: 'Ch2 · 预测下一个词', x: 300, y: 190 },
+    { id: 'gpt2', label: 'GPT-2', branch: 'llm', desc: 'Ch3 · Transformer', x: 700, y: 190 },
+    
+    // RL Branch (Ch4-9)
+    { id: 'rl-intro', label: 'RL基础', branch: 'rl', desc: 'Ch4 · MDP & Bellman', x: 180, y: 320 },
+    { id: 'policy-gradient', label: '策略梯度', branch: 'rl', desc: 'Ch5 · REINFORCE', x: 400, y: 300 },
+    { id: 'ppo', label: 'PPO', branch: 'rl', desc: 'Ch6 · 近端策略优化', x: 620, y: 300 },
+    { id: 'ppo-practice', label: 'PPO实战', branch: 'rl', desc: 'Ch7 · 代码实现', x: 480, y: 430 },
+    { id: 'ppo-math', label: 'PPO数学', branch: 'rl', desc: 'Ch8 · 信赖域理论', x: 700, y: 430 },
+    { id: 'grpo', label: 'GRPO', branch: 'rl', desc: 'Ch9 · 组相对优化', x: 870, y: 320 },
+    
+    // RLHF Branch (Ch10-13)
+    { id: 'llm-training', label: 'LLM训练', branch: 'rlhf', desc: 'Ch10 · SFT+RLHF全景', x: 300, y: 570 },
+    { id: 'dpo', label: 'DPO', branch: 'rlhf', desc: 'Ch11 · 直接偏好优化', x: 500, y: 550 },
+    { id: 'ppo-llm', label: 'PPO微调', branch: 'rlhf', desc: 'Ch12 · InstructGPT', x: 700, y: 570 },
+    { id: 'grpo-llm', label: 'GRPO微调', branch: 'rlhf', desc: 'Ch13 · DeepSeek-R1', x: 870, y: 550 },
+    
+    // Multimodal Branch (Ch14-21)
+    { id: 'vit', label: 'ViT', branch: 'mm', desc: 'Ch14 · Vision Transformer', x: 200, y: 710 },
+    { id: 'clip', label: 'CLIP', branch: 'mm', desc: 'Ch15 · 图文对比学习', x: 420, y: 690 },
+    { id: 'clipcap', label: 'ClipCap', branch: 'mm', desc: 'Ch16 · 图生文', x: 640, y: 690 },
+    { id: 'diffusion-principle', label: '扩散原理', branch: 'mm', desc: 'Ch17 · DDPM & ELBO', x: 340, y: 820 },
+    { id: 'diffusion-practice', label: '扩散实践', branch: 'mm', desc: 'Ch18 · U-Net & 采样', x: 580, y: 820 },
+    { id: 'cond-diffusion', label: '条件扩散', branch: 'mm', desc: 'Ch19 · CFG & SD', x: 810, y: 690 },
+    { id: 'dalle2', label: 'DALL·E 2', branch: 'mm', desc: 'Ch20 · Prior+Decoder', x: 720, y: 910 },
+    { id: 'summary', label: '总结', branch: 'mm', desc: 'Ch21 · 全书知识全景', x: 500, y: 960 },
+  ],
+  links: [
+    // LLM internal
+    { source: 'microgpt', target: 'llm-intro' },
+    { source: 'llm-intro', target: 'gpt2' },
+    
+    // LLM → RL
+    { source: 'gpt2', target: 'rl-intro' },
+    
+    // RL internal
+    { source: 'rl-intro', target: 'policy-gradient' },
+    { source: 'policy-gradient', target: 'ppo' },
+    { source: 'ppo', target: 'ppo-practice' },
+    { source: 'ppo', target: 'ppo-math' },
+    { source: 'ppo-practice', target: 'ppo-math' },
+    { source: 'ppo-math', target: 'grpo' },
+    { source: 'ppo', target: 'grpo' },
+    
+    // RL → RLHF
+    { source: 'rl-intro', target: 'llm-training' },
+    { source: 'ppo', target: 'ppo-llm' },
+    { source: 'grpo', target: 'grpo-llm' },
+    
+    // RLHF internal
+    { source: 'llm-training', target: 'dpo' },
+    { source: 'dpo', target: 'ppo-llm' },
+    { source: 'ppo-llm', target: 'grpo-llm' },
+    
+    // LLM → MM (cross-domain hub)
+    { source: 'gpt2', target: 'clip' },
+    
+    // MM internal
+    { source: 'vit', target: 'clip' },
+    { source: 'clip', target: 'clipcap' },
+    { source: 'clip', target: 'diffusion-principle' },
+    { source: 'clip', target: 'cond-diffusion' },
+    { source: 'clip', target: 'dalle2' },
+    { source: 'diffusion-principle', target: 'diffusion-practice' },
+    { source: 'diffusion-practice', target: 'cond-diffusion' },
+    { source: 'diffusion-principle', target: 'dalle2' },
+    { source: 'cond-diffusion', target: 'dalle2' },
+    
+    // Summary hub
+    { source: 'grpo-llm', target: 'summary' },
+    { source: 'dalle2', target: 'summary' },
+  ]
+};
+
+// Color mapping
+const branchColors = {
+  'llm': '#6366f1',
+  'rl': '#059669',
+  'rlhf': '#d97706',
+  'mm': '#dc2626'
+};
+
+// Initialize Graph
+function initGraph() {
+  const svg = document.getElementById('graphSvg');
+  const container = document.getElementById('graphContainer');
+  const width = container.clientWidth;
+  const height = container.clientHeight;
+  
+  svg.setAttribute('viewBox', '0 0 1000 1000');
+  
+  // Clear previous
+  svg.innerHTML = '';
+  
+  // Create links
+  graphData.links.forEach(link => {
+    const sourceNode = graphData.nodes.find(n => n.id === link.source);
+    const targetNode = graphData.nodes.find(n => n.id === link.target);
+    
+    if (sourceNode && targetNode) {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', sourceNode.x);
+      line.setAttribute('y1', sourceNode.y);
+      line.setAttribute('x2', targetNode.x);
+      line.setAttribute('y2', targetNode.y);
+      line.setAttribute('class', 'link');
+      line.setAttribute('data-source', link.source);
+      line.setAttribute('data-target', link.target);
+      svg.appendChild(line);
+    }
+  });
+  
+  // Create nodes
+  graphData.nodes.forEach(node => {
+    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    group.setAttribute('class', 'node');
+    group.setAttribute('data-id', node.id);
+    group.setAttribute('transform', `translate(${node.x}, ${node.y})`);
+    
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('r', '30');
+    circle.setAttribute('fill', branchColors[node.branch]);
+    circle.setAttribute('opacity', '0.85');
+    
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('class', 'node-text');
+    text.setAttribute('y', '-35');
+    text.textContent = node.label;
+    
+    const subtext = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    subtext.setAttribute('class', 'node-subtext');
+    subtext.setAttribute('y', '45');
+    subtext.textContent = node.desc;
+    
+    group.appendChild(circle);
+    group.appendChild(text);
+    group.appendChild(subtext);
+    
+    // Interactivity: hover effect + tooltip + navigation
+    group.addEventListener('mouseenter', (e) => {
+      // Highlight connected links
+      const nodeId = node.id;
+      svg.querySelectorAll('.link').forEach(l => {
+        if (l.dataset.source === nodeId || l.dataset.target === nodeId) {
+          l.classList.add('highlight');
+        }
+      });
+      showTooltip(e, node);
+    });
+    group.addEventListener('mouseleave', () => {
+      svg.querySelectorAll('.link.highlight').forEach(l => l.classList.remove('highlight'));
+      hideTooltip();
+    });
+    group.addEventListener('click', () => navigateToNode(node));
+    
+    svg.appendChild(group);
+  });
+}
+
+// Tooltip
+function showTooltip(e, node) {
+  const tooltip = document.getElementById('nodeTooltip');
+  tooltip.innerHTML = `
+    <strong style="color:${branchColors[node.branch]}">${node.label}</strong>
+    <p style="margin:8px 0 0;">${node.desc}</p>
+    <p style="margin:8px 0 0;font-size:12px;color:var(--ink-3);">点击查看详情 →</p>
+  `;
+  tooltip.style.display = 'block';
+  tooltip.style.left = e.pageX + 10 + 'px';
+  tooltip.style.top = e.pageY + 10 + 'px';
+}
+
+function hideTooltip() {
+  document.getElementById('nodeTooltip').style.display = 'none';
+}
+
+function navigateToNode(node) {
+  const pageMap = {
+    'microgpt': 'llm.html#microgpt',
+    'llm-intro': 'llm.html#llm-intro',
+    'gpt2': 'llm.html#gpt2',
+    'rl-intro': 'rl.html#rl-intro',
+    'policy-gradient': 'rl.html#policy-gradient',
+    'ppo': 'rl.html#ppo',
+    'ppo-practice': 'rl.html#ppo',
+    'ppo-math': 'rl.html#ppo-math',
+    'grpo': 'rl.html#grpo',
+    'llm-training': 'rlhf.html#llm-training',
+    'dpo': 'rlhf.html#dpo',
+    'ppo-llm': 'rlhf.html#ppo-llm',
+    'grpo-llm': 'rlhf.html#grpo-llm',
+    'vit': 'multimodal.html#vit',
+    'clip': 'multimodal.html#clip',
+    'clipcap': 'multimodal.html#clipcap',
+    'diffusion-principle': 'multimodal.html#diffusion',
+    'diffusion-practice': 'multimodal.html#diffusion',
+    'cond-diffusion': 'multimodal.html#cond-diffusion',
+    'dalle2': 'multimodal.html#dalle2',
+    'summary': 'multimodal.html#dalle2',
+  };
+  
+  if (pageMap[node.id]) {
+    window.location.href = pageMap[node.id];
+  }
+}
+
+// ============ 搜索功能 ============
+const searchOverlay = document.getElementById('search-overlay');
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+let selectedIndex = -1;
+
+// 搜索索引
+const searchIndex = [
+  { text: 'microGPT · Ch1 · 60行代码看懂大模型', url: 'llm.html#microgpt' },
+  { text: 'LLM基础 · Ch2 · 预测下一个词', url: 'llm.html#llm-intro' },
+  { text: 'GPT-2 · Ch3 · 完整Transformer实现', url: 'llm.html#gpt2' },
+  { text: 'RL基础 · Ch4 · MDP & 贝尔曼方程', url: 'rl.html#rl-intro' },
+  { text: '策略梯度 · Ch5 · REINFORCE GAE', url: 'rl.html#policy-gradient' },
+  { text: 'PPO · Ch6 · 近端策略优化', url: 'rl.html#ppo' },
+  { text: 'PPO实战 · Ch7 · PPO代码实现', url: 'rl.html#ppo' },
+  { text: 'PPO数学 · Ch8 · 信赖域理论', url: 'rl.html#ppo-math' },
+  { text: 'GRPO · Ch9 · 组相对策略优化', url: 'rl.html#grpo' },
+  { text: 'LLM训练流程 · Ch10 · SFT+RLHF全景', url: 'rlhf.html#llm-training' },
+  { text: 'DPO · Ch11 · 直接偏好优化', url: 'rlhf.html#dpo' },
+  { text: 'PPO微调LLM · Ch12 · InstructGPT', url: 'rlhf.html#ppo-llm' },
+  { text: 'GRPO微调LLM · Ch13 · DeepSeek-R1', url: 'rlhf.html#grpo-llm' },
+  { text: 'ViT · Ch14 · Vision Transformer', url: 'multimodal.html#vit' },
+  { text: 'CLIP · Ch15 · 图文对比学习', url: 'multimodal.html#clip' },
+  { text: 'ClipCap · Ch16 · 图生文', url: 'multimodal.html#clipcap' },
+  { text: '扩散模型原理 · Ch17 · DDPM', url: 'multimodal.html#diffusion' },
+  { text: '扩散模型实践 · Ch18 · U-Net与采样', url: 'multimodal.html#diffusion' },
+  { text: '条件扩散 · Ch19 · CFG & Stable Diffusion', url: 'multimodal.html#cond-diffusion' },
+  { text: 'DALL·E 2 · Ch20 · Prior + Decoder', url: 'multimodal.html#dalle2' },
+  { text: '全书总结 · Ch21 · 知识全景', url: 'multimodal.html#dalle2' },
+];
+
+searchInput.addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  searchResults.innerHTML = '';
+  selectedIndex = -1;
+  if (!query) return;
+  
+  const results = searchIndex.filter(item =>
+    item.text.toLowerCase().includes(query)
+  ).slice(0, 8);
+  
+  results.forEach((result, idx) => {
+    const div = document.createElement('div');
+    div.className = 'search-result-item';
+    div.textContent = result.text;
+    div.addEventListener('click', () => {
+      if (result.url) window.location.href = result.url;
+      closeSearch();
+    });
+    searchResults.appendChild(div);
+  });
+});
+
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    searchOverlay.classList.add('active');
+    searchInput.focus();
+  }
+  if (e.key === 'Escape') closeSearch();
+  
+  if (searchOverlay.classList.contains('active')) {
+    const items = searchResults.querySelectorAll('.search-result-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+      updateSelection(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, -1);
+      updateSelection(items);
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      e.preventDefault();
+      items[selectedIndex].click();
+    }
+  }
+});
+
+function updateSelection(items) {
+  items.forEach((item, idx) => {
+    item.classList.toggle('selected', idx === selectedIndex);
+  });
+}
+
+function closeSearch() {
+  searchOverlay.classList.remove('active');
+  searchInput.value = '';
+  searchResults.innerHTML = '';
+}
+
+searchOverlay.addEventListener('click', (e) => {
+  if (e.target === searchOverlay) closeSearch();
+});
+
+// ============ 滚动渐入动画 ============
+const fadeEls = document.querySelectorAll('.fade-in');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      observer.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.1 });
+fadeEls.forEach(el => observer.observe(el));
+
+// ============ 初始化图形 ============
+window.addEventListener('load', initGraph);
+window.addEventListener('resize', initGraph);
+</script>
+
+</body>
+</html>

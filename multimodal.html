@@ -9,6 +9,18 @@
 <body>
 <button class="nav-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
 
+<!-- 搜索覆盖层 -->
+<div id="search-overlay" class="search-overlay">
+  <div class="search-box">
+    <input type="text" id="search-input" class="search-input" placeholder="搜索概念、公式、章节... (Ctrl+K)" autocomplete="off">
+    <div id="search-results" class="search-results"></div>
+    <div class="search-hint">ESC 关闭 · ↑↓ 选择 · Enter 跳转</div>
+  </div>
+</div>
+
+<!-- 主题切换按钮 -->
+<button class="theme-toggle" id="theme-toggle" title="切换主题">🌓</button>
+
 <div class="shell">
 
 <aside class="sidebar">
@@ -24,21 +36,24 @@
       <a class="sidebar-link" href="rl.html"><span class="dot" style="background:var(--c-rl)"></span>强化学习</a>
       <a class="sidebar-link" href="rlhf.html"><span class="dot" style="background:var(--c-rlhf)"></span>RLHF 对齐训练</a>
       <a class="sidebar-link active" href="multimodal.html"><span class="dot" style="background:var(--c-mm)"></span>多模态 AI</a>
-      <a class="sidebar-link" href="derivations.html" style="margin-top:8px;border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
+      <a class="sidebar-link" href="knowledge-graph.html" style="margin-top:8px"><span class="dot" style="background:linear-gradient(135deg,var(--c-llm),var(--c-rl),var(--c-rlhf),var(--c-mm))"></span>🔗 知识图谱</a>
+      <a class="sidebar-link" href="derivations.html" style="border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
     </div>
     <div class="sidebar-group">
-      <div class="sidebar-group-title">本章内容</div>
-      <a class="sidebar-link" href="#vit">Vision Transformer</a>
-      <a class="sidebar-link" href="#clip">CLIP</a>
-      <a class="sidebar-link" href="#clipcap">ClipCap 图生文</a>
-      <a class="sidebar-link" href="#diffusion">扩散模型</a>
-      <a class="sidebar-link" href="#cond-diffusion">条件扩散模型</a>
-      <a class="sidebar-link" href="#dalle2">DALL-E2 文生图</a>
+      <div class="sidebar-group-title">本章导航</div>
+      <a class="sidebar-link" href="#vit">14 · Vision Transformer</a>
+      <a class="sidebar-link" href="#clip">15 · CLIP 图文对比</a>
+      <a class="sidebar-link" href="#clipcap">16 · ClipCap 图生文</a>
+      <a class="sidebar-link" href="#diffusion">17 · 扩散模型原理</a>
+      <a class="sidebar-link" href="#diffusion-reverse">18 · 反向去噪实践</a>
+      <a class="sidebar-link" href="#cond-diffusion">19 · 条件扩散</a>
+      <a class="sidebar-link" href="#dalle2">20 · DALL·E 2</a>
     </div>
   </nav>
   <div class="sidebar-footer">
-    第 14–20 章 · 162 页
+    第 14–20 章 · 162 页 · 🎨 第四部分
   </div>
+  <div class="search-shortcut">Ctrl+K 搜索</div>
 </aside>
 
 <main class="main">
@@ -50,324 +65,452 @@
 
   <span class="tag tag-mm">PART IV</span>
   <h1>多模态 AI</h1>
-  <p class="lead">从 Vision Transformer 到 CLIP，从扩散模型到 DALL-E2。探索 Transformer 如何从文本扩展到视觉，以及生成式 AI 如何从噪声中创造图像。</p>
+  <div class="page-intro page-intro-mm">
+    <p class="lead">让 AI 不只懂文字，还能<strong>看图、说话、画画</strong>。从 Vision Transformer 到 CLIP，从扩散模型到 DALL·E 2——探索 Transformer 如何从文本扩展到视觉，以及生成式 AI 如何<strong>"从噪声中雕出图像"</strong>。</p>
+  </div>
+
+  <div class="section-nav-grid">
+    <a class="section-nav-card" data-branch="mm" href="#vit"><div class="section-nav-num">第 14 章</div><h4>Vision Transformer</h4><p>图像即序列：Transformer 看世界</p></a>
+    <a class="section-nav-card" data-branch="mm" href="#clip"><div class="section-nav-num">第 15 章</div><h4>CLIP 图文对比</h4><p>连接视觉与语言的桥梁</p></a>
+    <a class="section-nav-card" data-branch="mm" href="#clipcap"><div class="section-nav-num">第 16 章</div><h4>ClipCap 图生文</h4><p>CLIP + GPT-2 = 看图说话</p></a>
+    <a class="section-nav-card" data-branch="mm" href="#diffusion"><div class="section-nav-num">第 17 章</div><h4>扩散模型原理</h4><p>DDPM · 正向加噪 · 预测噪声</p></a>
+    <a class="section-nav-card" data-branch="mm" href="#diffusion-reverse"><div class="section-nav-num">第 18 章</div><h4>反向去噪实践</h4><p>郎之万动力学 · 加速采样</p></a>
+    <a class="section-nav-card" data-branch="mm" href="#cond-diffusion"><div class="section-nav-num">第 19 章</div><h4>条件扩散</h4><p>控制生成内容</p></a>
+    <a class="section-nav-card" data-branch="mm" href="#dalle2"><div class="section-nav-num">第 20 章</div><h4>DALL·E 2</h4><p>文生图完整实现</p></a>
+  </div>
 
   <!-- ViT -->
-  <section class="section" id="vit">
+  <section class="section fade-in" id="vit">
     <span class="tag tag-mm">第 14 章</span>
-    <h2>Vision Transformer</h2>
+    <h2>Vision Transformer — 图像即序列</h2>
 
-    <p>2021 年，Dosovitsky 等人在论文《An Image is Worth 16×16 Words》中引入了将 Transformer 用于计算机视觉的想法。与卷积网络相比，Vision Transformer 能取得出色的结果，且需要更少的训练资源。</p>
+    <h3>🎯 导读</h3>
+    <p>2021 年论文《An Image is Worth 16×16 Words》。关键创新：把图像切分成固定大小的<strong>补丁（Patch）</strong>，每个补丁当成一个"词"，然后用标准 Transformer 编码器处理——和文本 Transformer 一模一样的架构，只是输入从"词序列"变成了"像素块序列"。</p>
 
-    <h3>核心思想：图像即序列</h3>
-    <p>ViT 的关键创新：将图像切分为固定大小的<strong>补丁（Patch）</strong>，将每个补丁视为一个"词"，然后用标准 Transformer 编码器处理。</p>
+    <h3>核心思想</h3>
+    <p>一张 224×224 的图像，切成 16×16 的补丁，得到 14×14=196 个补丁。每个补丁通过卷积投影映射到嵌入维度，然后在序列开头加一个可学习的 [CLS] token（用于聚合全局信息做分类），再加位置编码。</p>
 
-    <h3>补丁嵌入（Patch Embedding）</h3>
     <div class="code-block"><pre><span class="keyword">class</span> <span class="fn">PatchEmbedding</span>(nn.Module):
     <span class="keyword">def</span> __init__(self, d_model, img_size, patch_size, n_channels):
         super().__init__()
         self.linear_project = nn.Conv2d(
-            n_channels,      <span class="comment"># 输入通道</span>
+            n_channels,      <span class="comment"># 输入通道（RGB=3）</span>
             d_model,         <span class="comment"># 输出维度</span>
             kernel_size=patch_size,
             stride=patch_size
         )
-
     <span class="keyword">def</span> forward(self, x):
         <span class="comment"># (B, C, H, W) → (B, d_model, P_col, P_row) → (B, P, d_model)</span>
         x = self.linear_project(x)
-        x = x.flatten(2)
-        x = x.transpose(1, 2)
+        x = x.flatten(2).transpose(1, 2)
         <span class="keyword">return</span> x</pre></div>
-
-    <h3>类别 Token 与位置编码</h3>
-    <p>ViT 在序列开头添加一个可学习的<strong>类别 token</strong>（[CLS]），用于聚合全局信息做分类。同时添加位置编码让模型知道每个补丁的空间位置。</p>
-
-    <h3>Transformer 编码器</h3>
-    <p>与 GPT-2 的 Decoder-Only 不同，ViT 使用<strong>Transformer 编码器</strong>（双向注意力）。每个补丁可以看到所有其他补丁。</p>
 
     <div class="callout callout-info">
       <div class="callout-title">ViT vs CNN</div>
-      <p>CNN 通过局部卷积提取特征，ViT 通过全局自注意力提取特征。ViT 的优势在于能捕捉长距离依赖，但需要更多数据才能超越 CNN。</p>
+      <p>CNN 通过局部卷积提取特征，ViT 通过<strong>全局自注意力</strong>提取特征。ViT 的优势在于能捕捉长距离依赖——图像左上角的像素能看到右下角的像素。但需要更多数据才能超越 CNN。</p>
     </div>
 
-    <!-- Related knowledge -->
     <div class="related-box">
       <div class="related-box-title">相关分支知识</div>
-      <a class="related-link" href="llm.html#gpt2">
-        <div class="related-link-icon" style="background:rgba(99,102,241,0.1);color:var(--c-llm)">→</div>
-        <div class="related-link-content">
-          <h4>Transformer 架构共享</h4>
-          <p>ViT 的 Transformer 编码器与 GPT-2 的 Transformer 块共享核心组件（多头注意力、前馈层、残差连接），区别在于编码器 vs 解码器。</p>
-        </div>
-      </a>
+      <a class="related-link" href="llm.html#gpt2"><div class="related-link-icon" style="background:rgba(99,102,241,0.1);color:var(--c-llm)">→</div><div class="related-link-content"><h4>Transformer 架构共享</h4><p>ViT 的编码器与 GPT-2 的核心组件相同（多头注意力、前馈层、残差连接），区别是编码器（双向）vs 解码器（单向）。</p></div></a>
     </div>
   </section>
 
-  <!-- CLIP -->
-  <section class="section" id="clip">
+  <div class="chapter-sep"><span>第 15 章</span></div>
+
+  <section class="section fade-in" id="clip">
     <span class="tag tag-mm">第 15 章</span>
     <h2>CLIP — 图文对比学习</h2>
 
-    <p>CLIP 是一场革命：它允许通过"预测哪些图像和文本配对在一起"来识别开放世界中的对象，不再局限于固定类别。</p>
+    <h3>🎯 导读</h3>
+    <p>CLIP 是一场革命：它允许通过"预测哪些图像和文本配对在一起"来识别开放世界中的对象，不再局限于固定类别。一段文字"一只戴着墨镜的猫"就能找到对应图像——不需要事先"训练过猫这个类别"。</p>
 
     <h3>核心原理：对比学习</h3>
-    <p>CLIP 同时训练图像编码器和文本编码器，使匹配的图文对在嵌入空间中距离更近，不匹配的距离更远。</p>
+    <p>CLIP 同时训练图像编码器（ViT/ResNet）和文本编码器（Transformer），使匹配的图文对在嵌入空间中距离近、不匹配的距离远。</p>
     <div class="code-block"><pre><span class="comment"># CLIP 对比学习（简化）</span>
 <span class="comment"># batch 中 N 个图文对</span>
 image_features = image_encoder(images)    <span class="comment"># (N, D)</span>
 text_features  = text_encoder(texts)      <span class="comment"># (N, D)</span>
 
-<span class="comment"># 计算相似度矩阵 (N, N)</span>
+<span class="comment"># 计算相似度矩阵 (N, N)，对角线是正样本</span>
 logits = image_features @ text_features.T / temperature
-
-<span class="comment"># 对角线是正样本，其余是负样本</span>
 labels = torch.arange(N)
 loss = cross_entropy(logits, labels) + cross_entropy(logits.T, labels)</pre></div>
 
-    <h3>图像编码器与文本编码器</h3>
-    <p>CLIP 的图像编码器使用 Vision Transformer（或 ResNet），文本编码器使用 Transformer。两者将各自的输入映射到<strong>同一嵌入空间</strong>。</p>
-
-    <h3>零样本分类</h3>
-    <p>CLIP 最强大的能力：无需训练即可分类。将类别名称构造为文本（"a photo of a cat"），计算图像与每个文本的相似度，取最大的即为分类结果。</p>
+    <h3>零样本分类 — CLIP 最酷的能力</h3>
+    <p>无需训练即可分类任意类别。将类别名称构造成文本（"a photo of a cat"），计算图像与每个文本的相似度，取最大的即为分类结果。你几乎可以定义任意数量的类别，而且可以随时新增。</p>
 
     <div class="callout callout-tip">
-      <div class="callout-title">CLIP 的枢纽地位</div>
-      <p>CLIP 是多模态 AI 的关键枢纽：在 ClipCap 中驱动图生文，在 DALL-E2 中提供图文嵌入空间。理解 CLIP 是理解后续多模态模型的基础。</p>
-    </div>
-
-    <!-- Related knowledge -->
-    <div class="related-box">
-      <div class="related-box-title">相关分支知识</div>
-      <a class="related-link" href="#clipcap">
-        <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
-        <div class="related-link-content">
-          <h4>CLIP 驱动图生文</h4>
-          <p>ClipCap 利用 CLIP 的图像嵌入，通过映射网络输入到 GPT-2，实现图像描述生成。</p>
-        </div>
-      </a>
-      <a class="related-link" href="#dalle2">
-        <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
-        <div class="related-link-content">
-          <h4>CLIP 驱动文生图</h4>
-          <p>DALL-E2 使用 CLIP 的文本嵌入和图像嵌入，通过先验模型和扩散模型实现文生图。</p>
-        </div>
-      </a>
-      <a class="related-link" href="llm.html#gpt2">
-        <div class="related-link-icon" style="background:rgba(99,102,241,0.1);color:var(--c-llm)">→</div>
-        <div class="related-link-content">
-          <h4>Transformer 编码器</h4>
-          <p>CLIP 的文本编码器使用 Transformer 编码器，与 GPT-2 的 Decoder-Only 形成对比。</p>
-        </div>
-      </a>
+      <div class="callout-title">CLIP 是多模态 AI 的关键枢纽</div>
+      <p>在 ClipCap 中驱动图生文，在 DALL·E 2 中提供图文嵌入空间。理解 CLIP 是理解后续所有多模态模型的前提。</p>
     </div>
   </section>
 
-  <!-- ClipCap -->
-  <section class="section" id="clipcap">
+  <div class="chapter-sep"><span>第 16 章</span></div>
+
+  <section class="section fade-in" id="clipcap">
     <span class="tag tag-mm">第 16 章</span>
     <h2>ClipCap — 图生文</h2>
 
-    <h3>工作原理</h3>
-    <p>ClipCap 结合 CLIP 和 GPT-2 实现图像标题生成：</p>
+    <h3>🎯 导读</h3>
+    <p>ClipCap 是 CLIP 和 GPT-2 的巧妙结合：CLIP 负责"看懂"图像，GPT-2 负责"说出来"。关键挑战是两者的嵌入空间不匹配——ClipCap 用一个映射网络（MLP 或 Transformer）做"翻译"。</p>
+
     <div class="code-block"><pre><span class="comment"># ClipCap 工作流程</span>
 输入图片 → CLIP → 图像嵌入
-                        ↓
-               Mapping Network (MLP)
-                        ↓
-               前缀嵌入 (Prefix Embeddings)
-                        ↓
-              GPT-2 → 逐 token 生成标题
-                        ↓
-              "A drawing of a blue car"</pre></div>
+                      ↓
+             Mapping Network (MLP)
+                      ↓
+             前缀嵌入 (Prefix Embeddings)
+                      ↓
+            GPT-2 → 逐 token 生成标题
+                      ↓
+            "A drawing of a blue car"</pre></div>
 
-    <h3>关键问题：嵌入空间不匹配</h3>
-    <p>CLIP 和 GPT-2 的嵌入空间不同，不能直接连接。ClipCap 使用<strong>映射网络</strong>（Mapping Network）将 CLIP 嵌入映射到 GPT-2 的嵌入空间，生成"前缀嵌入"。</p>
-
-    <h3>两种变体</h3>
+    <h4>两种变体</h4>
     <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
-      <li><strong>微调 GPT-2</strong>：用 MLP 作为映射网络，GPT-2 和 MLP 都训练</li>
-      <li><strong>不微调 GPT-2</strong>：用 Transformer 作为映射网络，只训练映射网络</li>
+      <li><strong>微调 GPT-2</strong>：用 MLP 作为映射网络，GPT-2 和 MLP 都训练——效果好但改动大</li>
+      <li><strong>不微调 GPT-2</strong>：用 Transformer 作为映射网络，只训练映射网络——灵活但效果略弱</li>
+    </ul>
+  </section>
+
+  <div class="chapter-sep"><span>第 17 章</span></div>
+
+  <section class="section fade-in" id="diffusion">
+    <span class="tag tag-mm">第 17 章</span>
+    <h2>扩散模型原理 — 从噪声中学习</h2>
+
+    <div class="callout callout-tip" style="margin:24px 0 16px;">
+      <div class="callout-title">📐 可视化：正向扩散过程（基于 DDPM 公式）</div>
+      <p>以下 6 帧使用 DDPM 精确数学公式 <code>xₜ = √ᾱₜ·x₀ + √(1−ᾱₜ)·ε</code> 生成，噪声来自固定随机种子，Cosine 噪声调度（Improved DDPM）。这是正向扩散的确定性闭式解。</p>
+      <img src="images/ddpm-forward-diffusion.png" alt="DDPM 正向扩散过程 — 6帧从清晰原图到纯噪声" class="diffusion-img">
+      <p style="font-size:12px;color:var(--ink-3);margin:4px 0 0;">
+        来源：DDPM 论文 Figure 3 风格 (Ho et al., NeurIPS 2020) · Cosine noise schedule (Nichol & Dhariwal 2021)
+      </p>
+    </div>
+
+    <div class="callout callout-tip" style="margin:16px 0 32px;">
+      <div class="callout-title">📐 可视化：反向去噪过程（真实 DDPM 模型采样）</div>
+      <p>以下 6 帧来自真实预训练 DDPM 模型 (google/ddpm-cifar10-32) 的逐步去噪过程。从 x_T ~ N(0,I) 出发，经 50 步 DDPM 反向采样逐步还原为清晰图像。</p>
+      <img src="images/ddpm-reverse-denoising.png" alt="DDPM 反向去噪过程 — 真实DDPM模型从纯噪声逐步还原清晰图像" class="diffusion-img">
+      <p style="font-size:12px;color:var(--ink-3);margin:4px 0 0;">
+        来源：真实 DDPM 去噪过程 (Ho et al., NeurIPS 2020) · 模型: google/ddpm-cifar10-32 · seed=42 · 50 inference steps
+      </p>
+    </div>
+
+    <h3>🌰 先讲个直觉</h3>
+    <p>往一杯<strong>清水</strong>里滴一滴黄色墨水。墨水慢慢散开，越散越淡，最后整杯水变成均匀的淡黄色——你再也看不出墨水最初滴在哪儿了。这个"由清晰到混沌"的过程叫<strong>扩散</strong>。</p>
+    <p>现在反过来想：能不能让这杯均匀的黄水<strong>自己变回</strong>"一滴墨水 + 一杯清水"？凭空做几乎不可能——<strong>混沌容易，还原难</strong>。</p>
+    <p><strong>扩散模型干的，就是逆天而行：训练一台机器，学会把"混沌"一步步还原回"清晰"。</strong></p>
+    <p>把"墨水扩散"换成"图片"：拿一张清晰小狗照片，一点点往上撒"雪花点"（随机噪声），撒到最后变成纯雪花屏。然后训练一个神经网络学会"擦雪花"——给它一屏纯雪花，它能一步步擦出一张全新清晰的图。</p>
+    <p>那为什么非要"先把好好的图弄坏、再学着修好"？因为这一来一回，模型就在每一步里学会了"清晰的图长什么样、雪花该怎么擦"。学透之后，给它纯雪花也能擦出一张图——这就是 AI 生成图片的全部奥秘。</p>
+
+    <h3>正向扩散：马尔可夫加噪链</h3>
+    <p>正向过程是一个<strong>马尔可夫链</strong>——每步只依赖上一步：</p>
+    <div class="math-block">q(xₜ | xₜ₋₁) = N(xₜ; √(1−βₜ)·xₜ₋₁, βₜ·I)</div>
+    <p>βₜ 是噪声调度（noise schedule），从 β₁≈10⁻⁴ 线性增加到 β_T≈0.02。T 通常取 1000。当 T→∞ 时，x_T ~ N(0, I)——纯白噪声。</p>
+
+    <h3>一步到位加噪（闭式公式）</h3>
+    <p>利用重参数化技巧，不用循环 T 次，一步就能得到任意时间步的噪声图：</p>
+    <a class="math-block" href="derivations.html#diffusion-forward">xₜ = √ᾱₜ · x₀ + √(1−ᾱₜ) · ε</a>
+    <p>其中 ε ~ N(0, I)，αₜ = 1−βₜ，ᾱₜ = ∏ᵢ₌₁ᵗ αᵢ。训练时随机采样 t，直接得到 (x₀, xₜ) 对——这比迭代 T 次快了 T 倍。完整推导见<a href="derivations.html#diffusion-forward" class="concept-link c-mm">正向扩散闭式公式</a>。</p>
+
+    <h3>DDPM：预测噪声而非图像</h3>
+    <p>DDPM（Denoising Diffusion Probabilistic Models）的关键巧思：<strong>让模型预测噪声 ε，而不是直接预测 x₀。</strong>原因很简单——"找出被加了多少噪声"比"凭空画出干净图"简单得多：</p>
+    <div class="code-block"><pre><span class="comment"># 训练目标：最小化噪声预测误差</span>
+<span class="keyword">for</span> images, _ <span class="keyword">in</span> dataloader:
+    t = torch.randint(1, T+1, (len(images),))      <span class="comment"># 每张图随机选时间步</span>
+    x_noisy, noise = add_noise(images, t)           <span class="comment"># 加噪，记下真噪声</span>
+    noise_pred = model(x_noisy, t)                  <span class="comment"># 模型预测噪声</span>
+    loss = F.mse_loss(noise, noise_pred)            <span class="comment"># L_simple: 预测 vs 真实</span>
+    loss.backward(); optimizer.step()</pre></div>
+
+    <p>这个简单的 MSE 损失——被称为 L_simple——经过推导等价于<strong>变分下界（ELBO）的加权版本</strong>。权重更大的时间步（噪声多的中间段）被更重视，这正是 DDPM 训练效果好的数学原因。</p>
+
+    <h3>为什么用 U-Net？</h3>
+    <p>U-Net 长得像字母"U"：左半边逐层缩小（抓大局），底部压成浓缩特征，右半边逐层放大（补细节），中间有跳跃连接把精细位置信息抄近路传递。输入输出同尺寸、都需要逐像素精确预测——和"逐像素预测噪声"天然匹配。</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">ELBO 视角（可展开理解）</div>
+      <p>扩散模型可以看作一个<strong>分层 VAE</strong>——T 步潜在变量 x₁...x_T，x₀ 是观测图像。训练目标是最小化负 ELBO：−log p(x₀) ≤ E_q[ −log p(x_T) − Σₜ log(pθ(xₜ₋₁|xₜ)/q(xₜ|xₜ₋₁)) ]。经过化简，这个 ELBO 分解为 T 个去噪步骤的 KL 散度之和——每一步都在学"怎么擦掉一步噪声"。L_simple 就是忽略加权系数的简化版，实践中效果更好。</p>
+    </div>
+
+    <p><a href="derivations.html#diffusion-forward" class="concept-link c-mm">📐 完整推导见公式详解 → 正向扩散闭式公式</a></p>
+  </section>
+
+  <div class="chapter-sep"><span>第 18 章</span></div>
+
+  <section class="section fade-in" id="diffusion-reverse">
+    <span class="tag tag-mm">第 18 章</span>
+    <h2>扩散模型实践 — 反向去噪与加速采样</h2>
+
+    <h3>🎯 导读</h3>
+    <p>上一章讲了"怎么把图弄花"和"怎么学擦花"。这一章讲"怎么从纯噪声一步步擦出图来"——反向过程的数学、郎之万动力学的理论根基、以及怎么把 1000 步压缩到几十步。</p>
+
+    <h3>反向扩散：从噪声中重建</h3>
+    <p>反向过程同样是一个马尔可夫链，但每步用神经网络 εθ 预测噪声来引导：</p>
+    <div class="math-block">pθ(xₜ₋₁ | xₜ) = N(xₜ₋₁; μθ(xₜ, t), σ²_t·I)<br><br>μθ(xₜ, t) = (1/√αₜ) · (xₜ − (βₜ/√(1−ᾱₜ)) · εθ(xₜ, t))</div>
+    <p>从 x_T ~ N(0,I) 出发，迭代 T 次去噪，最终得到 x₀——一张全新生成的图像。</p>
+
+    <h3>郎之万动力学视角</h3>
+    <p>扩散模型的反向过程可以看作<strong>离散化的郎之万动力学</strong>：</p>
+    <div class="math-block">xₜ₊₁ = xₜ − (ε²/2)·∇f(xₜ) + √ε·N(0,I)</div>
+    <p>神经网络 εθ 实际上在估计<strong>得分函数（score function）</strong>∇log p(xₜ)。每步先沿得分方向爬坡（让图像更像"真的"），再加一点噪声防止陷入局部峰值。这就是<strong>得分匹配</strong>视角。详见<a href="derivations.html#langevin" class="concept-link c-mm">郎之万动力学推导</a>。</p>
+
+    <h3>灵魂三问</h3>
+    <p><strong>Q: 为什么一个网络能处理所有去噪步？</strong> 每一步要干的事其实一样——输入带噪图，输出噪声。用同一个网络，把时间步 t 也作为输入喂给它。t=900（满屏雪花）→ 大刀阔斧擦；t=5（挺清楚了）→ 小心翼翼擦。</p>
+    <p><strong>Q: 总共分几步？</strong> 步数多（1000）→ 相邻步差别小，质量高但慢；步数少（50）→ 快但质量打折。</p>
+    <p><strong>Q: 为什么 AI 画图比聊天慢？</strong> 生成一张图要把 U-Net 跑几十上百次，而聊天一个 token 跑一次。<strong>加速采样</strong>是兵家必争之地：</p>
+    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
+      <li><strong>DDIM</strong>：去马尔可夫化，用非马尔可夫跳步采样——50 步质量接近 1000 步</li>
+      <li><strong>LCM（潜在一致性模型）</strong>：蒸馏训练，4~8 步即可出图</li>
+      <li><strong>DPMSolver</strong>：用 ODE 数值解替代随机采样，20 步出高质量图</li>
     </ul>
 
-    <h3>推理过程</h3>
-    <p>逐 token 自回归生成：前缀嵌入 → 预测第一个 token → 前缀+第一个token → 预测第二个 → ... → 生成 &lt;EOS&gt; 或达到最大长度。</p>
-  </section>
-
-  <!-- Diffusion -->
-  <section class="section" id="diffusion">
-    <span class="tag tag-mm">第 17-18 章</span>
-    <h2>扩散模型 — 从原理到数学</h2>
-
-    <p>扩散模型是近年来 AI 生成艺术突破的主要因素，是 DALL-E 和 Midjourney 等知名模型的核心机制。</p>
-
-    <h3>通俗理解</h3>
-    <p>想象一杯透明的水加入黄色液体——液体逐渐扩散，水不再透明。这是<strong>正向扩散</strong>。反向操作（将混合物恢复原状）则困难得多——这是<strong>反向扩散</strong>。</p>
-    <p>在图像中：正向扩散 = 逐步添加噪声直到变成纯噪声；反向扩散 = 从纯噪声逐步去噪恢复图像。</p>
-
-    <h3>正向扩散过程</h3>
-    <p>逐步向图像添加高斯噪声。经过 T 步后，图像变成纯噪声。利用重参数化技巧，可以直接采样任意时间步 t 的噪声图像：</p>
-    <a class="math-block" href="derivations.html#diffusion-forward">xₜ = √(αₜ) · x₀ + √(1 - αₜ) · ε<br><br>其中 ε ~ N(0, I),  αₜ = ∏(1 - βᵢ)</a>
-    <p>完整的闭式公式推导（重参数化技巧、递归展开、方差合并）见<a href="derivations.html#diffusion-forward" class="concept-link c-mm">正向扩散闭式公式</a>。</p>
-
-    <h3>反向扩散过程</h3>
-    <p>训练神经网络预测每一步添加的噪声，然后从噪声图像中减去预测的噪声：</p>
-    <div class="code-block"><pre><span class="comment"># 扩散模型训练（简化）</span>
-<span class="keyword">for</span> each training step:
-    x₀ = sample_real_image()           <span class="comment"># 真实图像</span>
-    t = random_timestep()              <span class="comment"># 随机时间步</span>
-    ε = sample_noise()                 <span class="comment"># 随机噪声</span>
-    xₜ = add_noise(x₀, t, ε)          <span class="comment"># 加噪</span>
-    predicted_noise = model(xₜ, t)     <span class="comment"># 预测噪声</span>
-    loss = mse(ε, predicted_noise)     <span class="comment"># MSE 损失</span></pre></div>
-
-    <h3>U-Net 神经网络</h3>
-    <p>扩散模型使用 U-Net 作为去噪网络。U-Net 有编码器（下采样）和解码器（上采样）路径，中间有跳跃连接，保留细节信息。</p>
-
-    <h3>数学理论：郎之万动力学</h3>
-    <p>扩散模型的理论基础来自郎之万动力学——一种 MCMC 采样方法。在梯度下降的每一步添加噪声项，使采样过程能探索整个分布：</p>
-    <a class="math-block" href="derivations.html#langevin">xₜ₊₁ = xₜ - (ε²/2)∇f(xₜ) + √ε · N(0, I)</a>
-    <p>从概率分布的指数族形式到梯度下降再到加噪采样的完整推导，见<a href="derivations.html#langevin" class="concept-link c-mm">郎之万动力学</a>。</p>
-
-    <div class="callout callout-warn">
-      <div class="callout-title">预测噪声 vs 预测图像</div>
-      <p>虽然扩散模型可以预测"上一步的图像"或"添加的噪声"，但预测噪声更简单、更有效。这是 DDPM 的关键设计选择。</p>
+    <h3>🧠 产品经理视角</h3>
+    <div class="callout callout-info">
+      <div class="callout-title">扩散模型的商业要点</div>
+      <p><strong>能做：</strong>文生图、图生图、修图（inpainting）、超分辨率、风格迁移，甚至生成视频/3D/音频——本质都是"在噪声里雕出想要的东西"。<br>
+      <strong>坑：</strong>① 慢且贵（多步迭代）；② 可控性差（同一提示词每次出图不同，需 seed/ControlNet 约束）；③ 细节翻车（手指、文字常画错）；④ 版权风险（训练数据来源）。</p>
     </div>
+
+    <p class="one-liner">📌 <strong>一句话记住扩散模型</strong>：训练一个网络学会"擦雪花"——正向加噪是免费的练习题，反向去噪是真本事。给它一屏纯雪花，它能一步步擦出一张全新的图。</p>
   </section>
 
-  <!-- Conditional Diffusion -->
-  <section class="section" id="cond-diffusion">
-    <span class="tag tag-mm">第 19 章</span>
-    <h2>条件扩散模型</h2>
+  <div class="chapter-sep"><span>第 19 章</span></div>
 
-    <h3>为什么要条件化？</h3>
-    <p>普通扩散模型只能随机生成图像。我们希望能<strong>控制生成内容</strong>——给定标签、文本或低分辨率图像，生成对应的图像。</p>
+  <section class="section fade-in" id="cond-diffusion">
+    <span class="tag tag-mm">第 19 章</span>
+    <h2>条件扩散模型 — 控制生成内容</h2>
+
+    <h3>🎯 导读</h3>
+    <p>普通扩散模型只能随机生成图。条件扩散模型让我们能<strong>控制生成内容</strong>——给定标签、文本或低分辨率图像，生成对应的图像。从 p(x) 到 p(x|y)。</p>
 
     <h3>添加条件的方法</h3>
-    <p>将条件 y 添加到神经网络的输入中，把建模 p(x) 转为建模 p(x|y)。对于标签条件，通过嵌入层将标签转为向量，与时间步嵌入相加：</p>
-    <a class="math-block" href="derivations.html#cond-diffusion-derive">pθ(x₀|y) = ∫ pθ(x₀|x₁, y) · pθ(x₁|x₂, y) · ... · pθ(x_{T−1}|x_T, y) · p(x_T) dx₁...dx_T</a>
-    <p>从无条件到条件的完整推导、条件嵌入方式、分类器指引 vs 无分类器指引的对比，见<a href="derivations.html#cond-diffusion-derive" class="concept-link c-mm">条件扩散p(x|y)推导</a>。</p>
-    <div class="code-block"><pre><span class="comment"># 条件扩散模型</span>
-<span class="comment"># 噪声预测网络接收额外条件 y</span>
-ε_θ(xₜ, t, y)  <span class="comment"># y 可以是标签、文本等</span>
+    <p>将条件 y 添加到神经网络输入中。y 可以是：标签（通过嵌入层）、文本（通过 CLIP 编码器）、图像（通过编码器）。</p>
+    <div class="code-block"><pre><span class="comment"># 条件扩散模型：噪声预测网络接收额外条件</span>
+ε_θ(xₜ, t, y)  <span class="comment"># y 可以是标签、文本嵌入等</span>
 
-<span class="comment"># 标签条件：嵌入层 + 时间步嵌入</span>
+<span class="comment"># 标签条件示例</span>
 label_emb = embedding(y)       <span class="comment"># 标签 → 向量</span>
 time_emb = sinusoidal(t)       <span class="comment"># 时间步 → 向量</span>
 condition = label_emb + time_emb</pre></div>
 
-    <h3>分类器指引（Classifier Guidance）</h3>
-    <p>在反向扩散的每一步，使用分类器的梯度引导生成方向，使生成的图像更符合条件。</p>
-
-    <h3>无分类器指引（Classifier-Free Guidance）</h3>
-    <p>不需要额外分类器。同时训练有条件和无条件模型，在推理时通过两者的差值引导生成。这是 Stable Diffusion 使用的方法。</p>
+    <h3>两种引导方式</h3>
+    <p><strong>分类器指引</strong>：在反向每步用分类器梯度引导方向。<br>
+    <strong>无分类器指引（CFG）</strong>：同时训练有条件和无条件模型，推理时用两者差值引导——这是 Stable Diffusion 的方法，更简单有效。</p>
+    <p>完整推导见<a href="derivations.html#cond-diffusion-derive" class="concept-link c-mm">条件扩散p(x|y)推导</a>。</p>
 
     <h3>Stable Diffusion</h3>
-    <p>Stable Diffusion 是条件扩散模型的里程碑：在<strong>潜在空间</strong>（而非像素空间）进行扩散，大幅降低计算成本，使得在消费级 GPU 上生成高质量图像成为可能。</p>
-
-    <!-- Related knowledge -->
-    <div class="related-box">
-      <div class="related-box-title">相关分支知识</div>
-      <a class="related-link" href="#dalle2">
-        <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
-        <div class="related-link-content">
-          <h4>DALL-E2 的条件扩散</h4>
-          <p>DALL-E2 使用 CLIP 图像嵌入作为条件，通过条件扩散模型（UNet）生成图像。</p>
-        </div>
-      </a>
-    </div>
+    <p>条件扩散模型的里程碑：在<strong>潜在空间</strong>（而非像素空间）进行扩散，大幅降低计算成本，使消费级 GPU 也能生成高质量图像。真正的"从文字到图像"靠的是条件扩散——在去噪时额外塞进文本嵌入来引导生成方向。</p>
   </section>
 
-  <!-- DALL-E2 -->
-  <section class="section" id="dalle2">
-    <span class="tag tag-mm">第 20 章</span>
-    <h2>DALL-E2 — 文生图完整实现</h2>
+  <div class="chapter-sep"><span>第 20 章</span></div>
 
-    <p>DALL-E2 是条件扩散模型的应用巅峰：输入文本提示词，输出图像。它使用 unCLIP 方法，需要训练三个模型。</p>
+  <section class="section fade-in" id="dalle2">
+    <span class="tag tag-mm">第 20 章</span>
+    <h2>DALL·E 2 — 文生图完整实现</h2>
+
+    <h3>🎯 导读</h3>
+    <p>DALL·E 2 是条件扩散模型的应用巅峰：输入文本提示词，输出图像。它使用 unCLIP 方法，训练<strong>三个模型</strong>协同工作。精髓在于<strong>两阶段架构</strong>：先"翻译"文本为图像条件，再根据条件生成图像。</p>
 
     <h3>三个模型的架构</h3>
-    <div class="code-block"><pre><span class="comment"># DALL-E2 = CLIP + 先验模型 + 条件扩散模型</span>
+    <div class="code-block"><pre><span class="comment"># DALL·E 2 = CLIP + 先验模型 + 条件扩散模型</span>
 1. <span class="fn">CLIP 模型</span>
    → 学习图文对齐的嵌入空间
-   → 训练完毕后冻结
+   → 训练完毕后冻结——是前两个模型的基础
 
-2. <span class="fn">先验模型</span> (Prior Model)
-   → Decoder-Only Transformer
-   → 输入: 文本标题 + CLIP文本嵌入 + 时间步 + 噪声CLIP图像嵌入
+2. <span class="fn">先验模型</span> (Prior: Decoder-Only Transformer)
+   → 输入: 文本 + CLIP文本嵌入 + 时间步 + 噪声CLIP图像嵌入
    → 输出: CLIP图像嵌入
-   → 作用: 根据文本预测高质量的图像条件
+   → 作用: 把"文本"翻译成"图像条件"
 
-3. <span class="fn">条件扩散模型</span> (Decoder)
-   → UNet 架构
+3. <span class="fn">条件扩散模型</span> (Decoder: U-Net)
    → 输入: CLIP图像嵌入 + 噪声图像 + 时间步
    → 输出: 去噪后的图像
    → 作用: 根据条件生成最终图像</pre></div>
 
-    <h3>先验模型的训练</h3>
-    <p>先验模型的核心任务：根据文本标题预测 CLIP 图像嵌入。它是一个 Decoder-Only Transformer，接收 6 个输入：</p>
-    <ul style="padding-left:20px;margin-bottom:16px;color:var(--ink-2)">
-      <li>文本标题</li>
-      <li>CLIP 文本嵌入（冻结 CLIP 生成）</li>
-      <li>时间步嵌入</li>
-      <li>加噪声的 CLIP 图像嵌入</li>
-      <li>可学习嵌入</li>
-      <li>因果注意力掩码</li>
-    </ul>
-
     <div class="callout callout-danger">
-      <div class="callout-title">关键注意</div>
-      <p>先验模型是对 <strong>CLIP 图像嵌入</strong>添加噪声进行扩散，而不是对图像本身！这是一个容易混淆的点。</p>
+      <div class="callout-title">⚠️ 关键注意</div>
+      <p>先验模型是对 <strong>CLIP 图像嵌入</strong>进行扩散，而不是对图像本身！这是一个极易混淆的点——先验模型在嵌入空间里扩散，Decoder 在像素空间里扩散。</p>
     </div>
 
-    <h3>条件扩散模型（Decoder）</h3>
-    <p>Decoder 使用 UNet 架构，包含残差块、注意力块、下采样和上采样。以先验模型生成的 CLIP 图像嵌入作为条件，从纯噪声逐步去噪生成图像。</p>
-
     <h3>完整生成流程</h3>
-    <div class="code-block"><pre><span class="comment"># DALL-E2 文生图流程</span>
+    <div class="code-block"><pre><span class="comment"># DALL·E 2 文生图流程</span>
 输入: <span class="string">"A drawing of a blue car"</span>
 
 Step 1: 文本 → 冻结的 CLIP → CLIP 文本嵌入
 Step 2: CLIP文本嵌入 → 先验模型(扩散) → CLIP图像嵌入
-Step 3: CLIP图像嵌入 + 纯噪声 → 条件扩散模型(去噪) → 生成图像
+        （先验用扩散模型在嵌入空间中去噪，产生图像条件）
+Step 3: CLIP图像嵌入 + 纯噪声 → 条件扩散模型(去噪) → 🖼️
 
-输出: 🖼️ (一辆蓝色汽车的图像)</pre></div>
+输出: 一辆蓝色汽车的图像</pre></div>
 
-    <h3>训练配置与结果</h3>
-    <p>本章提供了完整的训练配置，包括数据集准备、模型超参数、训练循环和损失计算。训练完成后能生成与文本描述匹配的图像。</p>
+    <h3>为什么用两阶段？</h3>
+    <p>这种解耦设计让每个子模型专注做好自己的任务：先验专注"语义理解"（文字→图像构思），Decoder 专注"图像生成"（构思→像素）。两者分开训练和优化，整体质量远超端到端方法。</p>
 
     <div class="callout callout-tip">
-      <div class="callout-title">DALL-E2 的精髓</div>
-      <p>DALL-E2 的精髓在于<strong>两阶段架构</strong>：先用先验模型将文本"翻译"为图像条件（CLIP 图像嵌入），再用扩散模型根据条件生成图像。这种解耦设计让每个子模型都能专注做好自己的任务。</p>
+      <div class="callout-title">DALL·E 2 的精髓</div>
+      <p><strong>两阶段架构</strong>是整个系统的灵魂：先用先验模型将文本"翻译"为图像条件（CLIP 图像嵌入），再用扩散模型根据条件生成图像。CLIP 是基石、先验是翻译官、扩散模型是画家——三者缺一不可。</p>
     </div>
 
-    <!-- Related knowledge -->
+    <p class="one-liner">📌 <strong>一句话记住多模态</strong>：Transformer 从文本扩展到视觉（ViT）→ CLIP 打通图文壁垒 → 扩散模型实现生成（先撒雪花再擦掉）→ DALL·E 2 用两阶段架构把文字变成图像。关键是 CLIP 作为图文理解的枢纽。</p>
+
     <div class="related-box">
-      <div class="related-box-title">相关分支知识</div>
-      <a class="related-link" href="#clip">
-        <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
-        <div class="related-link-content">
-          <h4>CLIP 是 DALL-E2 的基石</h4>
-          <p>DALL-E2 的三个模型中，CLIP 是第一个且需要冻结的基础。没有 CLIP 的图文嵌入空间，DALL-E2 无法工作。</p>
-        </div>
-      </a>
-      <a class="related-link" href="#diffusion">
-        <div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div>
-        <div class="related-link-content">
-          <h4>扩散模型是 DALL-E2 的生成引擎</h4>
-          <p>第 17-19 章的扩散模型理论是 DALL-E2 的 Decoder 部分（条件扩散模型）的直接基础。</p>
-        </div>
-      </a>
-      <a class="related-link" href="llm.html#gpt2">
-        <div class="related-link-icon" style="background:rgba(99,102,241,0.1);color:var(--c-llm)">→</div>
-        <div class="related-link-content">
-          <h4>先验模型 = Decoder-Only Transformer</h4>
-          <p>DALL-E2 的先验模型与 GPT-2 使用相同的架构：因果注意力掩码的 Decoder-Only Transformer。</p>
-        </div>
-      </a>
+      <div class="related-box-title">关键依赖关系</div>
+      <a class="related-link" href="#clip"><div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div><div class="related-link-content"><h4>CLIP 是 DALL·E 2 的基石</h4><p>没有 CLIP 的图文嵌入空间，DALL·E 2 无法工作。CLIP 训练完毕后冻结，是先验和 Decoder 的基础。</p></div></a>
+      <a class="related-link" href="#diffusion"><div class="related-link-icon" style="background:rgba(220,38,38,0.1);color:var(--c-mm)">→</div><div class="related-link-content"><h4>扩散模型是生成引擎</h4><p>第 17-19 章的扩散模型理论是 DALL·E 2 的 Decoder（条件扩散模型）的直接基础。</p></div></a>
+      <a class="related-link" href="llm.html#gpt2"><div class="related-link-icon" style="background:rgba(99,102,241,0.1);color:var(--c-llm)">→</div><div class="related-link-content"><h4>先验模型 = Decoder-Only Transformer</h4><p>DALL·E 2 的先验模型与 GPT-2 使用相同的 Decoder-Only Transformer 架构。</p></div></a>
     </div>
   </section>
 
+  <div class="dotted-nav">
+    <a href="rlhf.html">← RLHF 对齐训练</a>
+    <a href="derivations.html">附录：公式与概念详解 →</a>
+  </div>
+
 </main>
 </div>
+
+<script>
+// ============ 主题切换功能 ============
+const themeToggle = document.getElementById('theme-toggle');
+const body = document.body;
+
+// 加载保存的主题
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+  body.classList.add('dark');
+  themeToggle.textContent = '☀️';
+}
+
+themeToggle.addEventListener('click', () => {
+  body.classList.toggle('dark');
+  const isDark = body.classList.contains('dark');
+  themeToggle.textContent = isDark ? '☀️' : '🌓';
+  localStorage.setItem('theme', isDark ? 'dark' : 'light');
+});
+
+// ============ 搜索功能 ============
+const searchOverlay = document.getElementById('search-overlay');
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+let searchIndex = [];
+let selectedIndex = -1;
+
+// 构建搜索索引
+function buildSearchIndex() {
+  const headings = document.querySelectorAll('.section h2, .section h3, .section h4');
+  searchIndex = [];
+  headings.forEach(h => {
+    const text = h.textContent.trim();
+    const id = h.closest('.section') ? h.closest('.section').id : '';
+    if (text && text.length > 2) {
+      searchIndex.push({ text: text.substring(0, 80), id });
+    }
+  });
+  const concepts = [
+    { text: 'Vision Transformer ViT', tags: ['ViT', 'Vision Transformer', '视觉Transformer'] },
+    { text: 'CLIP 图文对比学习', tags: ['CLIP', '对比学习'] },
+    { text: 'ClipCap 图像描述生成', tags: ['ClipCap', '图像描述'] },
+    { text: '扩散模型 Diffusion Model', tags: ['扩散模型', 'Diffusion'] },
+    { text: 'DALL-E 2 文生图', tags: ['DALL-E', 'DALL-E2', '文生图'] },
+    { text: 'U-Net 架构', tags: ['U-Net', 'UNet'] },
+    { text: '变分自编码器 VAE', tags: ['VAE', '变分自编码器'] },
+    { text: '朗之万动力学', tags: ['朗之万', 'Langevin'] }
+  ];
+  
+  concepts.forEach(concept => {
+    searchIndex.push({ text: concept.text, tags: concept.tags });
+  });
+}
+
+buildSearchIndex();
+
+// 搜索功能
+searchInput.addEventListener('input', (e) => {
+  const query = e.target.value.toLowerCase().trim();
+  searchResults.innerHTML = '';
+  selectedIndex = -1;
+  
+  if (!query) return;
+  
+  const results = searchIndex.filter(item => {
+    const textMatch = item.text.toLowerCase().includes(query);
+    const tagMatch = item.tags && item.tags.some(tag => tag.toLowerCase().includes(query));
+    return textMatch || tagMatch;
+  }).slice(0, 8);
+  
+  results.forEach((result, idx) => {
+    const div = document.createElement('div');
+    div.className = 'search-result-item';
+    div.textContent = result.text;
+    div.addEventListener('click', () => {
+      if (result.id) {
+        window.location.hash = result.id;
+      }
+      closeSearch();
+    });
+    searchResults.appendChild(div);
+  });
+});
+
+// 键盘快捷键
+document.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+    e.preventDefault();
+    searchOverlay.classList.add('active');
+    searchInput.focus();
+  }
+  
+  if (e.key === 'Escape') {
+    closeSearch();
+  }
+  
+  // 方向键选择
+  if (searchOverlay.classList.contains('active')) {
+    const items = searchResults.querySelectorAll('.search-result-item');
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      selectedIndex = Math.min(selectedIndex + 1, items.length - 1);
+      updateSelection(items);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      selectedIndex = Math.max(selectedIndex - 1, -1);
+      updateSelection(items);
+    } else if (e.key === 'Enter' && selectedIndex >= 0) {
+      e.preventDefault();
+      items[selectedIndex].click();
+    }
+  }
+});
+
+function updateSelection(items) {
+  items.forEach((item, idx) => {
+    item.classList.toggle('selected', idx === selectedIndex);
+  });
+}
+
+function closeSearch() {
+  searchOverlay.classList.remove('active');
+  searchInput.value = '';
+  searchResults.innerHTML = '';
+}
+
+searchOverlay.addEventListener('click', (e) => {
+  if (e.target === searchOverlay) closeSearch();
+});
+
+// ============ 滚动渐入动画 ============
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+</script>
+
 </body>
 </html>

@@ -1,0 +1,16 @@
+{
+  "paper": "Denoising Diffusion Probabilistic Models (Ho et al., NeurIPS 2020)",
+  "formula": "x_t = √ᾱₜ · x₀ + √(1-ᾱₜ) · ε",
+  "noise_schedule": "Cosine schedule (Improved DDPM, Nichol & Dhariwal 2021)",
+  "T": 1000,
+  "steps": [
+    0,
+    200,
+    400,
+    600,
+    800,
+    1000
+  ],
+  "image_size": "256×256",
+  "note": "Forward process only. Reverse (denoising) requires trained ε_θ network."
+}

@@ -3,20 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI知识库 — 大语言模型 · 强化学习 · 多模态</title>
+<title>AI 全栈知识地图</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Search Overlay -->
+<div class="search-overlay" id="searchOverlay">
+  <div class="search-box">
+    <input type="text" class="search-input" id="searchInput" placeholder="搜索概念、公式、章节… (Ctrl+K)" autocomplete="off">
+    <div class="search-results" id="searchResults"></div>
+    <div class="search-hint">ESC 关闭 · ↑↓ 选择 · Enter 跳转</div>
+  </div>
+</div>
+
+<!-- Theme Toggle -->
+<button class="theme-toggle" id="themeToggle" title="切换深色/浅色模式">🌓</button>
+
 <button class="nav-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+<!-- Search Shortcut -->
+<div class="search-shortcut">
+  <kbd>Ctrl+K</kbd>
+</div>
 
 <div class="shell">
 
-<!-- Sidebar -->
 <aside class="sidebar">
-  <div class="sidebar-brand">
-    <h2>AI知识库</h2>
-    <p>大语言模型 · 强化学习 · 多模态</p>
-  </div>
+  <div class="sidebar-brand"><h2>AI知识库</h2><p>大语言模型 · 强化学习 · 多模态</p></div>
   <nav class="sidebar-nav">
     <div class="sidebar-group">
       <div class="sidebar-group-title">知识主线</div>
@@ -25,198 +39,462 @@
       <a class="sidebar-link" href="rl.html"><span class="dot" style="background:var(--c-rl)"></span>强化学习</a>
       <a class="sidebar-link" href="rlhf.html"><span class="dot" style="background:var(--c-rlhf)"></span>RLHF 对齐训练</a>
       <a class="sidebar-link" href="multimodal.html"><span class="dot" style="background:var(--c-mm)"></span>多模态 AI</a>
-      <a class="sidebar-link" href="derivations.html" style="margin-top:8px;border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
+      <a class="sidebar-link" href="knowledge-graph.html" style="margin-top:8px"><span class="dot" style="background:linear-gradient(135deg,var(--c-llm),var(--c-rl),var(--c-rlhf),var(--c-mm))"></span>🔗 知识图谱</a>
+      <a class="sidebar-link" href="derivations.html" style="border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
     </div>
     <div class="sidebar-group">
-      <div class="sidebar-group-title">分支线</div>
-      <a class="sidebar-link" href="llm.html#microgpt">microgpt</a>
-      <a class="sidebar-link" href="llm.html#gpt2">GPT-2 实现</a>
-      <a class="sidebar-link" href="rl.html#policy-gradient">策略梯度法</a>
-      <a class="sidebar-link" href="rl.html#ppo">PPO 近端优化</a>
-      <a class="sidebar-link" href="rl.html#grpo">GRPO 组优化</a>
-      <a class="sidebar-link" href="rlhf.html#dpo">DPO 微调</a>
-      <a class="sidebar-link" href="rlhf.html#ppo-llm">PPO 微调 LLM</a>
-      <a class="sidebar-link" href="rlhf.html#grpo-llm">GRPO 复刻 R1</a>
-      <a class="sidebar-link" href="multimodal.html#vit">Vision Transformer</a>
-      <a class="sidebar-link" href="multimodal.html#clip">CLIP</a>
-      <a class="sidebar-link" href="multimodal.html#diffusion">扩散模型</a>
-      <a class="sidebar-link" href="multimodal.html#dalle2">DALL-E2</a>
+      <div class="sidebar-group-title">页面导航</div>
+      <a class="sidebar-link" href="#reading-guide">阅读指引</a>
+      <a class="sidebar-link" href="#branches">四大知识分支</a>
+      <a class="sidebar-link" href="#connections">训练管线</a>
+      <a class="sidebar-link" href="#glossary">知识要点词典</a>
+      <a class="sidebar-link" href="#chapters">章节索引</a>
     </div>
   </nav>
-  <div class="sidebar-footer">
-    基于左元《大语言模型、强化学习和多模态教程》<br>407 页 · 21 章
-  </div>
+  <div class="sidebar-footer">全 21 章 · 完整知识体系</div>
 </aside>
 
-<!-- Main Content -->
-<main class="main">
+  <!-- Main Content -->
+  <main class="main">
 
-  <!-- Hero -->
-  <section class="hero-section">
-    <div class="hero-kicker">理论与实践</div>
-    <h1 class="hero-title">大语言模型 · 强化学习 · 多模态</h1>
-    <p class="hero-subtitle">从零开始掌握现代 AI 核心技术栈——包含完整代码实现与数学推导</p>
-    <p class="hero-desc">基于左元《大语言模型、强化学习和多模态教程》的交互式知识地图。覆盖 microgpt、GPT-2、PPO、GRPO、DeepSeek-R1、Vision Transformer、CLIP、扩散模型及 DALL-E2 等 20 个章节。</p>
-  </section>
+    <!-- ═══════════ ZONE A: HERO ═══════════ -->
+    <div class="hero-zone">
+      <section class="hero-section">
+        <div class="hero-visual">
+          <img src="images/Abstract_minimalist_illustrati_2026-06-27T13-12-07.png" alt="AI 知识网络 — 四个知识分支的节点连接图" loading="eager">
+        </div>
+        <div class="hero-kicker">AI · Machine Learning · Deep Learning</div>
+        <h1 class="hero-title">AI 全栈知识地图</h1>
+        <p class="hero-subtitle">从 MicroGPT 到 GPT-2，从 DQN 到 DeepSeek-R1，从 CLIP 到 DALL·E 2——一条贯穿大模型、强化学习、对齐训练与多模态的完整学习路径。每篇都是独立深度长文，章节间交叉引用，帮你在分支之间建立真正的知识连接。</p>
+        <div class="hero-actions">
+          <a href="llm.html" class="btn btn-primary">开始阅读 →</a>
+          <a href="knowledge-graph.html" class="btn btn-outline">查看知识图谱</a>
+        </div>
+      </section>
+    </div>
 
-  <!-- Four Branches -->
-  <section>
-    <div class="map-section-title" style="margin-bottom:8px">知识主线</div>
-    <h2 style="margin-top:0">四大核心知识分支</h2>
-    <p style="color:var(--ink-2);font-size:15px">从基础理论到前沿实践，每个分支提供完整的从零实现路径。点击进入对应学习页面。</p>
+    <hr class="zone-divider">
 
+    <!-- ═══════════ ZONE B: ORIENT ═══════════ -->
+    <!-- Reading Guide: Personas + Paths merged -->
+    <h3 class="guide-section-title fade-in" id="reading-guide">阅读指引</h3>
+    <p class="guide-section-sub">三种角色，三条路径，按你的身份找到最合适的读法。</p>
+    <div class="guide-row">
+      <div class="guide-card">
+        <div class="guide-head">
+          <span class="guide-dot">🧑🎓</span>
+          <span class="guide-label">学生 / 转行者</span>
+          <span class="guide-arrow">→</span>
+          <span class="guide-path">LLM → RL → RLHF → 多模态</span>
+        </div>
+        <p class="guide-desc">从 MicroGPT 起步建立直觉，然后系统入门，按顺序建立完整知识体系。</p>
+      </div>
+      <div class="guide-card">
+        <div class="guide-head">
+          <span class="guide-dot">💻</span>
+          <span class="guide-label">工程师 / 研究者</span>
+          <span class="guide-arrow">→</span>
+          <span class="guide-path">按需切入目标分支</span>
+        </div>
+        <p class="guide-desc">直接深入架构细节与训练数学，利用交叉引用补全背景，对接工业实践。</p>
+      </div>
+      <div class="guide-card">
+        <div class="guide-head">
+          <span class="guide-dot">📚</span>
+          <span class="guide-label">爱好者 / 自学党</span>
+          <span class="guide-arrow">→</span>
+          <span class="guide-path">任意章节自由跳转</span>
+        </div>
+        <p class="guide-desc">按兴趣切入任意章节，跟着交叉引用在分支间自由探索，构建自己的知识网络。</p>
+      </div>
+    </div>
+
+    <hr class="zone-divider">
+
+    <!-- ═══════════ ZONE C: THE CORE ═══════════ -->
+    <div class="core-zone">
+    <!-- Branch Grid: 4 cards -->
+    <h2 class="section-title fade-in" id="branches">四大知识分支</h2>
+    <p class="section-sub">点击卡片进入对应分支，每个分支都是一篇完整的深度长文。</p>
     <div class="branch-grid">
 
-      <a class="branch-card" data-color="llm" href="llm.html">
-        <div class="branch-card-num">01</div>
-        <div class="branch-card-title">大语言模型</div>
-        <div class="branch-card-range">第 1–3 章 · 50 页</div>
-        <ul class="branch-card-topics">
-          <li>microgpt — 从零构建微型 GPT（200 行代码）</li>
-          <li>LLM 基础 — 训练原理与损失函数</li>
-          <li>GPT-2 — 完整实现与加载预训练权重</li>
-        </ul>
-        <span class="branch-card-cta">开始学习 →</span>
-      </a>
+      <!-- LLM -->
+      <div class="branch-card fade-in" data-color="llm" onclick="location.href='llm.html'">
+        <div class="branch-card-tag">LLM</div>
+        <h3>大语言模型</h3>
+        <p>从 MicroGPT 的 68 行代码出发，逐步深入 Transformer、GPT-2 架构、位置编码、Softmax 温度采样，再到 InstructGPT 的 SFT + RM + PPO 三阶段对齐训练。</p>
+        <div class="branch-card-topics">
+          <span>Transformer</span><span>GPT-2</span><span>ALiBi</span><span>RoPE</span><span>Beam Search</span>
+        </div>
+        <div class="branch-card-cta">阅读此分支 →</div>
+      </div>
 
-      <a class="branch-card" data-color="rl" href="rl.html">
-        <div class="branch-card-num">02</div>
-        <div class="branch-card-title">强化学习</div>
-        <div class="branch-card-range">第 4–9 章 · 92 页</div>
-        <ul class="branch-card-topics">
-          <li>RL 基础 — MDP 与贝尔曼方程</li>
-          <li>策略梯度 — REINFORCE 与 Actor-Critic</li>
-          <li>PPO — 近端策略优化理论与实战</li>
-          <li>GRPO — 组相对策略优化</li>
-        </ul>
-        <span class="branch-card-cta">开始学习 →</span>
-      </a>
+      <!-- RL -->
+      <div class="branch-card fade-in" data-color="rl" onclick="location.href='rl.html'">
+        <div class="branch-card-tag">RL</div>
+        <h3>强化学习</h3>
+        <p>从马尔可夫决策过程（MDP）的形式化定义出发，覆盖动态规划、蒙特卡洛、时序差分、Q-Learning、DQN、Policy Gradient、Actor-Critic，再到 PPO 和 GRPO 的数学推导。</p>
+        <div class="branch-card-topics">
+          <span>MDP</span><span>Q-Learning</span><span>DQN</span><span>Policy Gradient</span><span>PPO</span><span>GRPO</span>
+        </div>
+        <div class="branch-card-cta" style="background:var(--c-rl)">阅读此分支 →</div>
+      </div>
 
-      <a class="branch-card" data-color="rlhf" href="rlhf.html">
-        <div class="branch-card-num">03</div>
-        <div class="branch-card-title">人类反馈强化学习</div>
-        <div class="branch-card-range">第 10–13 章 · 88 页</div>
-        <ul class="branch-card-topics">
-          <li>训练流程 — 预训练 · SFT · RLHF 全景</li>
-          <li>DPO 微调 — 直接偏好优化实战</li>
-          <li>PPO 微调 — 复刻 InstructGPT</li>
-          <li>GRPO 微调 — 复刻 DeepSeek-R1</li>
-        </ul>
-        <span class="branch-card-cta">开始学习 →</span>
-      </a>
+      <!-- RLHF -->
+      <div class="branch-card fade-in" data-color="rlhf" onclick="location.href='rlhf.html'">
+        <div class="branch-card-tag">RLHF</div>
+        <h3>RLHF 对齐训练</h3>
+        <p>从 InstructGPT 论文出发，深入 SFT（监督微调）、RM（奖励模型训练）、PPO（强化学习优化）、PPO-ptx（预训练梯度保全）、拒绝采样、DPO，再到 DeepSeek-R1 的 GRPO 创新。</p>
+        <div class="branch-card-topics">
+          <span>InstructGPT</span><span>RM</span><span>PPO-ptx</span><span>拒绝采样</span><span>DPO</span><span>DeepSeek-R1</span>
+        </div>
+        <div class="branch-card-cta" style="background:var(--c-rlhf)">阅读此分支 →</div>
+      </div>
 
-      <a class="branch-card" data-color="mm" href="multimodal.html">
-        <div class="branch-card-num">04</div>
-        <div class="branch-card-title">多模态 AI</div>
-        <div class="branch-card-range">第 14–20 章 · 162 页</div>
-        <ul class="branch-card-topics">
-          <li>Vision Transformer — 图像分类</li>
-          <li>CLIP — 图文对比学习</li>
-          <li>ClipCap — 图生文</li>
-          <li>扩散模型 — 从理论到代码</li>
-          <li>DALL-E2 — 文生图完整实现</li>
-        </ul>
-        <span class="branch-card-cta">开始学习 →</span>
-      </a>
+      <!-- Multimodal -->
+      <div class="branch-card fade-in" data-color="mm" onclick="location.href='multimodal.html'">
+        <div class="branch-card-tag">多模态</div>
+        <h3>多模态 AI</h3>
+        <p>从 ViT（Vision Transformer）将图像切成 patch 送入 Transformer，到 CLIP 的对比学习对齐图文表示，再到 DALL·E 2 的扩散模型生成图像，完整覆盖多模态的核心技术链路。</p>
+        <div class="branch-card-topics">
+          <span>ViT</span><span>CLIP</span><span>DDPM</span><span>DALL·E 2</span><span>对比学习</span>
+        </div>
+        <div class="branch-card-cta" style="background:var(--c-mm)">阅读此分支 →</div>
+      </div>
 
     </div>
-  </section>
+    </div><!-- /core-zone -->
 
-  <!-- Knowledge Connections -->
-  <section class="map-section">
-    <div class="map-section-title">知识关联</div>
-    <h2 style="margin-top:0">重度相关的交叉知识</h2>
-    <p style="color:var(--ink-2);font-size:15px">这些核心概念贯穿多个分支，理解它们将串联起整个 AI 技术栈。</p>
+    <hr class="zone-divider">
 
-    <div class="conn-grid">
-      <div class="conn-card">
-        <span class="conn-card-tag" style="background:var(--c-llm)">核心机制</span>
-        <h4>Transformer 与注意力机制</h4>
-        <p>从 GPT-2 的自注意力到 ViT 的图像分块注意力，再到 CLIP 的跨模态注意力，是理解所有模型的基础。</p>
-        <div class="conn-card-branches">
-          <a href="llm.html#gpt2"><span style="color:var(--c-llm)">LLM</span></a>
-          <a href="multimodal.html#vit"><span style="color:var(--c-mm)">ViT</span></a>
-          <a href="multimodal.html#clip"><span style="color:var(--c-mm)">CLIP</span></a>
+    <!-- ═══════════ ZONE D: REFERENCE ═══════════ -->
+    <div class="ref-zone">
+    <!-- ==================== 训练管线 ==================== -->
+    <div class="map-section fade-in" style="margin:48px 0;">
+      <div class="map-section-title">Knowledge Connections</div>
+      <h2 id="connections">训练管线</h2>
+      <p style="color:var(--ink-2);font-size:13px;margin:0 0 20px;line-height:1.5;">
+        一次完整的深度学习训练，从原始数据到收敛模型，由八个紧密咬合的环节构成——以下按训练管线的时间顺序展开。
+      </p>
+
+      <div class="flow-chain">
+
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:var(--c-llm)">①</div>
+          <div class="flow-step-content">
+            <div class="flow-step-head">
+              <h4>文本预处理与分词（Tokenization）</h4>
+            </div>
+            <p>BPE 子词切分，构建 token↔ID 双向映射，定义模型词汇空间</p>
+          </div>
         </div>
-      </div>
 
-      <div class="conn-card">
-        <span class="conn-card-tag" style="background:var(--c-rl)">算法桥梁</span>
-        <h4>PPO 与 GRPO — 从 RL 到 RLHF</h4>
-        <p>PPO 先在 RL 基础篇用于游戏控制，然后扩展到 LLM 对齐训练（InstructGPT），GRPO 进一步简化用于 DeepSeek-R1。</p>
-        <div class="conn-card-branches">
-          <a href="rl.html#ppo"><span style="color:var(--c-rl)">RL</span></a>
-          <a href="rlhf.html#ppo-llm"><span style="color:var(--c-rlhf)">RLHF</span></a>
-          <a href="rlhf.html#grpo-llm"><span style="color:var(--c-rlhf)">DeepSeek-R1</span></a>
-        </div>
-      </div>
+        <div class="flow-arrow"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 4v10M6 11l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
 
-      <div class="conn-card">
-        <span class="conn-card-tag" style="background:var(--c-rlhf)">渐进学习</span>
-        <h4>扩散模型 — 从原理到 DALL-E2</h4>
-        <p>第 17-20 章构成递进路径：扩散基础 → 数学理论 → 条件扩散 → Stable Diffusion → DALL-E2 完整实现。</p>
-        <div class="conn-card-branches">
-          <a href="multimodal.html#diffusion"><span style="color:var(--c-mm)">DDPM</span></a>
-          <a href="multimodal.html#clip"><span style="color:var(--c-mm)">CLIP</span></a>
-          <a href="multimodal.html#dalle2"><span style="color:var(--c-mm)">DALL-E2</span></a>
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:linear-gradient(135deg,var(--c-llm),var(--c-mm))">②</div>
+          <div class="flow-step-content">
+            <div class="flow-step-head">
+              <h4>Token → 向量：嵌入层（Embedding）</h4>
+            </div>
+            <p>wte 稠密向量 + wpe 位置编码，离散符号进入连续可微空间</p>
+          </div>
         </div>
-      </div>
 
-      <div class="conn-card">
-        <span class="conn-card-tag" style="background:var(--c-mm)">桥梁模型</span>
-        <h4>CLIP — 图文理解的关键枢纽</h4>
-        <p>CLIP 连接视觉与语言：在多模态中作为图文对齐模型，在 ClipCap 中驱动图生文，在 DALL-E2 中提供图文嵌入空间。</p>
-        <div class="conn-card-branches">
-          <a href="multimodal.html#clipcap"><span style="color:var(--c-mm)">ClipCap</span></a>
-          <a href="multimodal.html#dalle2"><span style="color:var(--c-mm)">DALL-E2</span></a>
+        <div class="flow-arrow"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 4v10M6 11l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:var(--c-llm)">③</div>
+          <div class="flow-step-content">
+            <div class="flow-step-head">
+              <h4>模型架构：Transformer 前向计算图</h4>
+            </div>
+            <p>Masked Self-Attention + FFN + 残差 + LayerNorm，L 层堆叠</p>
+          </div>
         </div>
+
+        <div class="flow-arrow"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 4v10M6 11l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:linear-gradient(135deg,var(--c-llm),var(--c-mm))">④</div>
+          <div class="flow-step-content">
+            <div class="flow-step-head">
+              <h4>前向传播：从 Embedding 到 Logits</h4>
+            </div>
+            <p>逐层 attention→FFN→归一化，lm_head 投影 + Softmax 出概率</p>
+          </div>
+        </div>
+
+        <div class="flow-arrow"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 4v10M6 11l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:linear-gradient(135deg,var(--c-llm),var(--c-rl))">⑤</div>
+          <div class="flow-step-content">
+            <div class="flow-step-head">
+              <h4>损失计算：Cross-Entropy &amp; 策略目标</h4>
+            </div>
+            <p>CE Loss / J(θ) / DPO pairwise loss 定义优化方向</p>
+          </div>
+        </div>
+
+        <div class="flow-arrow"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 4v10M6 11l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:linear-gradient(135deg,var(--c-llm),var(--c-rl))">⑥</div>
+          <div class="flow-step-content">
+            <div class="flow-step-head">
+              <h4>反向传播：链式法则与自动微分</h4>
+            </div>
+            <p>∂L/∂z = p−y → Chain Rule 逐层回传 → PyTorch autograd</p>
+          </div>
+        </div>
+
+        <div class="flow-arrow"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 4v10M6 11l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:linear-gradient(135deg,var(--c-rl),var(--c-rlhf))">⑦</div>
+          <div class="flow-step-content">
+            <div class="flow-step-head">
+              <h4>梯度优化：SGD → Adam → Trust Region PPO</h4>
+            </div>
+            <p>θ←θ−α·∇J，PPO clip ≈ KL 约束，Adam 自适应学习率</p>
+          </div>
+        </div>
+
+        <div class="flow-arrow"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 4v10M6 11l4 4 4-4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+        <div class="flow-step">
+          <div class="flow-step-num" style="background:linear-gradient(135deg,var(--c-rl),var(--c-rlhf),var(--c-mm))">⑧</div>
+          <div class="flow-step-content">
+            <div class="flow-step-head">
+              <h4>训练循环与多阶段对齐</h4>
+            </div>
+            <p>Rollout→GAE→Update 迭代收敛，SFT→RM→PPO 三阶段管线</p>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- Formula entry -->
-    <a href="derivations.html" style="display:block;margin-top:24px;padding:24px;background:linear-gradient(135deg, rgba(99,102,241,0.06), rgba(220,38,38,0.04));border-radius:var(--r-lg);border:1px solid var(--border);text-decoration:none;color:inherit;transition:transform 0.15s,box-shadow 0.15s">
-      <div style="display:flex;align-items:center;gap:20px">
-        <div style="font-family:var(--font-mono);font-size:32px;color:var(--c-llm);font-weight:700">∑ ∇ θ</div>
-        <div style="flex:1">
-          <h4 style="margin:0 0 4px;font-size:17px">公式与概念详解</h4>
-          <p style="margin:0;font-size:13px;color:var(--ink-2)">所有重要公式和概念的详细推导：交叉熵、自注意力、策略梯度定理、GAE、KL散度、PPO替代目标、DPO推导、扩散闭式公式等 13 个核心推导。</p>
-        </div>
-        <div style="font-size:20px;color:var(--c-llm);font-weight:600">→</div>
+    <!-- Formula CTA -->
+    <a href="derivations.html" class="formula-cta">
+      <div class="formula-cta-icon">∑</div>
+      <div class="formula-cta-body">
+        <h4>公式与概念详解</h4>
+        <p>交叉熵损失、Attention 矩阵乘法、REINFORCE 梯度估计、PPO 替代目标、DDPM 逆向过程… 所有关键公式的完整推导，集中在一页。</p>
       </div>
+      <div class="formula-cta-arrow">→</div>
     </a>
-  </section>
 
-  <!-- Learning Path -->
-  <section>
-    <div class="map-section-title">学习路径</div>
-    <h2 style="margin-top:0">建议的学习顺序</h2>
-    <p style="color:var(--ink-2);font-size:15px">沿着这条主线循序渐进，每个阶段为下一阶段打基础。</p>
+    <!-- ============================ 知识要点词典 ============================ -->
+    <h2 class="section-title fade-in" id="glossary" style="font-size:24px;margin:56px 0 8px;">知识要点词典</h2>
+    <p style="color:var(--ink-3);font-size:14px;margin:0 0 24px;">按四大分支整理的核心术语速查——每个术语附带一句话定义和对应章节。</p>
+    <style>
+      .dict-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:16px; margin:0 0 48px; }
+      .dict-card { background:var(--bg-soft); border:1px solid var(--border-soft); border-radius:var(--r-md); padding:20px 22px; transition:border-color .2s; }
+      .dict-card:hover { border-color:var(--ink-3); }
+      .dict-card h4 { margin:0 0 6px; font-size:15px; font-weight:700; display:flex; align-items:center; gap:8px; }
+      .dict-card h4 .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+      .dict-list { display:flex; flex-direction:column; gap:6px; margin:0; padding:0; list-style:none; }
+      .dict-list li { font-size:13px; line-height:1.65; display:flex; flex-wrap:wrap; align-items:baseline; gap:6px; padding:6px 0; border-bottom:1px solid var(--border-soft); }
+      .dict-list li:last-child { border-bottom:none; }
+      .dict-term { font-family:var(--font-mono); font-weight:700; font-size:12px; color:var(--ink); background:var(--bg); padding:1px 7px; border-radius:4px; white-space:nowrap; flex-shrink:0; }
+      .dict-def { color:var(--ink-2); }
+      @media (max-width:768px) { .dict-grid { grid-template-columns:1fr; } }
+    </style>
+    <div class="dict-grid">
 
-    <div class="path-grid">
-      <a class="path-step" href="llm.html" style="text-decoration:none;color:inherit">
-        <div class="path-step-num" style="color:var(--c-llm)">STEP 1</div>
-        <h4>大语言模型基础</h4>
-        <p>从 microgpt 入手理解 GPT 架构和训练流程，建立对 Transformer 的直观认知</p>
-      </a>
-      <a class="path-step" href="rl.html" style="text-decoration:none;color:inherit">
-        <div class="path-step-num" style="color:var(--c-rl)">STEP 2</div>
-        <h4>强化学习核心</h4>
-        <p>掌握 MDP、策略梯度、PPO 和 GRPO，理解现代 AI 训练的核心优化方法</p>
-      </a>
-      <a class="path-step" href="rlhf.html" style="text-decoration:none;color:inherit">
-        <div class="path-step-num" style="color:var(--c-rlhf)">STEP 3</div>
-        <h4>LLM 对齐训练</h4>
-        <p>将 RL 应用于 LLM：DPO、PPO 微调 (InstructGPT)、GRPO 微调 (DeepSeek-R1)</p>
-      </a>
-      <a class="path-step" href="multimodal.html" style="text-decoration:none;color:inherit">
-        <div class="path-step-num" style="color:var(--c-mm)">STEP 4</div>
-        <h4>多模态扩展</h4>
-        <p>探索视觉 AI：ViT、CLIP、ClipCap、扩散模型和 DALL-E2 的完整实现</p>
-      </a>
+      <!-- LLM -->
+      <div class="dict-card fade-in">
+        <h4><span class="dot" style="background:var(--c-llm)"></span>大语言模型 · LLM</h4>
+        <ul class="dict-list">
+          <li><span class="dict-term">BPE</span><span class="dict-def">字节对编码，按子词频率合并构建词表（Ch1）</span></li>
+          <li><span class="dict-term">Embedding</span><span class="dict-def">wte 矩阵将 token ID 映射为 d<sub>model</sub> 维稠密向量（Ch2–3）</span></li>
+          <li><span class="dict-term">Self-Attention</span><span class="dict-def">Q·K<sup>T</sup>·V 计算序列内 token 间依赖权重（Ch3）</span></li>
+          <li><span class="dict-term">Multi-Head</span><span class="dict-def">多组独立的 Q/K/V 投影，并行捕获不同子空间（Ch3）</span></li>
+          <li><span class="dict-term">FFN</span><span class="dict-def">两层全连接 + GELU，提供非线性变换能力（Ch3）</span></li>
+          <li><span class="dict-term">LayerNorm</span><span class="dict-def">层归一化，沿特征维度标准化以稳定深层训练（Ch3）</span></li>
+          <li><span class="dict-term">Cross-Entropy</span><span class="dict-def">−Σ y·log(p)，衡量预测分布与真实分布的差异（Ch2）</span></li>
+          <li><span class="dict-term">Softmax</span><span class="dict-def">将 logits 指数归一化为概率分布（Ch2）</span></li>
+          <li><span class="dict-term">ALiBi / RoPE</span><span class="dict-def">线性偏置 / 旋转位置编码，替代绝对位置编码（Ch3）</span></li>
+          <li><span class="dict-term">Autoregressive</span><span class="dict-def">自回归生成：当前输出作为下一步输入，逐 token 预测（Ch2–3）</span></li>
+        </ul>
+      </div>
+
+      <!-- RL -->
+      <div class="dict-card fade-in">
+        <h4><span class="dot" style="background:var(--c-rl)"></span>强化学习 · RL</h4>
+        <ul class="dict-list">
+          <li><span class="dict-term">MDP</span><span class="dict-def">马尔可夫决策过程：(S, A, P, R, γ) 五元组形式化框架（Ch4）</span></li>
+          <li><span class="dict-term">Bellman Eq.</span><span class="dict-def">V(s) = max<sub>a</sub>[R + γ·Σ P·V(s′)]，价值递归定义（Ch4）</span></li>
+          <li><span class="dict-term">Q-Learning</span><span class="dict-def">基于 Q 表的时序差分学习，off-policy（Ch4）</span></li>
+          <li><span class="dict-term">DQN</span><span class="dict-def">神经网络拟合 Q 值 + Experience Replay + Target Network（Ch4）</span></li>
+          <li><span class="dict-term">Policy Gradient</span><span class="dict-def">∇J = E[∇logπ · R]，直接优化策略参数（Ch5）</span></li>
+          <li><span class="dict-term">Actor-Critic</span><span class="dict-def">Actor 做决策 + Critic 估计价值，组合 PG 与 TD（Ch5）</span></li>
+          <li><span class="dict-term">GAE</span><span class="dict-def">广义优势估计，λ 参数在偏差与方差间折中（Ch5）</span></li>
+          <li><span class="dict-term">PPO-Clip</span><span class="dict-def">clip(π<sub>new</sub>/π<sub>old</sub>, 1−ε, 1+ε)，Trust Region 的工程化实现（Ch6–8）</span></li>
+          <li><span class="dict-term">GRPO</span><span class="dict-def">组内相对优势替代 Critic，省去价值网络（Ch9）</span></li>
+          <li><span class="dict-term">Trust Region</span><span class="dict-def">信赖域约束，限制 KL(π<sub>old</sub>‖π<sub>new</sub>) ≤ δ 防策略崩溃（Ch8）</span></li>
+        </ul>
+      </div>
+
+      <!-- RLHF -->
+      <div class="dict-card fade-in">
+        <h4><span class="dot" style="background:var(--c-rlhf)"></span>RLHF 对齐训练</h4>
+        <ul class="dict-list">
+          <li><span class="dict-term">SFT</span><span class="dict-def">监督微调，在人类标注的 (prompt, answer) 对上训练（Ch10）</span></li>
+          <li><span class="dict-term">RM</span><span class="dict-def">奖励模型，对两个回答输出标量评分，学人类偏好排序（Ch10）</span></li>
+          <li><span class="dict-term">PPO-ptx</span><span class="dict-def">PPO + 预训练梯度项 β·∇logP(x)，防止遗忘（Ch12）</span></li>
+          <li><span class="dict-term">KL Penalty</span><span class="dict-def">−β·KL(π<sub>ref</sub>‖π<sub>θ</sub>)，约束策略不偏离初始模型（Ch12）</span></li>
+          <li><span class="dict-term">DPO</span><span class="dict-def">直接偏好优化，Bradley-Terry 模型下等价 RLHF 但只需分类 loss（Ch11）</span></li>
+          <li><span class="dict-term">Bradley-Terry</span><span class="dict-def">P(y≻y′)=σ(r−r′)，偏好比较的经典概率模型（Ch11）</span></li>
+          <li><span class="dict-term">Rejection Samp.</span><span class="dict-def">拒绝采样：RM 打分后保留高分样本做 SFT（Ch10）</span></li>
+          <li><span class="dict-term">GRPO-LLM</span><span class="dict-def">GRPO 用于对齐：组内比较替代 reward 估计（Ch13）</span></li>
+          <li><span class="dict-term">DeepSeek-R1</span><span class="dict-def">基于 GRPO 的推理增强模型，省去 RM 打分阶段（Ch13）</span></li>
+          <li><span class="dict-term">InstructGPT</span><span class="dict-def">SFT → RM → PPO 三阶段对齐管线（Ch12）</span></li>
+        </ul>
+      </div>
+
+      <!-- Multimodal -->
+      <div class="dict-card fade-in">
+        <h4><span class="dot" style="background:var(--c-mm)"></span>多模态 AI</h4>
+        <ul class="dict-list">
+          <li><span class="dict-term">ViT</span><span class="dict-def">Vision Transformer，图像切 patch + 线性投影→Transformer（Ch14）</span></li>
+          <li><span class="dict-term">Patch Embed.</span><span class="dict-def">图像块展平后经线性层投影为 token 向量（Ch14）</span></li>
+          <li><span class="dict-term">CLIP</span><span class="dict-def">双塔对比学习，图文编码器共享嵌入空间（Ch15）</span></li>
+          <li><span class="dict-term">Contrastive</span><span class="dict-def">对比损失：拉近匹配对、推远非匹配对的余弦距离（Ch15）</span></li>
+          <li><span class="dict-term">ClipCap</span><span class="dict-def">CLIP 视觉特征 → 前缀 token → GPT-2 解码文本（Ch16）</span></li>
+          <li><span class="dict-term">DDPM</span><span class="dict-def">前向加噪 x<sub>t</sub>=√ᾱ<sub>t</sub>x₀+√(1−ᾱ<sub>t</sub>)ε，反向 U-Net 预测噪声（Ch17–18）</span></li>
+          <li><span class="dict-term">CFG</span><span class="dict-def">无分类器引导：ε̂ = ε<sub>θ</sub>(x<sub>t</sub>) + w·(ε<sub>c</sub>−ε<sub>u</sub>)，控制文图一致性（Ch19）</span></li>
+          <li><span class="dict-term">U-Net</span><span class="dict-def">编码-解码+跳跃连接的噪声预测骨干网络（Ch18）</span></li>
+          <li><span class="dict-term">DALL·E 2</span><span class="dict-def">CLIP Prior 映射文本→图像嵌入 + 扩散 Decoder 生成（Ch20）</span></li>
+          <li><span class="dict-term">Stable Diff.</span><span class="dict-def">潜空间扩散（VAE+UNet+CLIP），大幅降低计算开销（Ch19）</span></li>
+        </ul>
+      </div>
+
     </div>
-  </section>
 
-</main>
+    <!-- Chapter Index: 2-column grid -->
+    <h2 class="section-title fade-in" id="chapters" style="font-size:24px;margin:56px 0 16px;">章节索引</h2>
+    <p style="color:var(--ink-3);font-size:14px;margin:0 0 20px;">全书 21 章，按四大部分组排列，点击任意章节直接跳转。</p>
+    <div class="chapter-grid">
+
+      <div class="chapter-group">
+        <div class="chapter-group-title">🤖 第一部分：大语言模型（LLM）</div>
+        <a href="llm.html#microgpt"><span class="chapter-num">01</span> MicroGPT — 最小的 GPT</a>
+        <a href="llm.html#llm-intro"><span class="chapter-num">02</span> LLM 简介 — 预测下一个 Token</a>
+        <a href="llm.html#gpt2"><span class="chapter-num">03</span> GPT-2 架构细节与实现</a>
+      </div>
+
+      <div class="chapter-group">
+        <div class="chapter-group-title">🎮 第二部分：强化学习（RL）</div>
+        <a href="rl.html#rl-intro"><span class="chapter-num">04</span> RL 基础 — MDP 与贝尔曼方程</a>
+        <a href="rl.html#policy-gradient"><span class="chapter-num">05</span> 策略梯度法 — 五代进化</a>
+        <a href="rl.html#ppo"><span class="chapter-num">06-07</span> PPO 近端策略优化与实战</a>
+        <a href="rl.html#ppo-math"><span class="chapter-num">08</span> PPO 背后的数学 — KL·CPI·信赖域</a>
+        <a href="rl.html#grpo"><span class="chapter-num">09</span> GRPO 组相对策略优化</a>
+      </div>
+
+      <div class="chapter-group">
+        <div class="chapter-group-title">🎯 第三部分：RLHF 对齐训练</div>
+        <a href="rlhf.html#training-overview"><span class="chapter-num">10</span> LLM 训练全貌概述</a>
+        <a href="rlhf.html#dpo"><span class="chapter-num">11</span> DPO 直接偏好优化</a>
+        <a href="rlhf.html#ppo-llm"><span class="chapter-num">12</span> PPO 微调大模型 (InstructGPT)</a>
+        <a href="rlhf.html#grpo-llm"><span class="chapter-num">13</span> GRPO 微调 — 复刻 DeepSeek-R1</a>
+      </div>
+
+      <div class="chapter-group">
+        <div class="chapter-group-title">🖼️ 第四部分：多模态 AI</div>
+        <a href="multimodal.html#vit"><span class="chapter-num">14</span> ViT — 视觉 Transformer</a>
+        <a href="multimodal.html#clip"><span class="chapter-num">15</span> CLIP — 图文对比学习</a>
+        <a href="multimodal.html#clipcap"><span class="chapter-num">16</span> ClipCap — 图生文</a>
+        <a href="multimodal.html#diffusion"><span class="chapter-num">17-18</span> 扩散模型 — DDPM 理论与实践</a>
+        <a href="multimodal.html#cond-diffusion"><span class="chapter-num">19</span> 条件扩散 — CFG & Stable Diffusion</a>
+        <a href="multimodal.html#dalle2"><span class="chapter-num">20</span> DALL·E 2 — 文生图完整实现</a>
+      </div>
+
+    </div>
+    </div><!-- /ref-zone -->
+
+    <hr class="zone-divider">
+
+    <!-- ═══════════ ZONE E: CLOSE ═══════════ -->
+    <!-- Big Quote / Epilogue -->
+    <div class="big-quote" style="margin-top:64px;">
+      「理解 AI 不是记住公式，而是看见概念之间的连接。」<br>
+      <span style="font-size:14px;color:var(--ink-3);font-weight:400;">—— 本知识地图的每一页，都在帮你建立这些连接。</span>
+    </div>
+
+  </main>
 </div>
+
+<script>
+  // --- Theme Toggle ---
+  const themeToggle = document.getElementById('themeToggle');
+  const body = document.body;
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme === 'dark') { body.classList.add('dark'); themeToggle.textContent = '☀️'; }
+  themeToggle.addEventListener('click', () => {
+    body.classList.toggle('dark');
+    const isDark = body.classList.contains('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+    themeToggle.textContent = isDark ? '☀️' : '🌓';
+  });
+
+  // --- Search ---
+  const searchOverlay = document.getElementById('searchOverlay');
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
+  const searchIndex = [
+    { title: 'MicroGPT — 最小的 GPT', url: 'llm.html#microgpt', keywords: 'MicroGPT GPT 最小 68行' },
+    { title: 'Transformer 架构', url: 'llm.html#transformer', keywords: 'Transformer 注意力 自注意力' },
+    { title: 'GPT-2 架构细节', url: 'llm.html#gpt2', keywords: 'GPT-2 架构 FeedForward GELU' },
+    { title: '位置编码（ALiBi & RoPE）', url: 'llm.html#pos-encoding', keywords: '位置编码 ALiBi RoPE 相对位置' },
+    { title: '生成策略', url: 'llm.html#generation', keywords: 'Beam Search 采样 temperature top-k' },
+    { title: 'MDP 形式化', url: 'rl.html#mdp', keywords: 'MDP 马尔可夫决策过程 Bellman' },
+    { title: 'DQN', url: 'rl.html#dqn', keywords: 'DQN Q-Learning Experience Replay' },
+    { title: 'Policy Gradient', url: 'rl.html#pg', keywords: 'Policy Gradient REINFORCE baseline' },
+    { title: 'PPO & GRPO', url: 'rl.html#ppo', keywords: 'PPO GRPO 近端策略优化' },
+    { title: 'InstructGPT 三阶段', url: 'rlhf.html#instructgpt', keywords: 'InstructGPT SFT RM PPO' },
+    { title: '奖励模型', url: 'rlhf.html#rm', keywords: 'RM 奖励模型 人类偏好' },
+    { title: 'PPO-ptx', url: 'rlhf.html#ppo-ptx', keywords: 'PPO-ptx 预训练梯度保全' },
+    { title: 'DeepSeek-R1', url: 'rlhf.html#deepseek', keywords: 'DeepSeek-R1 GRPO 推理能力' },
+    { title: 'ViT', url: 'multimodal.html#vit', keywords: 'ViT 视觉Transformer patch' },
+    { title: 'CLIP', url: 'multimodal.html#clip', keywords: 'CLIP 对比学习 图文对齐' },
+    { title: 'DALL·E 2', url: 'multimodal.html#dalle2', keywords: 'DALL·E 2 扩散模型 DDPM' },
+    { title: '交叉熵损失推导', url: 'derivations.html#cross-entropy', keywords: '交叉熵 softmax 损失函数' },
+    { title: 'PPO 替代目标推导', url: 'derivations.html#ppo-clip', keywords: 'PPO clip 替代目标 策略梯度' },
+  ];
+  function openSearch() { searchOverlay.classList.add('active'); searchInput.focus(); }
+  function closeSearch() { searchOverlay.classList.remove('active'); searchInput.value = ''; searchResults.innerHTML = ''; }
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
+    if (e.key === 'Escape') closeSearch();
+  });
+  themeToggle.addEventListener('click', () => { /* already handled above */ });
+  searchOverlay.addEventListener('click', (e) => { if (e.target === searchOverlay) closeSearch(); });
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    if (!q) { searchResults.innerHTML = ''; return; }
+    const matches = searchIndex.filter(item =>
+      item.title.toLowerCase().includes(q) || item.keywords.toLowerCase().includes(q)
+    );
+    searchResults.innerHTML = matches.map(m =>
+      `<div class="search-result-item" onclick="location.href='${m.url}'">${m.title}</div>`
+    ).join('');
+  });
+
+  // --- Scroll-triggered Entry Animations ---
+  const fadeEls = document.querySelectorAll('.fade-in');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+  fadeEls.forEach(el => observer.observe(el));
+</script>
+
 </body>
 </html>
