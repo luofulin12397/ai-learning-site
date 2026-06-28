@@ -16,7 +16,10 @@
   margin: 32px 0;
   position: relative;
   overflow: hidden;
+  box-shadow: inset 0 0 80px rgba(99,102,241,0.03);
+  transition: border-color 0.3s;
 }
+.graph-container:hover { border-color: var(--ink-3); }
 .graph-svg { width: 100%; height: 100%; }
 .node { cursor: pointer; transition: all 0.3s; }
 .node:hover { filter: brightness(1.2); }
@@ -74,6 +77,11 @@
       <a class="sidebar-link active" href="knowledge-graph.html"><span class="dot" style="background:var(--ink)"></span>知识图谱</a>
       <a class="sidebar-link" href="derivations.html" style="margin-top:8px;border-top:1px solid var(--border-soft);padding-top:12px"><span class="dot" style="background:var(--ink)"></span>公式与概念详解</a>
     </div>
+    <div class="sidebar-group">
+      <div class="sidebar-group-title">本页导航</div>
+      <a class="sidebar-link" href="#pipeline">训练管线</a>
+      <a class="sidebar-link" href="#glossary">知识要点词典</a>
+    </div>
   </nav>
   <div class="sidebar-footer">
     交互式知识探索 · <span style="font-size:11px;opacity:0.6">Ctrl+K 搜索</span>
@@ -115,86 +123,411 @@
     </div>
   </div>
 
-  <!-- Knowledge Connections Detail -->
+  <hr class="zone-divider" style="margin: 8px 0 0;">
+
+  <!-- Exploration Guide -->
   <section class="section fade-in">
-    <h2>核心知识关联</h2>
-    <p style="color:var(--ink-2);margin-bottom:24px;">这些概念贯穿多个知识分支，理解它们将帮助你建立完整的AI技术栈认知。</p>
+    <h2>图谱探索指引</h2>
+    <p style="color:var(--ink-2);margin-bottom:24px;">在上方图谱中，试试按这些线索追踪——每一条都是理解 AI 技术栈的关键路径。</p>
 
-    <div class="conn-grid">
-      <div class="conn-card">
-        <span class="conn-card-tag" style="background:var(--c-llm)">核心机制</span>
-        <h4>Transformer 与注意力机制</h4>
-        <p>从 GPT-2 的自注意力到 ViT 的图像分块注意力，再到 CLIP 的跨模态注意力——是理解所有模型的基础。</p>
-        <div class="conn-card-branches">
-          <a href="llm.html#gpt2"><span style="color:var(--c-llm)">LLM</span></a>
-          <a href="multimodal.html#vit"><span style="color:var(--c-mm)">ViT</span></a>
-          <a href="multimodal.html#clip"><span style="color:var(--c-mm)">CLIP</span></a>
+    <div class="explore-stack">
+      <div class="explore-card">
+        <div class="explore-body">
+          <h4 style="color:var(--c-llm)">追踪 Transformer 的跨模态之旅</h4>
+          <p>从 2 LLM基础 → 3 GPT-2 → <span style="color:var(--c-mm);font-weight:600">CLIP</span> → <span style="color:var(--c-mm);font-weight:600">ViT</span>，看同一套注意力机制如何在文本和图像两个世界中通用。</p>
         </div>
       </div>
 
-      <div class="conn-card">
-        <span class="conn-card-tag" style="background:var(--c-rl)">算法桥梁</span>
-        <h4>PPO 与 GRPO — 从 RL 到 RLHF</h4>
-        <p>PPO 先在 RL 基础篇用于游戏控制，然后扩展到 LLM 对齐训练（InstructGPT）。GRPO 进一步简化 PPO，专为 LLM 推理任务设计。</p>
-        <div class="conn-card-branches">
-          <a href="rl.html#ppo"><span style="color:var(--c-rl)">RL</span></a>
-          <a href="rlhf.html#ppo-llm"><span style="color:var(--c-rlhf)">RLHF</span></a>
-          <a href="rlhf.html#grpo-llm"><span style="color:var(--c-rlhf)">DeepSeek-R1</span></a>
+      <div class="explore-card">
+        <div class="explore-body">
+          <h4 style="color:var(--c-rl)">PPO → GRPO：强化学习的收敛与简化</h4>
+          <p>从 6 PPO → 8 PPO数学 → ⑨ GRPO，体会 RL 算法如何从游戏控制进化到 DeepSeek-R1 的推理训练。</p>
         </div>
       </div>
 
-      <div class="conn-card">
-        <span class="conn-card-tag" style="background:var(--c-rlhf)">渐进学习</span>
-        <h4>扩散模型 — 从原理到 DALL·E 2</h4>
-        <p>第 17-21 章构成递进路径：扩散基础 → 正向/反向数学 → 条件扩散 → Stable Diffusion → DALL·E 2 → 全书总结。</p>
-        <div class="conn-card-branches">
-          <a href="multimodal.html#diffusion"><span style="color:var(--c-mm)">DDPM</span></a>
-          <a href="multimodal.html#clip"><span style="color:var(--c-mm)">CLIP</span></a>
-          <a href="multimodal.html#dalle2"><span style="color:var(--c-mm)">DALL·E 2</span></a>
+      <div class="explore-card">
+        <div class="explore-body">
+          <h4 style="color:var(--c-rlhf)">RL → RLHF：从游戏到语言</h4>
+          <p>PPO 先在 RL 中用于游戏策略优化，再通过 InstructGPT 进入 LLM 对齐——点击 6 PPO → ⑫ PPO微调，看同一算法如何跨越领域。</p>
         </div>
       </div>
 
-      <div class="conn-card">
-        <span class="conn-card-tag" style="background:var(--c-mm)">桥梁模型</span>
-        <h4>CLIP — 图文理解的关键枢纽</h4>
-        <p>CLIP 连接视觉与语言：在多模态中作为图文对齐模型，在 ClipCap 中驱动图生文，在 DALL·E 2 中提供图文嵌入空间。</p>
-        <div class="conn-card-branches">
-          <a href="multimodal.html#clipcap"><span style="color:var(--c-mm)">ClipCap</span></a>
-          <a href="multimodal.html#dalle2"><span style="color:var(--c-mm)">DALL·E 2</span></a>
+      <div class="explore-card">
+        <div class="explore-body">
+          <h4 style="color:var(--c-mm)">CLIP：多模态的十字路口</h4>
+          <p>CLIP 是图中连接最多的节点之一——向左连接 GPT-2，向右辐射 DALL·E 2、扩散模型、ClipCap。理解 CLIP 就是理解多模态的关键。</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Learning Path Visualization -->
-  <section class="section fade-in">
-    <h2>学习路径</h2>
-    <div class="path-container">
-      <div class="path-flow">
-        <div class="path-step path-step-llm">
-          <div class="path-step-num">STEP 1</div>
-          <h4>大语言模型基础</h4>
-          <p>从 microGPT 入手理解 GPT 架构</p>
-        </div>
-        <div class="path-arrow">→</div>
-        <div class="path-step path-step-rl">
-          <div class="path-step-num">STEP 2</div>
-          <h4>强化学习核心</h4>
-          <p>掌握 MDP、策略梯度、PPO</p>
-        </div>
-        <div class="path-arrow">→</div>
-        <div class="path-step path-step-rlhf">
-          <div class="path-step-num">STEP 3</div>
-          <h4>LLM 对齐训练</h4>
-          <p>DPO、PPO、GRPO 三种方法</p>
-        </div>
-        <div class="path-arrow">→</div>
-        <div class="path-step path-step-mm">
-          <div class="path-step-num">STEP 4</div>
-          <h4>多模态扩展</h4>
-          <p>ViT、CLIP、扩散模型、DALL·E 2</p>
+  <hr class="zone-divider" style="margin: 8px 0 0;">
+
+  <!-- ==================== 训练管线 ==================== -->
+  <section class="section fade-in" id="pipeline">
+    <h2>训练管线</h2>
+    <p style="color:var(--ink-2);margin:0 0 24px;">从原始数据到收敛模型，八个紧密咬合的环节——每个步骤展开，看它在四大分支中如何各显神通。</p>
+
+    <div class="pipeline">
+
+      <!-- STEP 1 -->
+      <div class="pipeline-step">
+        <div class="pipeline-step-num" style="background:var(--c-llm)">1</div>
+        <div class="pipeline-step-body">
+          <div class="pipeline-step-title">预处理与分词</div>
+          <div class="pipeline-step-desc">将原始输入转化为模型可处理的离散 token 序列，定义词汇空间。</div>
+          <div class="pipeline-branches">
+            <div class="pipeline-branch" data-branch="llm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">LLM</div>
+                <div class="pipeline-branch-text">BPE 子词切分，构建 token↔ID 词表（Ch1）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="mm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">多模态</div>
+                <div class="pipeline-branch-text">图像分块（Patch）+ 线性投影 = 图像的"分词"（Ch14）</div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
+
+      <div class="pipeline-connector"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2v16M5 11l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <!-- STEP 2 -->
+      <div class="pipeline-step">
+        <div class="pipeline-step-num" style="background:linear-gradient(135deg,var(--c-llm),var(--c-mm))">2</div>
+        <div class="pipeline-step-body">
+          <div class="pipeline-step-title">嵌入层：离散 → 连续向量</div>
+          <div class="pipeline-step-desc">将离散 token 映射为稠密向量，注入位置信息，进入可微空间。</div>
+          <div class="pipeline-branches">
+            <div class="pipeline-branch" data-branch="llm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">LLM</div>
+                <div class="pipeline-branch-text">wte（词嵌入）+ wpe（位置编码），可学习参数（Ch2–3）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="mm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">多模态</div>
+                <div class="pipeline-branch-text">Patch Embedding（线性投影）+ Position Embedding；CLIP 双塔分别嵌入（Ch14–15）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="mm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">扩散</div>
+                <div class="pipeline-branch-text">时间步嵌入（Timestep Embedding），将扩散时刻 t 编码为向量（Ch17）</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-connector"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2v16M5 11l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <!-- STEP 3 -->
+      <div class="pipeline-step">
+        <div class="pipeline-step-num" style="background:var(--c-llm)">3</div>
+        <div class="pipeline-step-body">
+          <div class="pipeline-step-title">模型架构：前向计算图</div>
+          <div class="pipeline-step-desc">定义从输入到输出的可微计算图，是模型的"骨架"。</div>
+          <div class="pipeline-branches">
+            <div class="pipeline-branch" data-branch="llm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">LLM</div>
+                <div class="pipeline-branch-text">Decoder-Only Transformer：Masked Self-Attention + FFN + 残差 + LayerNorm，L 层（Ch3）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="mm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">ViT</div>
+                <div class="pipeline-branch-text">Encoder-Only Transformer，双向注意力，无因果掩码（Ch14）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="mm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">扩散</div>
+                <div class="pipeline-branch-text">U-Net（卷积 + 注意力混合），非纯 Transformer；DALL·E 2 先验 = Decoder-Only（Ch17,20）</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-connector"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2v16M5 11l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <!-- STEP 4 -->
+      <div class="pipeline-step">
+        <div class="pipeline-step-num" style="background:linear-gradient(135deg,var(--c-llm),var(--c-mm))">4</div>
+        <div class="pipeline-step-body">
+          <div class="pipeline-step-title">前向传播：从嵌入到输出</div>
+          <div class="pipeline-step-desc">输入逐层通过架构，最终投影为可解释的输出分布。</div>
+          <div class="pipeline-branches">
+            <div class="pipeline-branch" data-branch="llm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">LLM</div>
+                <div class="pipeline-branch-text">逐层 Attention→FFN→Norm，lm_head 投影 + Softmax 出 next-token 概率（Ch2–3）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="mm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">CLIP</div>
+                <div class="pipeline-branch-text">文本/图像分别前向 → 点积得相似度 → 对比损失（Ch15）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="mm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">扩散</div>
+                <div class="pipeline-branch-text">输入 (x_t, t) → U-Net → 预测噪声 ε_θ(x_t, t)（Ch17）</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-connector"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2v16M5 11l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <!-- STEP 5 -->
+      <div class="pipeline-step">
+        <div class="pipeline-step-num" style="background:linear-gradient(135deg,var(--c-llm),var(--c-rl))">5</div>
+        <div class="pipeline-step-body">
+          <div class="pipeline-step-title">损失计算：定义优化目标</div>
+          <div class="pipeline-step-desc">损失函数决定模型"往哪个方向学"，是训练的灵魂。</div>
+          <div class="pipeline-branches">
+            <div class="pipeline-branch" data-branch="llm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">LLM 预训练</div>
+                <div class="pipeline-branch-text">Cross-Entropy Loss：−Σ y·log(p)，最大化 next-token 似然（Ch2）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="rl">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">RL</div>
+                <div class="pipeline-branch-text">策略梯度目标 J(θ)=E[log π·R]；PPO L^CLIP；GRPO 组相对目标（Ch5–9）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="rlhf">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">RLHF / DPO</div>
+                <div class="pipeline-branch-text">DPO pairwise loss；PPO-ptx 含 KL 惩罚项；Bradley-Terry 偏好模型（Ch11–13）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="mm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">多模态</div>
+                <div class="pipeline-branch-text">对比损失（CLIP）；MSE ∥ε−ε_θ∥²（扩散）；CE（ViT 分类）（Ch14–17）</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-connector"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2v16M5 11l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <!-- STEP 6 -->
+      <div class="pipeline-step">
+        <div class="pipeline-step-num" style="background:linear-gradient(135deg,var(--c-llm),var(--c-rl))">6</div>
+        <div class="pipeline-step-body">
+          <div class="pipeline-step-title">反向传播：链式法则与 autograd</div>
+          <div class="pipeline-step-desc">损失对参数的梯度，沿计算图逆向传递，为优化提供方向。</div>
+          <div class="pipeline-branches">
+            <div class="pipeline-branch" data-branch="llm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">LLM / 多模态</div>
+                <div class="pipeline-branch-text">∂L/∂W 通过 Transformer 所有层回传；PyTorch autograd 自动完成（各章代码隐含）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="rl">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">RL</div>
+                <div class="pipeline-branch-text">策略梯度直接对 π_θ 求导；Actor-Critic 同时求价值网络梯度（Ch5）</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-connector"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2v16M5 11l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <!-- STEP 7 -->
+      <div class="pipeline-step">
+        <div class="pipeline-step-num" style="background:linear-gradient(135deg,var(--c-rl),var(--c-rlhf))">7</div>
+        <div class="pipeline-step-body">
+          <div class="pipeline-step-title">梯度优化：从 SGD 到 Trust Region</div>
+          <div class="pipeline-step-desc">用梯度更新参数，优化器的进化史 = 训练稳定性的进化史。</div>
+          <div class="pipeline-branches">
+            <div class="pipeline-branch" data-branch="llm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">LLM 预训练</div>
+                <div class="pipeline-branch-text">Adam / AdamW：自适应学习率 + 权重衰减，工业标准优化器（Ch3）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="rl">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">RL 进化</div>
+                <div class="pipeline-branch-text">REINFORCE（高方差）→ Baseline → Actor-Critic → GAE（偏差/方差折中）→ PPO-Clip（Trust Region 工程化）→ GRPO（去掉 Critic）（Ch5–9）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="rlhf">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">RLHF 对齐</div>
+                <div class="pipeline-branch-text">PPO-ptx：PPO + 预训练梯度项 β·∇logP(x) 防遗忘；DPO 只需 SGD（更简单）（Ch11–13）</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pipeline-connector"><svg width="20" height="20" viewBox="0 0 20 20"><path d="M10 2v16M5 11l5 5 5-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+      <!-- STEP 8 -->
+      <div class="pipeline-step">
+        <div class="pipeline-step-num" style="background:linear-gradient(135deg,var(--c-rl),var(--c-rlhf),var(--c-mm))">8</div>
+        <div class="pipeline-step-body">
+          <div class="pipeline-step-title">训练循环与多阶段对齐</div>
+          <div class="pipeline-step-desc">单次更新不够，迭代循环才能收敛；大模型训练往往是多阶段管线。</div>
+          <div class="pipeline-branches">
+            <div class="pipeline-branch" data-branch="llm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">LLM 预训练</div>
+                <div class="pipeline-branch-text">for epoch in epochs: for batch in dataloader: forward → loss → backward → step（Ch3）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="rl">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">RL 训练循环</div>
+                <div class="pipeline-branch-text">Rollout（采样轨迹）→ GAE（算优势）→ Update（多轮 PPO 更新）→ 重复，直到策略收敛（Ch6–7）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="rlhf">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">RLHF 三阶段</div>
+                <div class="pipeline-branch-text">SFT（监督微调）→ RM（训练奖励模型）→ PPO（强化学习对齐）；DPO 可跳过 RM（Ch10–13）</div>
+              </div>
+            </div>
+            <div class="pipeline-branch" data-branch="mm">
+              <span class="pipeline-branch-dot"></span>
+              <div>
+                <div class="pipeline-branch-head">扩散训练/采样</div>
+                <div class="pipeline-branch-text">训练：采样噪声→加噪→预测噪声→MSE；采样：T 步反向去噪链（Ch17–18）</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Formula CTA -->
+  <a href="derivations.html" class="formula-cta fade-in">
+    <div class="formula-cta-icon">∑</div>
+    <div class="formula-cta-body">
+      <h4>公式与概念详解</h4>
+      <p>交叉熵损失、Attention 矩阵乘法、REINFORCE 梯度估计、PPO 替代目标、DDPM 逆向过程… 所有关键公式的完整推导，集中在一页。</p>
+    </div>
+    <div class="formula-cta-arrow">→</div>
+  </a>
+
+  <!-- ============================ 知识要点词典 ============================ -->
+  <section class="section fade-in" id="glossary">
+    <h2>知识要点词典</h2>
+    <p style="color:var(--ink-2);margin:0 0 24px;">40 个核心术语，按四大分支整理，附带精确定义和对应章节。</p>
+
+    <div class="dict-stack">
+
+      <!-- LLM -->
+      <div class="dict-card fade-in" data-branch="llm">
+        <h4><span class="dot" style="background:var(--c-llm)"></span>大语言模型 · LLM</h4>
+        <ul class="dict-list">
+          <li><span class="dict-term" style="background:var(--c-llm)">BPE</span><span class="dict-def">Byte-Pair Encoding：从语料中统计子词频率，迭代合并最高频字节对，构建紧凑词表，解决 OOV 问题<span class="ref">（Ch1）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-llm)">Embedding</span><span class="dict-def">可学习的查找表 wte ∈ ℝ<sup>|V|×d</sup>，把离散 token ID 映射为连续稠密向量，是模型"理解"文字的第一步<span class="ref">（Ch2–3）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-llm)">Self-Attention</span><span class="dict-def">Attention(Q,K,V)=softmax(QK<sup>T</sup>/√d)V，让每个 token 看到序列中所有其他 token，是 Transformer 的核心<span class="ref">（Ch3）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-llm)">Multi-Head</span><span class="dict-def">将 Q/K/V 分成 h 组独立投影，并行计算 h 个注意力头，捕获不同语义子空间的关系<span class="ref">（Ch3）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-llm)">FFN</span><span class="dict-def">每层 Transformer 两次线性变换 + GELU 激活：FFN(x)=W<sub>2</sub>·GELU(W<sub>1</sub>·x)，提供大部分模型参数和非线性<span class="ref">（Ch3）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-llm)">LayerNorm</span><span class="dict-def">沿特征维度做标准化：x̂=(x−μ)/σ，再仿射变换 y=γx̂+β，稳定深层网络训练，Post-LN 放每层末尾<span class="ref">（Ch3）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-llm)">Cross-Entropy</span><span class="dict-def">CE=−Σ<sub>i</sub>y<sub>i</sub>log(p<sub>i</sub>)，在语言模型中 y 是 one-hot 目标 token，等价于最大化正确 token 的对数似然<span class="ref">（Ch2）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-llm)">Softmax</span><span class="dict-def">将任意实向量 z 映射为概率分布：softmax(z)<sub>i</sub>=e<sup>z<sub>i</sub></sup>/Σe<sup>z<sub>j</sub></sup>，语言模型中作用在 logits 上得到下一个 token 概率<span class="ref">（Ch2）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-llm)">RoPE</span><span class="dict-def">旋转位置编码：用旋转矩阵对 q,k 注入相对位置信息，外推性好，是 LLaMA 等现代 LLM 的标准选择<span class="ref">（Ch3）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-llm)">Autoregressive</span><span class="dict-def">自回归：模型一次预测一个 token，把上一步的输出拼回输入，循环直到生成结束符，是 GPT 系列的生成方式<span class="ref">（Ch2–3）</span></span></li>
+        </ul>
+      </div>
+
+      <!-- RL -->
+      <div class="dict-card fade-in" data-branch="rl">
+        <h4><span class="dot" style="background:var(--c-rl)"></span>强化学习 · RL</h4>
+        <ul class="dict-list">
+          <li><span class="dict-term" style="background:var(--c-rl)">MDP</span><span class="dict-def">马尔可夫决策过程 (S,A,P,R,γ)：形式化描述"状态→动作→奖励→下一状态"的交互循环，是 RL 的数学基础<span class="ref">（Ch4）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rl)">Bellman Eq.</span><span class="dict-def">价值函数的递归定义：V<sup>π</sup>(s)=E<sub>a∼π</sub>[R(s,a)+γ·V<sup>π</sup>(s′)]，是动态规划和价值迭代的理论核心<span class="ref">（Ch4）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rl)">Q-Learning</span><span class="dict-def">经典的 TD 学习算法：用 Q 表存储状态-动作价值，通过时序差分更新，off-policy，收敛到最优 Q*<span class="ref">（Ch4）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rl)">DQN</span><span class="dict-def">Deep Q-Network：用神经网络替代 Q 表，配合 Experience Replay（打破相关性）和 Target Network（稳定目标），在 Atari 上超越人类<span class="ref">（Ch4）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rl)">Policy Gradient</span><span class="dict-def">直接优化策略参数：∇J(θ)=E<sub>τ∼π<sub>θ</sub></sub>[∇log π<sub>θ</sub>(a|s)·R(τ)]，用回合总回报作为基线Free 的梯度方向<span class="ref">（Ch5）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rl)">Actor-Critic</span><span class="dict-def">Actor（策略网络）输出动作，Critic（价值网络）估计状态价值做基线，两者联合训练降低策略梯度的方差<span class="ref">（Ch5）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rl)">GAE</span><span class="dict-def">Generalized Advantage Estimation：Â<sub>t</sub><sup>GAE</sup>=Σ(γλ)<sup>l</sup>δ<sub>t+l</sub>，λ∈[0,1] 在偏差（TD(0)）与方差（MC）间平滑折中<span class="ref">（Ch5）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rl)">PPO-Clip</span><span class="dict-def">Proximal Policy Optimization：用 clip 函数限制重要性采样比率 r<sub>t</sub>(θ)∈[1−ε,1+ε]，是 Trust Region 的简洁工程实现，ChatGPT 的训练算法<span class="ref">（Ch6–8）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rl)">GRPO</span><span class="dict-def">Group Relative Policy Optimization：对每个 prompt 采样 G 个回答，用组内相对排序替代 Critic 网络，省去价值函数估计，降低内存<span class="ref">（Ch9）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rl)">Trust Region</span><span class="dict-def">信赖域：约束策略更新幅度 D<sub>KL</sub>(π<sub>old</sub>‖π<sub>new</sub>)≤δ，防止单次更新破坏已学行为，TRPO 用共轭梯度精确求解，PPO 用 clip 近似<span class="ref">（Ch8）</span></span></li>
+        </ul>
+      </div>
+
+      <!-- RLHF -->
+      <div class="dict-card fade-in" data-branch="rlhf">
+        <h4><span class="dot" style="background:var(--c-rlhf)"></span>RLHF 对齐训练</h4>
+        <ul class="dict-list">
+          <li><span class="dict-term" style="background:var(--c-rlhf)">SFT</span><span class="dict-def">Supervised Fine-Tuning：在高质量 (prompt, response) 对上做有监督训练，让模型学会"按指令回答"的基本格式<span class="ref">（Ch10）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rlhf)">RM</span><span class="dict-def">Reward Model：一个 Transformer 末尾加标量头，对同一 prompt 的两个回答打分 r<sub>θ</sub>(x,y)，训练目标是让高分回答排序靠前<span class="ref">（Ch10）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rlhf)">PPO-ptx</span><span class="dict-def">PPO for LLM：在 PPO 目标上加预训练梯度项 β·log P<sub>ref</sub>(x)，防止模型在对齐训练中遗忘通用语言能力<span class="ref">（Ch12）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rlhf)">KL Penalty</span><span class="dict-def">在 PPO 目标中加入 −β·D<sub>KL</sub>(π<sub>ref</sub>‖π<sub>θ</sub>)，约束当前策略不偏离参考模型太远，是防止"奖励黑客"的关键<span class="ref">（Ch12）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rlhf)">DPO</span><span class="dict-def">Direct Preference Optimization：在 Bradley-Terry 模型下推导出的封闭解，把 RLHF 的三阶段压缩成一个 SGD 分类 loss，无需 RM 和 PPO<span class="ref">（Ch11）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rlhf)">Bradley-Terry</span><span class="dict-def">P(y<sub>w</sub>≻y<sub>l</sub>)=σ(r(y<sub>w</sub>)−r(y<sub>l</sub>))：用 sigmoid 建模人类对两个回答的偏好概率，是 RLHF 和 DPO 的共同理论基础<span class="ref">（Ch11）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rlhf)">Rejection Samp.</span><span class="dict-def">拒绝采样微调：对每个 prompt 生成 K 个回答，用 RM 打分保留前 N 个，用这些高质量样本做 SFT，是 PPO 前的朴素对齐方法<span class="ref">（Ch10）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rlhf)">GRPO-LLM</span><span class="dict-def">把 GRPO 用于 LLM 对齐：对每个 prompt 采样 G 个回答，用 RM 打分后计算组内相对优势，无需单独训练 RM（DeepSeek-R1 做法）<span class="ref">（Ch13）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rlhf)">DeepSeek-R1</span><span class="dict-def">用 GRPO 做推理对齐的旗舰模型：先 SFT 冷启动，再做多轮 GRPO，让模型自发产生"链式思考"和自检行为<span class="ref">（Ch13）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-rlhf)">InstructGPT</span><span class="dict-def">OpenAI 的三阶段对齐管线：SFT（教格式）→ RM（学偏好）→ PPO（强化对齐），是 RLHF 在 LLM 上的第一次成功实践<span class="ref">（Ch12）</span></span></li>
+        </ul>
+      </div>
+
+      <!-- Multimodal -->
+      <div class="dict-card fade-in" data-branch="mm">
+        <h4><span class="dot" style="background:var(--c-mm)"></span>多模态 AI</h4>
+        <ul class="dict-list">
+          <li><span class="dict-term" style="background:var(--c-mm)">ViT</span><span class="dict-def">Vision Transformer：把图像切成 N 个 P×P patch，每个 patch 展平后线性投影为 token，像处理文本一样处理图像，分类用在 [CLS] token 上<span class="ref">（Ch14）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-mm)">Patch Embed.</span><span class="dict-def">图像块嵌入：将每个 P×P×3 的 patch 展平为 P²·3 维向量，再经可学习线性层 E∈ℝ<sup>(P²·3)×d</sup> 投影为 d 维 token<span class="ref">（Ch14）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-mm)">CLIP</span><span class="dict-def">Contrastive Language-Image Pre-training：用双塔（文本 Transformer + 图像 ViT）做对比学习，把匹配的图文对拉近距离，是多模态的基础预训练范式<span class="ref">（Ch15）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-mm)">Contrastive</span><span class="dict-def">对比损失 L=−log[exp(sim(i,t)/τ)/Σexp(sim/τ)]：分子是匹配对的相似度，分母是所有对的相似度之和，训练目标是让对角线元素最大<span class="ref">（Ch15）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-mm)">ClipCap</span><span class="dict-def">用 CLIP 提取图像嵌入，映射为少量"前缀 token"，拼在文本前面输入 GPT-2，让语言模型以图像为上下文继续生成，实现图像描述<span class="ref">（Ch16）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-mm)">DDPM</span><span class="dict-def">Denoising Diffusion Probabilistic Model：前向 T 步逐渐加高斯噪声至纯噪，反向用 U-Net 学 p<sub>θ</sub>(x<sub>t−1</sub>|x<sub>t</sub>)，训练目标是预测所加噪声 ε<span class="ref">（Ch17–18）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-mm)">CFG</span><span class="dict-def">Classifier-Free Guidance：ε̂ = ε<sub>θ</sub>(x<sub>t</sub>) + w·[ε<sub>θ</sub>(x<sub>t</sub>,c)−ε<sub>θ</sub>(x<sub>t</sub>,∅)]，在条件生成和无条件生成之间做线性外推，w 越大图像与提示越一致（但可能过饱和）<span class="ref">（Ch19）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-mm)">U-Net</span><span class="dict-def">扩散模型的骨干网络：编码器逐级下采样 + 解码器上采样 + 跳跃连接（skip connection）保留细节，每个残差块里嵌有时间步嵌入，是 DDPM 的标准架构<span class="ref">（Ch18）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-mm)">DALL·E 2</span><span class="dict-def">两阶段文生图：先训 CLIP Prior（把文本嵌入映射到图像嵌入空间），再用扩散 Decoder（Glide）从图像嵌入生成像素，实现"文本→图像"的完整管线<span class="ref">（Ch20）</span></span></li>
+          <li><span class="dict-term" style="background:var(--c-mm)">Stable Diff.</span><span class="dict-def">Stable Diffusion：在 VAE 的潜空间（而非像素空间）做扩散，U-Net 输入通道数大幅降低，在相同质量下提速 4–8×，是文生图的主流方案<span class="ref">（Ch19）</span></span></li>
+        </ul>
+      </div>
+
     </div>
   </section>
 

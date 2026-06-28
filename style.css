@@ -596,6 +596,30 @@ a.math-block:hover::after { opacity: 1; }
   letter-spacing: 0.04em;
 }
 .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-scroll-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin-top: 40px;
+  color: #64748b;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  opacity: 0.7;
+  animation: hero-scroll-pulse 2.5s ease-in-out infinite;
+}
+.hero-scroll-hint svg {
+  animation: hero-scroll-bounce 2s ease-in-out infinite;
+}
+@keyframes hero-scroll-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 0.85; }
+}
+@keyframes hero-scroll-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
 .hero-zone .btn-primary {
   background: var(--c-llm);
   color: #fff;
@@ -737,13 +761,18 @@ body.dark .hero-zone .btn-outline { border-color: rgba(255,255,255,0.25); }
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0;
-  height: 2px;
+  height: 3px;
   border-radius: var(--r-lg) var(--r-lg) 0 0;
   background: var(--border);
+  transition: height 0.2s;
 }
+.guide-card:hover::before { height: 4px; }
 .guide-card:nth-child(1)::before { background: var(--c-llm); }
 .guide-card:nth-child(2)::before { background: var(--c-rl); }
 .guide-card:nth-child(3)::before { background: var(--c-rlhf); }
+.guide-card[data-guide="llm"] .guide-path { background: rgba(99,102,241,0.08); color: var(--c-llm); }
+.guide-card[data-guide="rl"] .guide-path { background: rgba(5,150,105,0.08); color: var(--c-rl); }
+.guide-card[data-guide="rlhf"] .guide-path { background: rgba(217,119,6,0.08); color: var(--c-rlhf); }
 .guide-head {
   display: flex;
   flex-direction: column;
@@ -751,6 +780,12 @@ body.dark .hero-zone .btn-outline { border-color: rgba(255,255,255,0.25); }
   margin-bottom: 10px;
 }
 .guide-dot { font-size: 22px; margin-bottom: 4px; line-height: 1; }
+.guide-icon {
+  font-size: 28px;
+  margin-bottom: 6px;
+  line-height: 1;
+  display: block;
+}
 .guide-label {
   font-family: var(--font-display);
   font-weight: 700;
@@ -956,6 +991,11 @@ body.dark .hero-zone .btn-outline { border-color: rgba(255,255,255,0.25); }
   border-top: 3px solid var(--border);
   position: relative;
   overflow: hidden;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.chapter-group:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 .chapter-group:nth-child(1) { border-top-color: var(--c-llm); }
 .chapter-group:nth-child(2) { border-top-color: var(--c-rl); }
@@ -1204,35 +1244,40 @@ body.dark .hero-zone .btn-outline { border-color: rgba(255,255,255,0.25); }
 .deriv-index {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin: 24px 0 40px;
+  gap: 14px;
+  margin: 28px 0 44px;
 }
 .deriv-index-col {
   background: var(--bg-card);
   border: 1px solid var(--border);
-  border-radius: var(--r-md);
+  border-radius: var(--r-lg);
   overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.deriv-index-col:hover {
+  box-shadow: var(--shadow-sm);
 }
 .deriv-index-head {
   font-family: var(--font-mono);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: #fff;
-  padding: 6px 14px;
+  padding: 8px 14px;
   letter-spacing: 0.06em;
   text-align: center;
 }
 .deriv-index-col a {
   display: block;
-  padding: 7px 14px;
+  padding: 8px 14px;
   font-size: 13px;
   color: var(--ink-2);
   border-top: 1px solid var(--border-soft);
   transition: background 0.15s, padding-left 0.15s, color 0.15s;
+  text-decoration: none;
 }
 .deriv-index-col a:hover {
   background: var(--bg-soft);
-  padding-left: 20px;
+  padding-left: 18px;
   color: var(--ink);
 }
 @media (max-width: 768px) {
@@ -1240,6 +1285,11 @@ body.dark .hero-zone .btn-outline { border-color: rgba(255,255,255,0.25); }
 }
 @media (max-width: 480px) {
   .deriv-index { grid-template-columns: 1fr; }
+}
+
+body.dark .deriv-index-col {
+  background: var(--bg-card);
+  border-color: var(--border);
 }
 
 /* --- Graph Legend (knowledge-graph.html) --- */
@@ -1424,17 +1474,6 @@ body.dark .hero-zone .btn-outline { border-color: rgba(255,255,255,0.25); }
 .theme-toggle:hover { transform: scale(1.1); }
 
 /* --- Dark Mode --- */
-body.dark {
-  --ink: #f3f4f6;
-  --ink-2: #d1d5db;
-  --ink-3: #9ca3af;
-  --bg: #111827;
-  --bg-card: #1f2937;
-  --bg-soft: #374151;
-  --bg-code: #0f172a;
-  --border: #374151;
-  --border-soft: #4b5563;
-}
 
 /* --- Scroll-triggered Entry Animations --- */
 .fade-in {
@@ -1649,30 +1688,83 @@ body.dark {
 }
 
 /* --- Derivations Section Rhythm (derivations.html) --- */
-.deriv-section {
-  margin-bottom: 48px;
+.deriv-main .section {
+  margin-bottom: 56px;
+  scroll-margin-top: 80px;
 }
-.deriv-section h2 {
-  font-size: 22px;
-  margin: 0 0 6px;
+
+/* Step headings */
+.deriv-main .section h3 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 28px 0 10px;
+  color: var(--ink);
 }
-.deriv-def {
-  font-size: 13px;
-  color: var(--ink-3);
-  margin: 0 0 16px;
-  padding: 8px 14px;
-  background: var(--bg-soft);
-  border-radius: var(--r-sm);
+.deriv-main .section h3::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--ink-3);
+  flex-shrink: 0;
+}
+
+/* Sub-step heading */
+.deriv-main .section h4 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 20px 0 8px;
+  color: var(--ink);
+  padding-left: 12px;
   border-left: 3px solid var(--border);
-  line-height: 1.6;
 }
-.deriv-section.deriv-llm .deriv-def { border-left-color: var(--c-llm); }
-.deriv-section.deriv-rl .deriv-def { border-left-color: var(--c-rl); }
-.deriv-section.deriv-rlhf .deriv-def { border-left-color: var(--c-rlhf); }
-.deriv-section.deriv-mm .deriv-def { border-left-color: var(--c-mm); }
-.deriv-back {
+
+/* Enhanced math blocks */
+.deriv-main .math-block {
+  background: var(--bg-soft);
+  border-left: 3px solid var(--border);
+  border-radius: 0 var(--r-sm) var(--r-sm) 0;
+  padding: 14px 18px;
+  margin: 12px 0 16px;
+  font-size: 14px;
+  line-height: 1.75;
+  overflow-x: auto;
+}
+.deriv-main .math-block strong {
+  color: var(--ink);
+}
+
+/* Derivation step list */
+.deriv-main .section ul {
+  margin: 8px 0 16px;
+  padding-left: 20px;
+  color: var(--ink-2);
+  font-size: 13.5px;
+  line-height: 1.7;
+}
+.deriv-main .section ul li { margin-bottom: 4px; }
+.deriv-main .section ul li strong { color: var(--ink); }
+
+/* Regular paragraphs in derivations */
+.deriv-main .section > p {
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--ink-2);
+  margin: 8px 0 12px;
+}
+
+/* Callout boxes */
+.deriv-main .callout {
+  margin: 20px 0 24px;
+  border-radius: var(--r-md);
+}
+
+/* Back links */
+.deriv-main .deriv-back {
   display: inline-block;
-  margin-top: 16px;
+  margin-top: 12px;
   font-size: 12px;
   font-family: var(--font-mono);
   color: var(--ink-3);
@@ -1683,15 +1775,37 @@ body.dark {
   transition: all 0.15s;
   text-decoration: none;
 }
-.deriv-back:hover {
+.deriv-main .deriv-back:hover {
   color: var(--ink);
   background: var(--bg-card);
   border-color: var(--border);
 }
-.deriv-section-sep {
-  border: none;
-  border-top: 1px solid var(--border-soft);
-  margin: 0 0 40px;
+
+/* Code blocks */
+.deriv-main .code-block {
+  margin: 12px 0 16px;
+}
+
+/* Chapter separator */
+.deriv-main .chapter-sep {
+  height: 1px;
+  background: var(--border-soft);
+  margin: 48px 0 40px;
+}
+
+/* Dark mode */
+body.dark .deriv-main .math-block {
+  border-left-color: var(--border);
+}
+body.dark .deriv-main .section h3::before {
+  background: var(--ink-3);
+}
+
+/* Responsive */
+@media (max-width: 680px) {
+  .deriv-main .math-block { font-size: 13px; padding: 12px 14px; }
+  .deriv-main .section h3 { font-size: 14px; }
+  .deriv-main .section h4 { font-size: 13px; }
 }
 
 /* --- Pipeline (homepage 训练管线 — 新版) --- */
@@ -1902,6 +2016,9 @@ body.dark {
   --bg-soft: #162032;
   --border: #2d3f55;
   --border-soft: #233044;
+  --shadow-sm: 0 1px 2px rgba(0,0,0,0.2);
+  --shadow-md: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.35);
 }
 body.dark .pipeline-step-num {
   box-shadow: 0 0 0 3px var(--bg-card), 0 0 0 4px var(--border);
@@ -1918,3 +2035,131 @@ body.dark .dict-card {
   background: var(--bg-card);
   border-color: var(--border);
 }
+body.dark .dict-list li:nth-child(even),
+body.dark .dict-list li:hover { background: rgba(255,255,255,0.03); }
+body.dark .big-quote::before { color: var(--border); }
+body.dark .explore-card:hover {
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+}
+
+/* --- Explore Stack (图谱探索指引) --- */
+.explore-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0 0 32px;
+  padding-left: 32px;
+  border-left: 2px solid var(--border-soft);
+}
+.explore-card {
+  position: relative;
+  padding: 16px 0 24px 28px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+.explore-card:last-child { padding-bottom: 0; }
+.explore-card:hover { transform: translateX(4px); }
+.explore-card::before {
+  content: '0';
+  position: absolute;
+  left: -42px; top: 14px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink-3);
+  z-index: 2;
+}
+.explore-card:nth-child(1)::before { content:'1'; background: var(--c-llm); }
+.explore-card:nth-child(2)::before { content:'2'; background: var(--c-rl); }
+.explore-card:nth-child(3)::before { content:'3'; background: var(--c-rlhf); }
+.explore-card:nth-child(4)::before { content:'4'; background: var(--c-mm); }
+.explore-badge {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+.explore-body h4 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.explore-body p {
+  font-size: 13.5px;
+  color: var(--ink-2);
+  margin: 0;
+  line-height: 1.7;
+  max-width: 580px;
+}
+.explore-body span { white-space: nowrap; }
+
+/* dark mode */
+body.dark .explore-stack { border-left-color: var(--border); }
+body.dark .explore-card::before { border: 2px solid var(--bg); }
+
+/* responsive */
+@media (max-width: 680px) {
+  .explore-stack { padding-left: 24px; }
+  .explore-card { padding: 12px 0 20px 20px; }
+  .explore-card::before { left: -33px; width: 16px; height: 16px; font-size: 9px; }
+  .explore-body p { max-width: 100%; font-size: 13px; }
+}
+
+/* --- Dict Stack (知识要点词典) --- */
+.dict-stack { display:flex; flex-direction:column; gap:16px; margin:0 0 48px; }
+.dict-card { background:var(--bg-card); border:1px solid var(--border); border-radius:var(--r-lg); padding:20px 24px 14px; transition:border-color .2s, box-shadow .2s; position:relative; }
+.dict-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 3px;
+  height: 100%;
+  background: var(--border);
+  border-radius: var(--r-lg) 0 0 var(--r-lg);
+  transition: width 0.2s;
+}
+.dict-card[data-branch="llm"]::before { background: var(--c-llm); }
+.dict-card[data-branch="rl"]::before { background: var(--c-rl); }
+.dict-card[data-branch="rlhf"]::before { background: var(--c-rlhf); }
+.dict-card[data-branch="mm"]::before { background: var(--c-mm); }
+.dict-card:hover { border-color:var(--ink-3); box-shadow:0 2px 12px rgba(0,0,0,0.05); }
+.dict-card h4 { margin:0 0 12px; font-size:14px; font-weight:700; display:flex; align-items:center; gap:8px; padding-bottom:10px; border-bottom:1px solid var(--border-soft); }
+.dict-card h4 .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.dict-list { display:flex; flex-direction:column; gap:0; margin:0; padding:0; list-style:none; }
+.dict-list li {
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+  padding:12px 14px;
+  border-radius: var(--r-sm);
+  transition: background 0.18s;
+}
+.dict-list li:nth-child(even) { background: var(--bg-soft); }
+.dict-list li:hover { background: var(--bg-soft); }
+.dict-term {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 12px;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  align-self: flex-start;
+  white-space: nowrap;
+  line-height: 1.6;
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: default;
+}
+.dict-term:hover { transform: translateY(-1px); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+.dict-def { color: var(--ink-2); font-size: 13px; line-height: 1.6; }
+.dict-def .ref { color: var(--ink-3); font-size: 11px; margin-left: 4px; font-family: var(--font-mono); }
